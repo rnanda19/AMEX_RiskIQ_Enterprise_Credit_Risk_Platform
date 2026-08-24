@@ -29,6 +29,11 @@ Organized as 18 sequential notebooks around the CRISP-DM lifecycle: Business Und
 
 ![Architecture](assets/architecture_diagram.png)
 
+## Live Dashboards
+
+- 📊 [Financial Impact Dashboard](https://rnanda19.github.io/AMEX_RiskIQ_Enterprise_Credit_Risk_Platform/Problem1_Credit_Scoring_PD_Prediction/reports/executive_reports/Financial_Impact_Dashboard.html) — interactive ROI, revenue-impact, and loss-reduction dashboard
+- 📈 [Power BI Dashboard Preview](https://rnanda19.github.io/AMEX_RiskIQ_Enterprise_Credit_Risk_Platform/Problem1_Credit_Scoring_PD_Prediction/reports/powerbi_dashboard/PowerBI_Dashboard_Preview.html) — star-schema data model and dashboard preview
+
 ## 5. Key Results & Visuals
 
 - Total RWA (computed, Basel III, Notebook 08): $203,644,380

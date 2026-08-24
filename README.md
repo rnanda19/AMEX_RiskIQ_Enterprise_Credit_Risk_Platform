@@ -21,6 +21,13 @@ Every number in this repository is either computed live by that notebook's own c
 | Risk tiers defined (Problem 2) | 4, chi-square p≈0.0, Cramér's V 0.76 |
 | Live FastAPI self-test, both problems (measured) | Pass |
 
+## Live Dashboards
+
+- 📊 [Financial Impact Dashboard](https://rnanda19.github.io/AMEX_RiskIQ_Enterprise_Credit_Risk_Platform/Problem1_Credit_Scoring_PD_Prediction/reports/executive_reports/Financial_Impact_Dashboard.html) — interactive ROI, revenue-impact, and loss-reduction dashboard for Problem 1
+- 📈 [Power BI Dashboard Preview](https://rnanda19.github.io/AMEX_RiskIQ_Enterprise_Credit_Risk_Platform/Problem1_Credit_Scoring_PD_Prediction/reports/powerbi_dashboard/PowerBI_Dashboard_Preview.html) — star-schema data model and dashboard preview
+
+(Served via GitHub Pages — click through to view them rendered directly in your browser.)
+
 ## Repository Structure
 
 ```
