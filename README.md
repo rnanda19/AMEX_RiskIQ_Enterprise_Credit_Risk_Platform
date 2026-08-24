@@ -1,6 +1,6 @@
 # AMEX RiskIQ: Enterprise Credit Risk Platform
 
-[![Python 3.11](https://img.shields.io/badge/python-3.11-blue.svg)]() [![CRISP-DM](https://img.shields.io/badge/methodology-CRISP--DM-informational.svg)]() [![License: All Rights Reserved](https://img.shields.io/badge/license-All%20Rights%20Reserved-lightgrey.svg)](LICENSE)
+[![CI](https://github.com/rnanda19/AMEX_RiskIQ_Enterprise_Credit_Risk_Platform/actions/workflows/ci.yml/badge.svg)](https://github.com/rnanda19/AMEX_RiskIQ_Enterprise_Credit_Risk_Platform/actions/workflows/ci.yml) [![Python 3.11](https://img.shields.io/badge/python-3.11-blue.svg)]() [![CRISP-DM](https://img.shields.io/badge/methodology-CRISP--DM-informational.svg)]() [![License: All Rights Reserved](https://img.shields.io/badge/license-All%20Rights%20Reserved-lightgrey.svg)](LICENSE)
 
 An enterprise-grade credit risk platform built end-to-end on the real Kaggle **American Express Default Prediction** dataset. This repository holds **Phase 1: Foundation** of a larger 14-problem, 5-phase roadmap — Problem 1 (Probability of Default) and Problem 2 (Risk Tier Classification), 25 notebooks combined. Later phases (Regulatory & Loss Provisioning, Behavioral Intelligence, Operational Risk Management, Customer & Business Intelligence) are in active development.
 
@@ -36,11 +36,36 @@ AMEX_RiskIQ_Enterprise_Credit_Risk_Platform/
 │                                              production architecture & comprehensive reporting
 ├── Problem2_Risk_Tier_Classification/        7 notebooks -- maps Problem 1's real PD score to
 │                                              discrete, validated, deployed & monitored risk tiers
+├── shared/                                   Cross-problem library (metrics, config, monitoring),
+│                                              extracted & unit-tested -- see shared/tests/
+├── scripts/                                  CI helper scripts (notebook syntax checker)
+├── .github/workflows/                        CI: notebook syntax check, unit tests, lint
+├── CONTRIBUTING.md                           Engineering standards this repo follows
+├── ROADMAP.md                                Hardening-track + problem-roadmap status, both tracks
 ├── LICENSE
 └── README.md   (this file)
 ```
 
-Each subfolder is a complete, independently runnable package with its own `README.md`, `notebooks/`, `src/` (FastAPI service + Docker), `reports/` (real Word reports per pillar), `docs/`, `models/`, and `requirements.txt`. Start with each subfolder's own README for full detail.
+Each subfolder is a complete, independently runnable package with its own `README.md`, `notebooks/`, `src/` (FastAPI service + Docker), `tests/` (pytest), `reports/` (real Word reports per pillar), `docs/`, `models/`, and `requirements.txt`. Start with each subfolder's own README for full detail.
+
+## Engineering & Testing
+
+- **CI** (`.github/workflows/ci.yml`) runs on every push: a syntax check of
+  every code cell in every notebook (`scripts/check_notebook_syntax.py`),
+  the unit test suite, and lint (pyflakes, currently advisory — see
+  `docs/known_lint_findings.md`).
+- **Tests** cover the parts of this platform that are already standalone,
+  real Python (not notebook cells): the FastAPI scoring service and the
+  monitoring job, tested against small, genuinely-fit synthetic fixtures
+  so CI never needs the real multi-GB trained model — see
+  `Problem1_Credit_Scoring_PD_Prediction/tests/conftest.py` for how, and
+  `MODEL_CARD.md` in that same folder for what the real trained numbers
+  are.
+- **`shared/`** holds logic extracted, byte-verified-identical, from the
+  notebooks that first defined it (the official AMEX competition metric,
+  the platform config loader, the PSI monitoring helper) — a single tested
+  copy instead of duplicated inline code. See `shared/__init__.py` and
+  `ROADMAP.md` for why the notebooks aren't wired to import from it yet.
 
 ## How to Run
 

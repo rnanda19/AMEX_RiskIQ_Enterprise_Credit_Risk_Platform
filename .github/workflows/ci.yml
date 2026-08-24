@@ -1,0 +1,51 @@
+name: CI
+
+# Runs on every push/PR touching main. Three checks, all fast (seconds, not
+# minutes) because none of them touch the real Kaggle dataset or the real
+# multi-GB trained model artifacts -- see shared/tests/ and each Problem's
+# tests/ for how synthetic-but-structurally-real fixtures make that possible.
+on:
+  push:
+    branches: [main]
+  pull_request:
+    branches: [main]
+
+jobs:
+  notebook-syntax-check:
+    name: Notebook syntax check (ast.parse every code cell)
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+      - run: python scripts/check_notebook_syntax.py .
+
+  unit-tests:
+    name: Unit tests (shared/ + each Problem's tests/)
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+      - run: pip install -r requirements-dev.txt
+      - run: python -m pytest shared/tests -v
+      - name: Problem 1 tests
+        run: python -m pytest Problem1_Credit_Scoring_PD_Prediction/tests -v
+        if: hashFiles('Problem1_Credit_Scoring_PD_Prediction/tests/**') != ''
+      - name: Problem 2 tests
+        run: python -m pytest Problem2_Risk_Tier_Classification/tests -v
+        if: hashFiles('Problem2_Risk_Tier_Classification/tests/**') != ''
+
+  lint:
+    name: Lint (pyflakes -- unused imports, undefined names)
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+      - run: pip install pyflakes
+      - run: pyflakes shared/ scripts/ Problem1_Credit_Scoring_PD_Prediction/src Problem1_Credit_Scoring_PD_Prediction/tests
+        continue-on-error: true  # advisory for now -- see ROADMAP.md "make lint blocking"
