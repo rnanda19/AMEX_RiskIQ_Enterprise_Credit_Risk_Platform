@@ -54,18 +54,20 @@ Each subfolder is a complete, independently runnable package with its own `READM
   every code cell in every notebook (`scripts/check_notebook_syntax.py`),
   the unit test suite, and lint (pyflakes, currently advisory — see
   `docs/known_lint_findings.md`).
-- **Tests** cover the parts of this platform that are already standalone,
-  real Python (not notebook cells): the FastAPI scoring service and the
-  monitoring job, tested against small, genuinely-fit synthetic fixtures
-  so CI never needs the real multi-GB trained model — see
-  `Problem1_Credit_Scoring_PD_Prediction/tests/conftest.py` for how, and
-  `MODEL_CARD.md` in that same folder for what the real trained numbers
-  are.
-- **`shared/`** holds logic extracted, byte-verified-identical, from the
-  notebooks that first defined it (the official AMEX competition metric,
-  the platform config loader, the PSI monitoring helper) — a single tested
-  copy instead of duplicated inline code. See `shared/__init__.py` and
-  `ROADMAP.md` for why the notebooks aren't wired to import from it yet.
+- **Tests** (41 passing, both problems + `shared/`) cover the parts of this
+  platform that are already standalone, real Python (not notebook cells):
+  both problems' FastAPI scoring services and Problem 1's monitoring job,
+  tested against small, genuinely-fit synthetic fixtures so CI never needs
+  the real multi-GB trained model — see each problem's
+  `tests/conftest.py` for how, and each problem's `MODEL_CARD.md` for what
+  the real trained numbers are.
+- **`shared/`** holds logic extracted, byte-verified-identical (or, for
+  Problem 2's tier assignment, generalized with the exact same behavior),
+  from the notebooks/services that first defined it: the official AMEX
+  competition metric, the platform config loader, the PSI monitoring
+  helper, and threshold-band assignment — a single tested copy instead of
+  duplicated inline code. See `shared/__init__.py` and `ROADMAP.md` for why
+  the notebooks aren't wired to import from it yet.
 
 ## How to Run
 
