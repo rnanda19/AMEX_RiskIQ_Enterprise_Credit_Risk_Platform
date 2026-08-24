@@ -1,0 +1,98 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>AMEX PD Scoring -- Power BI Report Preview (Static)</title>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.0/chart.umd.min.js"></script>
+<style>
+  body { font-family: -apple-system, Segoe UI, Arial, sans-serif; margin: 0; background: #f4f4f2; color: #0b0b0b; }
+  header { background: #0b2a4a; color: white; padding: 20px 28px; }
+  header h1 { margin: 0 0 4px 0; font-size: 20px; }
+  header p { margin: 0; font-size: 13px; opacity: 0.85; }
+  .banner { background: #d69a2a; color: #2a1c00; padding: 10px 28px; font-size: 13px; font-weight: 600; }
+  .kpis { display: flex; gap: 16px; padding: 20px 28px; flex-wrap: wrap; }
+  .kpi { background: white; border-radius: 8px; padding: 16px 20px; box-shadow: 0 1px 3px rgba(0,0,0,0.08); min-width: 170px; }
+  .kpi .label { font-size: 12px; color: #52514e; }
+  .kpi .value { font-size: 24px; font-weight: 700; color: #0b2a4a; }
+  .charts { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; padding: 0 28px 28px 28px; }
+  .chart-card { background: white; border-radius: 8px; padding: 16px; box-shadow: 0 1px 3px rgba(0,0,0,0.08); }
+  .chart-card h3 { margin: 0 0 10px 0; font-size: 14px; color: #0b2a4a; }
+  canvas { max-height: 280px; }
+  .fallback { display: none; padding: 40px; text-align: center; color: #52514e; }
+  footer { padding: 16px 28px; font-size: 12px; color: #52514e; }
+</style>
+</head>
+<body>
+<header>
+  <h1>AMEX Enterprise Credit Risk Platform -- Power BI Report Preview</h1>
+  <p>Phase 1 &middot; Problem 1 -- Credit Scoring / PD Prediction &middot; Champion: xgboost (model version 1) &middot; Generated 2026-08-23 23:07</p>
+</header>
+<div class="banner">STATIC PREVIEW ONLY -- this approximates the intended Power BI report layout. It is not the real, interactive .pbix. Build that in Power BI Desktop using fact_customer_risk_scores.csv/.parquet, the dim_*.csv files, and dax_measures.dax in this same folder.</div>
+<div class="kpis">
+  <div class="kpi"><div class="label">Total Accounts (Holdout)</div><div class="value" id="kpiTotal">--</div></div>
+  <div class="kpi"><div class="label">Actual Default Rate</div><div class="value" id="kpiDefaultRate">--</div></div>
+  <div class="kpi"><div class="label">Average Predicted PD</div><div class="value" id="kpiAvgPd">--</div></div>
+</div>
+<div class="charts">
+  <div class="chart-card"><h3>Account Distribution by Risk Tier</h3><canvas id="tierCountChart"></canvas></div>
+  <div class="chart-card"><h3>Actual Default Rate by Risk Tier</h3><canvas id="tierRateChart"></canvas></div>
+  <div class="chart-card"><h3>Predicted PD Distribution</h3><canvas id="pdHistChart"></canvas></div>
+  <div class="chart-card"><h3>Model Calibration (Avg Predicted PD vs. Actual Default Rate)</h3><canvas id="calibrationChart"></canvas></div>
+</div>
+<div class="fallback" id="fallbackBanner">Chart.js could not load from the CDN in this environment -- the KPI cards above are still real, live-computed numbers. Open this file with internet access to see the charts, or open the real .pbix in Power BI Desktop instead.</div>
+<footer>Deliberately static: no drill-down, no cross-filtering. Power BI Desktop provides that; this HTML file does not attempt to replicate it.</footer>
+<script>
+const DATA = {"risk_tiers": ["Prime", "Near-Prime", "Subprime", "High Risk"], "tier_counts": [50264, 7013, 6694, 27812], "tier_actual_rate_pct": [0.76, 9.45, 24.81, 75.72], "pd_histogram": {"counts": [50294, 4380, 2610, 2012, 1665, 1565, 1446, 1406, 1320, 1427, 1458, 1510, 1477, 1679, 1743, 1917, 2200, 2634, 3084, 5956], "bin_edges": [0.0003, 0.0502, 0.1002, 0.1502, 0.2001, 0.2501, 0.3001, 0.35, 0.4, 0.45, 0.4999, 0.5499, 0.5999, 0.6498, 0.6998, 0.7498, 0.7997, 0.8497, 0.8997, 0.9496, 0.9996]}, "total_accounts": 91783, "actual_default_rate_pct": 25.89, "avg_predicted_pd_pct": 25.85, "model_version": "1", "champion_model": "xgboost", "generated_at": "2026-08-23 23:07"};
+document.getElementById("kpiTotal").textContent = DATA.total_accounts.toLocaleString();
+document.getElementById("kpiDefaultRate").textContent = DATA.actual_default_rate_pct.toFixed(2) + "%";
+document.getElementById("kpiAvgPd").textContent = DATA.avg_predicted_pd_pct.toFixed(2) + "%";
+
+const CHART_LIB_AVAILABLE = (typeof Chart !== "undefined");
+
+function safeRenderChart(fn, label) {
+  if (!CHART_LIB_AVAILABLE) {
+    document.getElementById("fallbackBanner").style.display = "block";
+    return;
+  }
+  try { fn(); } catch (e) { console.error("Chart render failed: " + label, e); }
+}
+
+function renderTierCountChart() {
+  new Chart(document.getElementById("tierCountChart"), {
+    type: "bar",
+    data: { labels: DATA.risk_tiers, datasets: [{ label: "Accounts", data: DATA.tier_counts, backgroundColor: "#2a78d6" }] },
+    options: { plugins: { legend: { display: false } }, scales: { y: { beginAtZero: true } } }
+  });
+}
+function renderTierRateChart() {
+  new Chart(document.getElementById("tierRateChart"), {
+    type: "bar",
+    data: { labels: DATA.risk_tiers, datasets: [{ label: "Actual Default Rate (%)", data: DATA.tier_actual_rate_pct, backgroundColor: "#e34948" }] },
+    options: { plugins: { legend: { display: false } }, scales: { y: { beginAtZero: true } } }
+  });
+}
+function renderPdHistChart() {
+  const edges = DATA.pd_histogram.bin_edges;
+  const labels = edges.slice(0, -1).map((e, i) => e.toFixed(2) + "-" + edges[i+1].toFixed(2));
+  new Chart(document.getElementById("pdHistChart"), {
+    type: "bar",
+    data: { labels: labels, datasets: [{ label: "Accounts", data: DATA.pd_histogram.counts, backgroundColor: "#3a9e5f" }] },
+    options: { plugins: { legend: { display: false } }, scales: { x: { ticks: { maxRotation: 90, minRotation: 90 } } } }
+  });
+}
+function renderCalibrationChart() {
+  new Chart(document.getElementById("calibrationChart"), {
+    type: "bar",
+    data: { labels: ["Average Predicted PD", "Actual Default Rate"],
+             datasets: [{ label: "%", data: [DATA.avg_predicted_pd_pct, DATA.actual_default_rate_pct], backgroundColor: ["#2a78d6", "#e34948"] }] },
+    options: { plugins: { legend: { display: false } }, scales: { y: { beginAtZero: true } } }
+  });
+}
+
+safeRenderChart(renderTierCountChart, "tier count");
+safeRenderChart(renderTierRateChart, "tier rate");
+safeRenderChart(renderPdHistChart, "pd histogram");
+safeRenderChart(renderCalibrationChart, "calibration");
+</script>
+</body>
+</html>

@@ -1,0 +1,12 @@
+services:
+  amex-pd-api:
+    build: .
+    image: amex-pd-api:latest
+    container_name: amex-pd-api
+    ports:
+      - "8000:8000"
+    volumes:
+      - ${AMEX_PROJECT_ROOT_HOST}:/mnt/amex-project:ro
+    environment:
+      - AMEX_PROJECT_ROOT=/mnt/amex-project
+    restart: unless-stopped

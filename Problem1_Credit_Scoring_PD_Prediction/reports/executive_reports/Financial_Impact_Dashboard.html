@@ -1,0 +1,403 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>AMEX Credit Risk Platform - Financial Impact Dashboard</title>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.0/chart.umd.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/chartjs-plugin-datalabels/2.2.0/chartjs-plugin-datalabels.min.js"></script>
+<style>
+  :root {
+    --bg: #f5f5f3; --surface: #ffffff; --ink: #14140f; --ink-soft: #55544c; --grid: #e2e0d8;
+    --blue: #2a78d6; --red: #e34948; --green: #3a9e5f; --amber: #d99a2b; --purple: #7d5fd6;
+  }
+  * { box-sizing: border-box; }
+  body { margin: 0; font-family: -apple-system, Segoe UI, Roboto, Helvetica, Arial, sans-serif;
+         background: var(--bg); color: var(--ink); }
+  header { padding: 24px 28px 18px; background: var(--surface); border-bottom: 1px solid var(--grid); }
+  header h1 { margin: 0 0 4px; font-size: 22px; }
+  header p { margin: 2px 0; color: var(--ink-soft); font-size: 13px; }
+  .disclaimer { background: #fff8e6; border: 1px solid #eddca3; border-radius: 8px; padding: 12px 16px;
+                margin: 16px 28px 0; font-size: 12.5px; color: #6b5610; }
+  main { padding: 20px 28px 60px; max-width: 1400px; margin: 0 auto; }
+  .controls { display: flex; flex-wrap: wrap; gap: 18px; align-items: center; background: var(--surface);
+              border: 1px solid var(--grid); border-radius: 10px; padding: 14px 18px; margin-bottom: 20px; }
+  .control-group { display: flex; flex-direction: column; gap: 6px; }
+  .control-group label { font-size: 11px; text-transform: uppercase; letter-spacing: .04em; color: var(--ink-soft); }
+  .btn-row { display: flex; gap: 6px; flex-wrap: wrap; }
+  .btn-row button { border: 1px solid var(--grid); background: #fff; color: var(--ink); padding: 6px 12px;
+                     border-radius: 20px; font-size: 12.5px; cursor: pointer; }
+  .btn-row button.active { background: var(--blue); color: #fff; border-color: var(--blue); }
+  select, input[type=text] { border: 1px solid var(--grid); border-radius: 6px; padding: 6px 10px; font-size: 13px; }
+  .kpi-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(190px, 1fr)); gap: 14px; margin-bottom: 24px; }
+  .kpi-card { background: var(--surface); border: 1px solid var(--grid); border-radius: 10px; padding: 14px 16px; }
+  .kpi-card .label { font-size: 11px; text-transform: uppercase; color: var(--ink-soft); letter-spacing: .04em; }
+  .kpi-card .value { font-size: 22px; font-weight: 700; margin-top: 4px; }
+  .kpi-card .sub { font-size: 11px; color: var(--ink-soft); margin-top: 2px; }
+  .chart-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(430px, 1fr)); gap: 18px; margin-bottom: 24px; }
+  .chart-card { background: var(--surface); border: 1px solid var(--grid); border-radius: 10px; padding: 14px 16px; }
+  .chart-card h3 { margin: 0 0 10px; font-size: 13.5px; }
+  .chart-card canvas { max-height: 320px; }
+  table { width: 100%; border-collapse: collapse; font-size: 12.5px; }
+  th, td { text-align: left; padding: 8px 10px; border-bottom: 1px solid var(--grid); }
+  th { cursor: pointer; user-select: none; color: var(--ink-soft); font-weight: 600; }
+  th.sortable:hover { color: var(--blue); }
+  .table-card { background: var(--surface); border: 1px solid var(--grid); border-radius: 10px; padding: 16px 18px; margin-bottom: 20px; }
+  .table-card h3 { margin: 0 0 12px; font-size: 14px; }
+  .table-scroll { overflow-x: auto; }
+  .assumption-tag { display: inline-block; font-size: 10px; padding: 1px 6px; border-radius: 8px; margin-left: 6px; }
+  .tag-measured { background: #e5f4ea; color: #1e7a3f; }
+  .tag-assumption { background: #fdeee6; color: #a14a1a; }
+  footer { padding: 20px 28px 40px; color: var(--ink-soft); font-size: 11.5px; max-width: 1400px; margin: 0 auto; }
+</style>
+</head>
+<body>
+<header>
+  <h1>AMEX Enterprise Credit Risk Platform &mdash; Financial Impact Dashboard</h1>
+  <p id="problemNameLine"></p>
+  <p id="generatedLine"></p>
+</header>
+<div class="disclaimer">
+  <strong>How to read this dashboard:</strong> figures tagged <span class="assumption-tag tag-measured">MEASURED</span>
+  come from this platform's own live model runs. Figures tagged <span class="assumption-tag tag-assumption">ASSUMPTION</span>
+  rest on a stated hypothetical deployment scenario (the Kaggle AMEX dataset has no real financial data) &mdash;
+  edit the constants in Notebook 14, Sections 4-5, and re-run to substitute your institution's real figures.
+  This is a worked financial methodology, not investment or accounting advice.
+</div>
+<main>
+  <div class="controls">
+    <div class="control-group">
+      <label>Time Horizon</label>
+      <div class="btn-row" id="horizonButtons"></div>
+    </div>
+    <div class="control-group">
+      <label>Scenario</label>
+      <select id="scenarioSelect">
+        <option value="conservative">Conservative (x0.7 benefit)</option>
+        <option value="base" selected>Base (x1.0 benefit)</option>
+        <option value="optimistic">Optimistic (x1.3 benefit)</option>
+      </select>
+    </div>
+    <div class="control-group">
+      <label>Filter Team Recommendations</label>
+      <select id="teamFilter"></select>
+    </div>
+    <div class="control-group">
+      <label>Search Recommendations</label>
+      <input type="text" id="teamSearch" placeholder="e.g. compliance, ROI, payback">
+    </div>
+  </div>
+
+  <div class="kpi-grid" id="kpiGrid"></div>
+
+  <div class="chart-grid">
+    <div class="chart-card"><h3 id="chart1Title"></h3><canvas id="chartNetBenefit"></canvas></div>
+    <div class="chart-card"><h3 id="chart2Title"></h3><canvas id="chartRoiByHorizon"></canvas></div>
+    <div class="chart-card"><h3 id="chart3Title"></h3><canvas id="chartInvestment"></canvas></div>
+    <div class="chart-card"><h3 id="chart4Title"></h3><canvas id="chartAnnualBenefit"></canvas></div>
+    <div class="chart-card"><h3 id="chart5Title"></h3><canvas id="chartCaptureRate"></canvas></div>
+    <div class="chart-card"><h3 id="chart6Title"></h3><canvas id="chartTimeline"></canvas></div>
+  </div>
+
+  <div class="table-card">
+    <h3>Year-by-Year Financial Breakdown (click a column header to sort, selected scenario)</h3>
+    <div class="table-scroll"><table id="financialTable"></table></div>
+  </div>
+
+  <div class="table-card">
+    <h3>SMART Recommendations by Team</h3>
+    <div class="table-scroll"><table id="smartTable"></table></div>
+  </div>
+</main>
+<footer id="footerAssumptions"></footer>
+
+<script>
+const DATA = {"generated_at": "2026-08-23 23:08", "problem_name": "Phase 1 \u00b7 Problem 1 -- Credit Scoring / PD Prediction", "champion_model": "xgboost", "measured": {"holdout_auc": 0.962, "holdout_amex_metric": 0.7936, "holdout_top4pct_capture": 0.663, "live_portfolio_default_rate": 0.2589}, "assumptions": {"deployment_portfolio_size_accounts": 2000000, "avg_exposure_at_default_usd": 3500, "legacy_model_top4pct_capture_rate": 0.25, "collections_intervention_success_rate": 0.35, "new_applicants_per_year": 400000, "incremental_approval_rate": 0.03, "avg_annual_net_interest_margin_per_account_usd": 220}, "legacy_capture_rate": 0.25, "investment_breakdown": [{"category": "Data Science / ML Engineering (4 FTE x 4 months)", "amount_usd": 224000, "type": "one_time"}, {"category": "Independent Model Risk Validation (1 FTE x 6 weeks)", "amount_usd": 24000, "type": "one_time"}, {"category": "Compliance & Legal Review (Basel/IFRS9, fair-lending sign-off)", "amount_usd": 40000, "type": "one_time"}, {"category": "MLOps / Platform Engineering (2 FTE x 3 months)", "amount_usd": 78000, "type": "one_time"}, {"category": "Change Management & Staff Retraining", "amount_usd": 30000, "type": "one_time"}, {"category": "Cloud Infrastructure Setup & Initial Compute", "amount_usd": 25000, "type": "one_time"}], "total_one_time_investment": 421000, "monthly_recurring_cost": 16500, "implementation_weeks": 22, "implementation_phases": [{"phase": "1. Discovery & Scoping", "chart_label": "1. Discovery & Scoping", "weeks": 2, "start_week": 0}, {"phase": "2. Data Engineering Hardening (productionize Notebooks 02/04 pipelines)", "chart_label": "2. Data Engineering Hardening", "weeks": 3, "start_week": 2}, {"phase": "3. Model Finalization & Sign-off (Notebook 05)", "chart_label": "3. Model Finalization & Sign-off", "weeks": 2, "start_week": 5}, {"phase": "4. Model Risk Validation & Compliance Review (Notebooks 07/08)", "chart_label": "4. MRM & Compliance Review", "weeks": 4, "start_week": 7}, {"phase": "5. MLOps Build-Out & Deployment (Notebooks 09-11)", "chart_label": "5. MLOps Build-Out & Deployment", "weeks": 5, "start_week": 11}, {"phase": "6. UAT & Shadow-Mode Parallel Run", "chart_label": "6. UAT & Shadow-Mode", "weeks": 4, "start_week": 16}, {"phase": "7. Go-Live & Hypercare", "chart_label": "7. Go-Live & Hypercare", "weeks": 2, "start_week": 20}], "monthly_models": {"conservative": [{"month": 1, "month_cost_usd": 70166.67, "month_benefit_usd": 0.0, "cumulative_cost_usd": 70166.67, "cumulative_benefit_usd": 0.0, "cumulative_net_usd": -70166.67, "roi_pct": -100.0}, {"month": 2, "month_cost_usd": 70166.67, "month_benefit_usd": 0.0, "cumulative_cost_usd": 140333.33, "cumulative_benefit_usd": 0.0, "cumulative_net_usd": -140333.33, "roi_pct": -100.0}, {"month": 3, "month_cost_usd": 70166.67, "month_benefit_usd": 0.0, "cumulative_cost_usd": 210500.0, "cumulative_benefit_usd": 0.0, "cumulative_net_usd": -210500.0, "roi_pct": -100.0}, {"month": 4, "month_cost_usd": 70166.67, "month_benefit_usd": 0.0, "cumulative_cost_usd": 280666.67, "cumulative_benefit_usd": 0.0, "cumulative_net_usd": -280666.67, "roi_pct": -100.0}, {"month": 5, "month_cost_usd": 70166.67, "month_benefit_usd": 0.0, "cumulative_cost_usd": 350833.33, "cumulative_benefit_usd": 0.0, "cumulative_net_usd": -350833.33, "roi_pct": -100.0}, {"month": 6, "month_cost_usd": 70166.67, "month_benefit_usd": 0.0, "cumulative_cost_usd": 421000.0, "cumulative_benefit_usd": 0.0, "cumulative_net_usd": -421000.0, "roi_pct": -100.0}, {"month": 7, "month_cost_usd": 16500.0, "month_benefit_usd": 2573204.45, "cumulative_cost_usd": 437500.0, "cumulative_benefit_usd": 2573204.45, "cumulative_net_usd": 2135704.45, "roi_pct": 488.16}, {"month": 8, "month_cost_usd": 16500.0, "month_benefit_usd": 5146408.89, "cumulative_cost_usd": 454000.0, "cumulative_benefit_usd": 7719613.34, "cumulative_net_usd": 7265613.34, "roi_pct": 1600.36}, {"month": 9, "month_cost_usd": 16500.0, "month_benefit_usd": 7719613.34, "cumulative_cost_usd": 470500.0, "cumulative_benefit_usd": 15439226.67, "cumulative_net_usd": 14968726.67, "roi_pct": 3181.45}, {"month": 10, "month_cost_usd": 16500.0, "month_benefit_usd": 10292817.78, "cumulative_cost_usd": 487000.0, "cumulative_benefit_usd": 25732044.46, "cumulative_net_usd": 25245044.46, "roi_pct": 5183.79}, {"month": 11, "month_cost_usd": 16500.0, "month_benefit_usd": 12866022.23, "cumulative_cost_usd": 503500.0, "cumulative_benefit_usd": 38598066.69, "cumulative_net_usd": 38094566.69, "roi_pct": 7565.95}, {"month": 12, "month_cost_usd": 16500.0, "month_benefit_usd": 15439226.67, "cumulative_cost_usd": 520000.0, "cumulative_benefit_usd": 54037293.36, "cumulative_net_usd": 53517293.36, "roi_pct": 10291.79}, {"month": 13, "month_cost_usd": 16500.0, "month_benefit_usd": 15439226.67, "cumulative_cost_usd": 536500.0, "cumulative_benefit_usd": 69476520.03, "cumulative_net_usd": 68940020.03, "roi_pct": 12849.96}, {"month": 14, "month_cost_usd": 16500.0, "month_benefit_usd": 15439226.67, "cumulative_cost_usd": 553000.0, "cumulative_benefit_usd": 84915746.71, "cumulative_net_usd": 84362746.71, "roi_pct": 15255.47}, {"month": 15, "month_cost_usd": 16500.0, "month_benefit_usd": 15439226.67, "cumulative_cost_usd": 569500.0, "cumulative_benefit_usd": 100354973.38, "cumulative_net_usd": 99785473.38, "roi_pct": 17521.59}, {"month": 16, "month_cost_usd": 16500.0, "month_benefit_usd": 15439226.67, "cumulative_cost_usd": 586000.0, "cumulative_benefit_usd": 115794200.06, "cumulative_net_usd": 115208200.06, "roi_pct": 19660.1}, {"month": 17, "month_cost_usd": 16500.0, "month_benefit_usd": 15439226.67, "cumulative_cost_usd": 602500.0, "cumulative_benefit_usd": 131233426.73, "cumulative_net_usd": 130630926.73, "roi_pct": 21681.48}, {"month": 18, "month_cost_usd": 16500.0, "month_benefit_usd": 15439226.67, "cumulative_cost_usd": 619000.0, "cumulative_benefit_usd": 146672653.41, "cumulative_net_usd": 146053653.41, "roi_pct": 23595.1}, {"month": 19, "month_cost_usd": 16500.0, "month_benefit_usd": 15439226.67, "cumulative_cost_usd": 635500.0, "cumulative_benefit_usd": 162111880.08, "cumulative_net_usd": 161476380.08, "roi_pct": 25409.34}, {"month": 20, "month_cost_usd": 16500.0, "month_benefit_usd": 15439226.67, "cumulative_cost_usd": 652000.0, "cumulative_benefit_usd": 177551106.75, "cumulative_net_usd": 176899106.75, "roi_pct": 27131.76}, {"month": 21, "month_cost_usd": 16500.0, "month_benefit_usd": 15439226.67, "cumulative_cost_usd": 668500.0, "cumulative_benefit_usd": 192990333.43, "cumulative_net_usd": 192321833.43, "roi_pct": 28769.16}, {"month": 22, "month_cost_usd": 16500.0, "month_benefit_usd": 15439226.67, "cumulative_cost_usd": 685000.0, "cumulative_benefit_usd": 208429560.1, "cumulative_net_usd": 207744560.1, "roi_pct": 30327.67}, {"month": 23, "month_cost_usd": 16500.0, "month_benefit_usd": 15439226.67, "cumulative_cost_usd": 701500.0, "cumulative_benefit_usd": 223868786.78, "cumulative_net_usd": 223167286.78, "roi_pct": 31812.87}, {"month": 24, "month_cost_usd": 16500.0, "month_benefit_usd": 15439226.67, "cumulative_cost_usd": 718000.0, "cumulative_benefit_usd": 239308013.45, "cumulative_net_usd": 238590013.45, "roi_pct": 33229.81}, {"month": 25, "month_cost_usd": 16500.0, "month_benefit_usd": 15439226.67, "cumulative_cost_usd": 734500.0, "cumulative_benefit_usd": 254747240.13, "cumulative_net_usd": 254012740.13, "roi_pct": 34583.08}, {"month": 26, "month_cost_usd": 16500.0, "month_benefit_usd": 15439226.67, "cumulative_cost_usd": 751000.0, "cumulative_benefit_usd": 270186466.8, "cumulative_net_usd": 269435466.8, "roi_pct": 35876.89}, {"month": 27, "month_cost_usd": 16500.0, "month_benefit_usd": 15439226.67, "cumulative_cost_usd": 767500.0, "cumulative_benefit_usd": 285625693.47, "cumulative_net_usd": 284858193.47, "roi_pct": 37115.07}, {"month": 28, "month_cost_usd": 16500.0, "month_benefit_usd": 15439226.67, "cumulative_cost_usd": 784000.0, "cumulative_benefit_usd": 301064920.15, "cumulative_net_usd": 300280920.15, "roi_pct": 38301.14}, {"month": 29, "month_cost_usd": 16500.0, "month_benefit_usd": 15439226.67, "cumulative_cost_usd": 800500.0, "cumulative_benefit_usd": 316504146.82, "cumulative_net_usd": 315703646.82, "roi_pct": 39438.31}, {"month": 30, "month_cost_usd": 16500.0, "month_benefit_usd": 15439226.67, "cumulative_cost_usd": 817000.0, "cumulative_benefit_usd": 331943373.5, "cumulative_net_usd": 331126373.5, "roi_pct": 40529.54}, {"month": 31, "month_cost_usd": 16500.0, "month_benefit_usd": 15439226.67, "cumulative_cost_usd": 833500.0, "cumulative_benefit_usd": 347382600.17, "cumulative_net_usd": 346549100.17, "roi_pct": 41577.58}, {"month": 32, "month_cost_usd": 16500.0, "month_benefit_usd": 15439226.67, "cumulative_cost_usd": 850000.0, "cumulative_benefit_usd": 362821826.85, "cumulative_net_usd": 361971826.85, "roi_pct": 42584.92}, {"month": 33, "month_cost_usd": 16500.0, "month_benefit_usd": 15439226.67, "cumulative_cost_usd": 866500.0, "cumulative_benefit_usd": 378261053.52, "cumulative_net_usd": 377394553.52, "roi_pct": 43553.9}, {"month": 34, "month_cost_usd": 16500.0, "month_benefit_usd": 15439226.67, "cumulative_cost_usd": 883000.0, "cumulative_benefit_usd": 393700280.19, "cumulative_net_usd": 392817280.19, "roi_pct": 44486.67}, {"month": 35, "month_cost_usd": 16500.0, "month_benefit_usd": 15439226.67, "cumulative_cost_usd": 899500.0, "cumulative_benefit_usd": 409139506.87, "cumulative_net_usd": 408240006.87, "roi_pct": 45385.21}, {"month": 36, "month_cost_usd": 16500.0, "month_benefit_usd": 15439226.67, "cumulative_cost_usd": 916000.0, "cumulative_benefit_usd": 424578733.54, "cumulative_net_usd": 423662733.54, "roi_pct": 46251.39}, {"month": 37, "month_cost_usd": 16500.0, "month_benefit_usd": 15439226.67, "cumulative_cost_usd": 932500.0, "cumulative_benefit_usd": 440017960.22, "cumulative_net_usd": 439085460.22, "roi_pct": 47086.91}, {"month": 38, "month_cost_usd": 16500.0, "month_benefit_usd": 15439226.67, "cumulative_cost_usd": 949000.0, "cumulative_benefit_usd": 455457186.89, "cumulative_net_usd": 454508186.89, "roi_pct": 47893.38}, {"month": 39, "month_cost_usd": 16500.0, "month_benefit_usd": 15439226.67, "cumulative_cost_usd": 965500.0, "cumulative_benefit_usd": 470896413.56, "cumulative_net_usd": 469930913.56, "roi_pct": 48672.29}, {"month": 40, "month_cost_usd": 16500.0, "month_benefit_usd": 15439226.67, "cumulative_cost_usd": 982000.0, "cumulative_benefit_usd": 486335640.24, "cumulative_net_usd": 485353640.24, "roi_pct": 49425.01}, {"month": 41, "month_cost_usd": 16500.0, "month_benefit_usd": 15439226.67, "cumulative_cost_usd": 998500.0, "cumulative_benefit_usd": 501774866.91, "cumulative_net_usd": 500776366.91, "roi_pct": 50152.87}, {"month": 42, "month_cost_usd": 16500.0, "month_benefit_usd": 15439226.67, "cumulative_cost_usd": 1015000.0, "cumulative_benefit_usd": 517214093.59, "cumulative_net_usd": 516199093.59, "roi_pct": 50857.05}, {"month": 43, "month_cost_usd": 16500.0, "month_benefit_usd": 15439226.67, "cumulative_cost_usd": 1031500.0, "cumulative_benefit_usd": 532653320.26, "cumulative_net_usd": 531621820.26, "roi_pct": 51538.71}, {"month": 44, "month_cost_usd": 16500.0, "month_benefit_usd": 15439226.67, "cumulative_cost_usd": 1048000.0, "cumulative_benefit_usd": 548092546.94, "cumulative_net_usd": 547044546.94, "roi_pct": 52198.91}, {"month": 45, "month_cost_usd": 16500.0, "month_benefit_usd": 15439226.67, "cumulative_cost_usd": 1064500.0, "cumulative_benefit_usd": 563531773.61, "cumulative_net_usd": 562467273.61, "roi_pct": 52838.64}, {"month": 46, "month_cost_usd": 16500.0, "month_benefit_usd": 15439226.67, "cumulative_cost_usd": 1081000.0, "cumulative_benefit_usd": 578971000.28, "cumulative_net_usd": 577890000.28, "roi_pct": 53458.83}, {"month": 47, "month_cost_usd": 16500.0, "month_benefit_usd": 15439226.67, "cumulative_cost_usd": 1097500.0, "cumulative_benefit_usd": 594410226.96, "cumulative_net_usd": 593312726.96, "roi_pct": 54060.39}, {"month": 48, "month_cost_usd": 16500.0, "month_benefit_usd": 15439226.67, "cumulative_cost_usd": 1114000.0, "cumulative_benefit_usd": 609849453.63, "cumulative_net_usd": 608735453.63, "roi_pct": 54644.12}, {"month": 49, "month_cost_usd": 16500.0, "month_benefit_usd": 15439226.67, "cumulative_cost_usd": 1130500.0, "cumulative_benefit_usd": 625288680.31, "cumulative_net_usd": 624158180.31, "roi_pct": 55210.81}, {"month": 50, "month_cost_usd": 16500.0, "month_benefit_usd": 15439226.67, "cumulative_cost_usd": 1147000.0, "cumulative_benefit_usd": 640727906.98, "cumulative_net_usd": 639580906.98, "roi_pct": 55761.2}, {"month": 51, "month_cost_usd": 16500.0, "month_benefit_usd": 15439226.67, "cumulative_cost_usd": 1163500.0, "cumulative_benefit_usd": 656167133.66, "cumulative_net_usd": 655003633.66, "roi_pct": 56295.97}, {"month": 52, "month_cost_usd": 16500.0, "month_benefit_usd": 15439226.67, "cumulative_cost_usd": 1180000.0, "cumulative_benefit_usd": 671606360.33, "cumulative_net_usd": 670426360.33, "roi_pct": 56815.79}, {"month": 53, "month_cost_usd": 16500.0, "month_benefit_usd": 15439226.67, "cumulative_cost_usd": 1196500.0, "cumulative_benefit_usd": 687045587.0, "cumulative_net_usd": 685849087.0, "roi_pct": 57321.28}, {"month": 54, "month_cost_usd": 16500.0, "month_benefit_usd": 15439226.67, "cumulative_cost_usd": 1213000.0, "cumulative_benefit_usd": 702484813.68, "cumulative_net_usd": 701271813.68, "roi_pct": 57813.01}, {"month": 55, "month_cost_usd": 16500.0, "month_benefit_usd": 15439226.67, "cumulative_cost_usd": 1229500.0, "cumulative_benefit_usd": 717924040.35, "cumulative_net_usd": 716694540.35, "roi_pct": 58291.54}, {"month": 56, "month_cost_usd": 16500.0, "month_benefit_usd": 15439226.67, "cumulative_cost_usd": 1246000.0, "cumulative_benefit_usd": 733363267.03, "cumulative_net_usd": 732117267.03, "roi_pct": 58757.41}, {"month": 57, "month_cost_usd": 16500.0, "month_benefit_usd": 15439226.67, "cumulative_cost_usd": 1262500.0, "cumulative_benefit_usd": 748802493.7, "cumulative_net_usd": 747539993.7, "roi_pct": 59211.09}, {"month": 58, "month_cost_usd": 16500.0, "month_benefit_usd": 15439226.67, "cumulative_cost_usd": 1279000.0, "cumulative_benefit_usd": 764241720.38, "cumulative_net_usd": 762962720.38, "roi_pct": 59653.07}, {"month": 59, "month_cost_usd": 16500.0, "month_benefit_usd": 15439226.67, "cumulative_cost_usd": 1295500.0, "cumulative_benefit_usd": 779680947.05, "cumulative_net_usd": 778385447.05, "roi_pct": 60083.79}, {"month": 60, "month_cost_usd": 16500.0, "month_benefit_usd": 15439226.67, "cumulative_cost_usd": 1312000.0, "cumulative_benefit_usd": 795120173.72, "cumulative_net_usd": 793808173.72, "roi_pct": 60503.67}], "base": [{"month": 1, "month_cost_usd": 70166.67, "month_benefit_usd": 0.0, "cumulative_cost_usd": 70166.67, "cumulative_benefit_usd": 0.0, "cumulative_net_usd": -70166.67, "roi_pct": -100.0}, {"month": 2, "month_cost_usd": 70166.67, "month_benefit_usd": 0.0, "cumulative_cost_usd": 140333.33, "cumulative_benefit_usd": 0.0, "cumulative_net_usd": -140333.33, "roi_pct": -100.0}, {"month": 3, "month_cost_usd": 70166.67, "month_benefit_usd": 0.0, "cumulative_cost_usd": 210500.0, "cumulative_benefit_usd": 0.0, "cumulative_net_usd": -210500.0, "roi_pct": -100.0}, {"month": 4, "month_cost_usd": 70166.67, "month_benefit_usd": 0.0, "cumulative_cost_usd": 280666.67, "cumulative_benefit_usd": 0.0, "cumulative_net_usd": -280666.67, "roi_pct": -100.0}, {"month": 5, "month_cost_usd": 70166.67, "month_benefit_usd": 0.0, "cumulative_cost_usd": 350833.33, "cumulative_benefit_usd": 0.0, "cumulative_net_usd": -350833.33, "roi_pct": -100.0}, {"month": 6, "month_cost_usd": 70166.67, "month_benefit_usd": 0.0, "cumulative_cost_usd": 421000.0, "cumulative_benefit_usd": 0.0, "cumulative_net_usd": -421000.0, "roi_pct": -100.0}, {"month": 7, "month_cost_usd": 16500.0, "month_benefit_usd": 3676006.35, "cumulative_cost_usd": 437500.0, "cumulative_benefit_usd": 3676006.35, "cumulative_net_usd": 3238506.35, "roi_pct": 740.23}, {"month": 8, "month_cost_usd": 16500.0, "month_benefit_usd": 7352012.7, "cumulative_cost_usd": 454000.0, "cumulative_benefit_usd": 11028019.05, "cumulative_net_usd": 10574019.05, "roi_pct": 2329.08}, {"month": 9, "month_cost_usd": 16500.0, "month_benefit_usd": 11028019.05, "cumulative_cost_usd": 470500.0, "cumulative_benefit_usd": 22056038.11, "cumulative_net_usd": 21585538.11, "roi_pct": 4587.79}, {"month": 10, "month_cost_usd": 16500.0, "month_benefit_usd": 14704025.4, "cumulative_cost_usd": 487000.0, "cumulative_benefit_usd": 36760063.51, "cumulative_net_usd": 36273063.51, "roi_pct": 7448.27}, {"month": 11, "month_cost_usd": 16500.0, "month_benefit_usd": 18380031.76, "cumulative_cost_usd": 503500.0, "cumulative_benefit_usd": 55140095.27, "cumulative_net_usd": 54636595.27, "roi_pct": 10851.36}, {"month": 12, "month_cost_usd": 16500.0, "month_benefit_usd": 22056038.11, "cumulative_cost_usd": 520000.0, "cumulative_benefit_usd": 77196133.37, "cumulative_net_usd": 76676133.37, "roi_pct": 14745.41}, {"month": 13, "month_cost_usd": 16500.0, "month_benefit_usd": 22056038.11, "cumulative_cost_usd": 536500.0, "cumulative_benefit_usd": 99252171.48, "cumulative_net_usd": 98715671.48, "roi_pct": 18399.94}, {"month": 14, "month_cost_usd": 16500.0, "month_benefit_usd": 22056038.11, "cumulative_cost_usd": 553000.0, "cumulative_benefit_usd": 121308209.58, "cumulative_net_usd": 120755209.58, "roi_pct": 21836.39}, {"month": 15, "month_cost_usd": 16500.0, "month_benefit_usd": 22056038.11, "cumulative_cost_usd": 569500.0, "cumulative_benefit_usd": 143364247.69, "cumulative_net_usd": 142794747.69, "roi_pct": 25073.7}, {"month": 16, "month_cost_usd": 16500.0, "month_benefit_usd": 22056038.11, "cumulative_cost_usd": 586000.0, "cumulative_benefit_usd": 165420285.8, "cumulative_net_usd": 164834285.8, "roi_pct": 28128.72}, {"month": 17, "month_cost_usd": 16500.0, "month_benefit_usd": 22056038.11, "cumulative_cost_usd": 602500.0, "cumulative_benefit_usd": 187476323.9, "cumulative_net_usd": 186873823.9, "roi_pct": 31016.4}, {"month": 18, "month_cost_usd": 16500.0, "month_benefit_usd": 22056038.11, "cumulative_cost_usd": 619000.0, "cumulative_benefit_usd": 209532362.01, "cumulative_net_usd": 208913362.01, "roi_pct": 33750.14}, {"month": 19, "month_cost_usd": 16500.0, "month_benefit_usd": 22056038.11, "cumulative_cost_usd": 635500.0, "cumulative_benefit_usd": 231588400.11, "cumulative_net_usd": 230952900.11, "roi_pct": 36341.92}, {"month": 20, "month_cost_usd": 16500.0, "month_benefit_usd": 22056038.11, "cumulative_cost_usd": 652000.0, "cumulative_benefit_usd": 253644438.22, "cumulative_net_usd": 252992438.22, "roi_pct": 38802.52}, {"month": 21, "month_cost_usd": 16500.0, "month_benefit_usd": 22056038.11, "cumulative_cost_usd": 668500.0, "cumulative_benefit_usd": 275700476.33, "cumulative_net_usd": 275031976.33, "roi_pct": 41141.66}, {"month": 22, "month_cost_usd": 16500.0, "month_benefit_usd": 22056038.11, "cumulative_cost_usd": 685000.0, "cumulative_benefit_usd": 297756514.43, "cumulative_net_usd": 297071514.43, "roi_pct": 43368.1}, {"month": 23, "month_cost_usd": 16500.0, "month_benefit_usd": 22056038.11, "cumulative_cost_usd": 701500.0, "cumulative_benefit_usd": 319812552.54, "cumulative_net_usd": 319111052.54, "roi_pct": 45489.82}, {"month": 24, "month_cost_usd": 16500.0, "month_benefit_usd": 22056038.11, "cumulative_cost_usd": 718000.0, "cumulative_benefit_usd": 341868590.64, "cumulative_net_usd": 341150590.64, "roi_pct": 47514.01}, {"month": 25, "month_cost_usd": 16500.0, "month_benefit_usd": 22056038.11, "cumulative_cost_usd": 734500.0, "cumulative_benefit_usd": 363924628.75, "cumulative_net_usd": 363190128.75, "roi_pct": 49447.26}, {"month": 26, "month_cost_usd": 16500.0, "month_benefit_usd": 22056038.11, "cumulative_cost_usd": 751000.0, "cumulative_benefit_usd": 385980666.86, "cumulative_net_usd": 385229666.86, "roi_pct": 51295.56}, {"month": 27, "month_cost_usd": 16500.0, "month_benefit_usd": 22056038.11, "cumulative_cost_usd": 767500.0, "cumulative_benefit_usd": 408036704.96, "cumulative_net_usd": 407269204.96, "roi_pct": 53064.39}, {"month": 28, "month_cost_usd": 16500.0, "month_benefit_usd": 22056038.11, "cumulative_cost_usd": 784000.0, "cumulative_benefit_usd": 430092743.07, "cumulative_net_usd": 429308743.07, "roi_pct": 54758.77}, {"month": 29, "month_cost_usd": 16500.0, "month_benefit_usd": 22056038.11, "cumulative_cost_usd": 800500.0, "cumulative_benefit_usd": 452148781.17, "cumulative_net_usd": 451348281.17, "roi_pct": 56383.3}, {"month": 30, "month_cost_usd": 16500.0, "month_benefit_usd": 22056038.11, "cumulative_cost_usd": 817000.0, "cumulative_benefit_usd": 474204819.28, "cumulative_net_usd": 473387819.28, "roi_pct": 57942.21}, {"month": 31, "month_cost_usd": 16500.0, "month_benefit_usd": 22056038.11, "cumulative_cost_usd": 833500.0, "cumulative_benefit_usd": 496260857.39, "cumulative_net_usd": 495427357.39, "roi_pct": 59439.4}, {"month": 32, "month_cost_usd": 16500.0, "month_benefit_usd": 22056038.11, "cumulative_cost_usd": 850000.0, "cumulative_benefit_usd": 518316895.49, "cumulative_net_usd": 517466895.49, "roi_pct": 60878.46}, {"month": 33, "month_cost_usd": 16500.0, "month_benefit_usd": 22056038.11, "cumulative_cost_usd": 866500.0, "cumulative_benefit_usd": 540372933.6, "cumulative_net_usd": 539506433.6, "roi_pct": 62262.72}, {"month": 34, "month_cost_usd": 16500.0, "month_benefit_usd": 22056038.11, "cumulative_cost_usd": 883000.0, "cumulative_benefit_usd": 562428971.71, "cumulative_net_usd": 561545971.71, "roi_pct": 63595.24}, {"month": 35, "month_cost_usd": 16500.0, "month_benefit_usd": 22056038.11, "cumulative_cost_usd": 899500.0, "cumulative_benefit_usd": 584485009.81, "cumulative_net_usd": 583585509.81, "roi_pct": 64878.88}, {"month": 36, "month_cost_usd": 16500.0, "month_benefit_usd": 22056038.11, "cumulative_cost_usd": 916000.0, "cumulative_benefit_usd": 606541047.92, "cumulative_net_usd": 605625047.92, "roi_pct": 66116.27}, {"month": 37, "month_cost_usd": 16500.0, "month_benefit_usd": 22056038.11, "cumulative_cost_usd": 932500.0, "cumulative_benefit_usd": 628597086.02, "cumulative_net_usd": 627664586.02, "roi_pct": 67309.88}, {"month": 38, "month_cost_usd": 16500.0, "month_benefit_usd": 22056038.11, "cumulative_cost_usd": 949000.0, "cumulative_benefit_usd": 650653124.13, "cumulative_net_usd": 649704124.13, "roi_pct": 68461.97}, {"month": 39, "month_cost_usd": 16500.0, "month_benefit_usd": 22056038.11, "cumulative_cost_usd": 965500.0, "cumulative_benefit_usd": 672709162.24, "cumulative_net_usd": 671743662.24, "roi_pct": 69574.69}, {"month": 40, "month_cost_usd": 16500.0, "month_benefit_usd": 22056038.11, "cumulative_cost_usd": 982000.0, "cumulative_benefit_usd": 694765200.34, "cumulative_net_usd": 693783200.34, "roi_pct": 70650.02}, {"month": 41, "month_cost_usd": 16500.0, "month_benefit_usd": 22056038.11, "cumulative_cost_usd": 998500.0, "cumulative_benefit_usd": 716821238.45, "cumulative_net_usd": 715822738.45, "roi_pct": 71689.81}, {"month": 42, "month_cost_usd": 16500.0, "month_benefit_usd": 22056038.11, "cumulative_cost_usd": 1015000.0, "cumulative_benefit_usd": 738877276.55, "cumulative_net_usd": 737862276.55, "roi_pct": 72695.79}, {"month": 43, "month_cost_usd": 16500.0, "month_benefit_usd": 22056038.11, "cumulative_cost_usd": 1031500.0, "cumulative_benefit_usd": 760933314.66, "cumulative_net_usd": 759901814.66, "roi_pct": 73669.59}, {"month": 44, "month_cost_usd": 16500.0, "month_benefit_usd": 22056038.11, "cumulative_cost_usd": 1048000.0, "cumulative_benefit_usd": 782989352.77, "cumulative_net_usd": 781941352.77, "roi_pct": 74612.72}, {"month": 45, "month_cost_usd": 16500.0, "month_benefit_usd": 22056038.11, "cumulative_cost_usd": 1064500.0, "cumulative_benefit_usd": 805045390.87, "cumulative_net_usd": 803980890.87, "roi_pct": 75526.62}, {"month": 46, "month_cost_usd": 16500.0, "month_benefit_usd": 22056038.11, "cumulative_cost_usd": 1081000.0, "cumulative_benefit_usd": 827101428.98, "cumulative_net_usd": 826020428.98, "roi_pct": 76412.62}, {"month": 47, "month_cost_usd": 16500.0, "month_benefit_usd": 22056038.11, "cumulative_cost_usd": 1097500.0, "cumulative_benefit_usd": 849157467.08, "cumulative_net_usd": 848059967.08, "roi_pct": 77271.98}, {"month": 48, "month_cost_usd": 16500.0, "month_benefit_usd": 22056038.11, "cumulative_cost_usd": 1114000.0, "cumulative_benefit_usd": 871213505.19, "cumulative_net_usd": 870099505.19, "roi_pct": 78105.88}, {"month": 49, "month_cost_usd": 16500.0, "month_benefit_usd": 22056038.11, "cumulative_cost_usd": 1130500.0, "cumulative_benefit_usd": 893269543.3, "cumulative_net_usd": 892139043.3, "roi_pct": 78915.44}, {"month": 50, "month_cost_usd": 16500.0, "month_benefit_usd": 22056038.11, "cumulative_cost_usd": 1147000.0, "cumulative_benefit_usd": 915325581.4, "cumulative_net_usd": 914178581.4, "roi_pct": 79701.71}, {"month": 51, "month_cost_usd": 16500.0, "month_benefit_usd": 22056038.11, "cumulative_cost_usd": 1163500.0, "cumulative_benefit_usd": 937381619.51, "cumulative_net_usd": 936218119.51, "roi_pct": 80465.67}, {"month": 52, "month_cost_usd": 16500.0, "month_benefit_usd": 22056038.11, "cumulative_cost_usd": 1180000.0, "cumulative_benefit_usd": 959437657.61, "cumulative_net_usd": 958257657.61, "roi_pct": 81208.28}, {"month": 53, "month_cost_usd": 16500.0, "month_benefit_usd": 22056038.11, "cumulative_cost_usd": 1196500.0, "cumulative_benefit_usd": 981493695.72, "cumulative_net_usd": 980297195.72, "roi_pct": 81930.4}, {"month": 54, "month_cost_usd": 16500.0, "month_benefit_usd": 22056038.11, "cumulative_cost_usd": 1213000.0, "cumulative_benefit_usd": 1003549733.83, "cumulative_net_usd": 1002336733.83, "roi_pct": 82632.87}, {"month": 55, "month_cost_usd": 16500.0, "month_benefit_usd": 22056038.11, "cumulative_cost_usd": 1229500.0, "cumulative_benefit_usd": 1025605771.93, "cumulative_net_usd": 1024376271.93, "roi_pct": 83316.49}, {"month": 56, "month_cost_usd": 16500.0, "month_benefit_usd": 22056038.11, "cumulative_cost_usd": 1246000.0, "cumulative_benefit_usd": 1047661810.04, "cumulative_net_usd": 1046415810.04, "roi_pct": 83982.01}, {"month": 57, "month_cost_usd": 16500.0, "month_benefit_usd": 22056038.11, "cumulative_cost_usd": 1262500.0, "cumulative_benefit_usd": 1069717848.15, "cumulative_net_usd": 1068455348.15, "roi_pct": 84630.13}, {"month": 58, "month_cost_usd": 16500.0, "month_benefit_usd": 22056038.11, "cumulative_cost_usd": 1279000.0, "cumulative_benefit_usd": 1091773886.25, "cumulative_net_usd": 1090494886.25, "roi_pct": 85261.52}, {"month": 59, "month_cost_usd": 16500.0, "month_benefit_usd": 22056038.11, "cumulative_cost_usd": 1295500.0, "cumulative_benefit_usd": 1113829924.36, "cumulative_net_usd": 1112534424.36, "roi_pct": 85876.84}, {"month": 60, "month_cost_usd": 16500.0, "month_benefit_usd": 22056038.11, "cumulative_cost_usd": 1312000.0, "cumulative_benefit_usd": 1135885962.46, "cumulative_net_usd": 1134573962.46, "roi_pct": 86476.67}], "optimistic": [{"month": 1, "month_cost_usd": 70166.67, "month_benefit_usd": 0.0, "cumulative_cost_usd": 70166.67, "cumulative_benefit_usd": 0.0, "cumulative_net_usd": -70166.67, "roi_pct": -100.0}, {"month": 2, "month_cost_usd": 70166.67, "month_benefit_usd": 0.0, "cumulative_cost_usd": 140333.33, "cumulative_benefit_usd": 0.0, "cumulative_net_usd": -140333.33, "roi_pct": -100.0}, {"month": 3, "month_cost_usd": 70166.67, "month_benefit_usd": 0.0, "cumulative_cost_usd": 210500.0, "cumulative_benefit_usd": 0.0, "cumulative_net_usd": -210500.0, "roi_pct": -100.0}, {"month": 4, "month_cost_usd": 70166.67, "month_benefit_usd": 0.0, "cumulative_cost_usd": 280666.67, "cumulative_benefit_usd": 0.0, "cumulative_net_usd": -280666.67, "roi_pct": -100.0}, {"month": 5, "month_cost_usd": 70166.67, "month_benefit_usd": 0.0, "cumulative_cost_usd": 350833.33, "cumulative_benefit_usd": 0.0, "cumulative_net_usd": -350833.33, "roi_pct": -100.0}, {"month": 6, "month_cost_usd": 70166.67, "month_benefit_usd": 0.0, "cumulative_cost_usd": 421000.0, "cumulative_benefit_usd": 0.0, "cumulative_net_usd": -421000.0, "roi_pct": -100.0}, {"month": 7, "month_cost_usd": 16500.0, "month_benefit_usd": 4778808.26, "cumulative_cost_usd": 437500.0, "cumulative_benefit_usd": 4778808.26, "cumulative_net_usd": 4341308.26, "roi_pct": 992.3}, {"month": 8, "month_cost_usd": 16500.0, "month_benefit_usd": 9557616.51, "cumulative_cost_usd": 454000.0, "cumulative_benefit_usd": 14336424.77, "cumulative_net_usd": 13882424.77, "roi_pct": 3057.8}, {"month": 9, "month_cost_usd": 16500.0, "month_benefit_usd": 14336424.77, "cumulative_cost_usd": 470500.0, "cumulative_benefit_usd": 28672849.54, "cumulative_net_usd": 28202349.54, "roi_pct": 5994.12}, {"month": 10, "month_cost_usd": 16500.0, "month_benefit_usd": 19115233.03, "cumulative_cost_usd": 487000.0, "cumulative_benefit_usd": 47788082.56, "cumulative_net_usd": 47301082.56, "roi_pct": 9712.75}, {"month": 11, "month_cost_usd": 16500.0, "month_benefit_usd": 23894041.28, "cumulative_cost_usd": 503500.0, "cumulative_benefit_usd": 71682123.84, "cumulative_net_usd": 71178623.84, "roi_pct": 14136.77}, {"month": 12, "month_cost_usd": 16500.0, "month_benefit_usd": 28672849.54, "cumulative_cost_usd": 520000.0, "cumulative_benefit_usd": 100354973.38, "cumulative_net_usd": 99834973.38, "roi_pct": 19199.03}, {"month": 13, "month_cost_usd": 16500.0, "month_benefit_usd": 28672849.54, "cumulative_cost_usd": 536500.0, "cumulative_benefit_usd": 129027822.92, "cumulative_net_usd": 128491322.92, "roi_pct": 23949.92}, {"month": 14, "month_cost_usd": 16500.0, "month_benefit_usd": 28672849.54, "cumulative_cost_usd": 553000.0, "cumulative_benefit_usd": 157700672.46, "cumulative_net_usd": 157147672.46, "roi_pct": 28417.3}, {"month": 15, "month_cost_usd": 16500.0, "month_benefit_usd": 28672849.54, "cumulative_cost_usd": 569500.0, "cumulative_benefit_usd": 186373522.0, "cumulative_net_usd": 185804022.0, "roi_pct": 32625.82}, {"month": 16, "month_cost_usd": 16500.0, "month_benefit_usd": 28672849.54, "cumulative_cost_usd": 586000.0, "cumulative_benefit_usd": 215046371.53, "cumulative_net_usd": 214460371.53, "roi_pct": 36597.33}, {"month": 17, "month_cost_usd": 16500.0, "month_benefit_usd": 28672849.54, "cumulative_cost_usd": 602500.0, "cumulative_benefit_usd": 243719221.07, "cumulative_net_usd": 243116721.07, "roi_pct": 40351.32}, {"month": 18, "month_cost_usd": 16500.0, "month_benefit_usd": 28672849.54, "cumulative_cost_usd": 619000.0, "cumulative_benefit_usd": 272392070.61, "cumulative_net_usd": 271773070.61, "roi_pct": 43905.18}, {"month": 19, "month_cost_usd": 16500.0, "month_benefit_usd": 28672849.54, "cumulative_cost_usd": 635500.0, "cumulative_benefit_usd": 301064920.15, "cumulative_net_usd": 300429420.15, "roi_pct": 47274.5}, {"month": 20, "month_cost_usd": 16500.0, "month_benefit_usd": 28672849.54, "cumulative_cost_usd": 652000.0, "cumulative_benefit_usd": 329737769.69, "cumulative_net_usd": 329085769.69, "roi_pct": 50473.28}, {"month": 21, "month_cost_usd": 16500.0, "month_benefit_usd": 28672849.54, "cumulative_cost_usd": 668500.0, "cumulative_benefit_usd": 358410619.22, "cumulative_net_usd": 357742119.22, "roi_pct": 53514.15}, {"month": 22, "month_cost_usd": 16500.0, "month_benefit_usd": 28672849.54, "cumulative_cost_usd": 685000.0, "cumulative_benefit_usd": 387083468.76, "cumulative_net_usd": 386398468.76, "roi_pct": 56408.54}, {"month": 23, "month_cost_usd": 16500.0, "month_benefit_usd": 28672849.54, "cumulative_cost_usd": 701500.0, "cumulative_benefit_usd": 415756318.3, "cumulative_net_usd": 415054818.3, "roi_pct": 59166.76}, {"month": 24, "month_cost_usd": 16500.0, "month_benefit_usd": 28672849.54, "cumulative_cost_usd": 718000.0, "cumulative_benefit_usd": 444429167.84, "cumulative_net_usd": 443711167.84, "roi_pct": 61798.21}, {"month": 25, "month_cost_usd": 16500.0, "month_benefit_usd": 28672849.54, "cumulative_cost_usd": 734500.0, "cumulative_benefit_usd": 473102017.38, "cumulative_net_usd": 472367517.38, "roi_pct": 64311.44}, {"month": 26, "month_cost_usd": 16500.0, "month_benefit_usd": 28672849.54, "cumulative_cost_usd": 751000.0, "cumulative_benefit_usd": 501774866.91, "cumulative_net_usd": 501023866.91, "roi_pct": 66714.23}, {"month": 27, "month_cost_usd": 16500.0, "month_benefit_usd": 28672849.54, "cumulative_cost_usd": 767500.0, "cumulative_benefit_usd": 530447716.45, "cumulative_net_usd": 529680216.45, "roi_pct": 69013.71}, {"month": 28, "month_cost_usd": 16500.0, "month_benefit_usd": 28672849.54, "cumulative_cost_usd": 784000.0, "cumulative_benefit_usd": 559120565.99, "cumulative_net_usd": 558336565.99, "roi_pct": 71216.4}, {"month": 29, "month_cost_usd": 16500.0, "month_benefit_usd": 28672849.54, "cumulative_cost_usd": 800500.0, "cumulative_benefit_usd": 587793415.53, "cumulative_net_usd": 586992915.53, "roi_pct": 73328.28}, {"month": 30, "month_cost_usd": 16500.0, "month_benefit_usd": 28672849.54, "cumulative_cost_usd": 817000.0, "cumulative_benefit_usd": 616466265.07, "cumulative_net_usd": 615649265.07, "roi_pct": 75354.87}, {"month": 31, "month_cost_usd": 16500.0, "month_benefit_usd": 28672849.54, "cumulative_cost_usd": 833500.0, "cumulative_benefit_usd": 645139114.6, "cumulative_net_usd": 644305614.6, "roi_pct": 77301.21}, {"month": 32, "month_cost_usd": 16500.0, "month_benefit_usd": 28672849.54, "cumulative_cost_usd": 850000.0, "cumulative_benefit_usd": 673811964.14, "cumulative_net_usd": 672961964.14, "roi_pct": 79172.0}, {"month": 33, "month_cost_usd": 16500.0, "month_benefit_usd": 28672849.54, "cumulative_cost_usd": 866500.0, "cumulative_benefit_usd": 702484813.68, "cumulative_net_usd": 701618313.68, "roi_pct": 80971.53}, {"month": 34, "month_cost_usd": 16500.0, "month_benefit_usd": 28672849.54, "cumulative_cost_usd": 883000.0, "cumulative_benefit_usd": 731157663.22, "cumulative_net_usd": 730274663.22, "roi_pct": 82703.81}, {"month": 35, "month_cost_usd": 16500.0, "month_benefit_usd": 28672849.54, "cumulative_cost_usd": 899500.0, "cumulative_benefit_usd": 759830512.75, "cumulative_net_usd": 758931012.75, "roi_pct": 84372.54}, {"month": 36, "month_cost_usd": 16500.0, "month_benefit_usd": 28672849.54, "cumulative_cost_usd": 916000.0, "cumulative_benefit_usd": 788503362.29, "cumulative_net_usd": 787587362.29, "roi_pct": 85981.15}, {"month": 37, "month_cost_usd": 16500.0, "month_benefit_usd": 28672849.54, "cumulative_cost_usd": 932500.0, "cumulative_benefit_usd": 817176211.83, "cumulative_net_usd": 816243711.83, "roi_pct": 87532.84}, {"month": 38, "month_cost_usd": 16500.0, "month_benefit_usd": 28672849.54, "cumulative_cost_usd": 949000.0, "cumulative_benefit_usd": 845849061.37, "cumulative_net_usd": 844900061.37, "roi_pct": 89030.56}, {"month": 39, "month_cost_usd": 16500.0, "month_benefit_usd": 28672849.54, "cumulative_cost_usd": 965500.0, "cumulative_benefit_usd": 874521910.91, "cumulative_net_usd": 873556410.91, "roi_pct": 90477.1}, {"month": 40, "month_cost_usd": 16500.0, "month_benefit_usd": 28672849.54, "cumulative_cost_usd": 982000.0, "cumulative_benefit_usd": 903194760.44, "cumulative_net_usd": 902212760.44, "roi_pct": 91875.03}, {"month": 41, "month_cost_usd": 16500.0, "month_benefit_usd": 28672849.54, "cumulative_cost_usd": 998500.0, "cumulative_benefit_usd": 931867609.98, "cumulative_net_usd": 930869109.98, "roi_pct": 93226.75}, {"month": 42, "month_cost_usd": 16500.0, "month_benefit_usd": 28672849.54, "cumulative_cost_usd": 1015000.0, "cumulative_benefit_usd": 960540459.52, "cumulative_net_usd": 959525459.52, "roi_pct": 94534.53}, {"month": 43, "month_cost_usd": 16500.0, "month_benefit_usd": 28672849.54, "cumulative_cost_usd": 1031500.0, "cumulative_benefit_usd": 989213309.06, "cumulative_net_usd": 988181809.06, "roi_pct": 95800.47}, {"month": 44, "month_cost_usd": 16500.0, "month_benefit_usd": 28672849.54, "cumulative_cost_usd": 1048000.0, "cumulative_benefit_usd": 1017886158.6, "cumulative_net_usd": 1016838158.6, "roi_pct": 97026.54}, {"month": 45, "month_cost_usd": 16500.0, "month_benefit_usd": 28672849.54, "cumulative_cost_usd": 1064500.0, "cumulative_benefit_usd": 1046559008.13, "cumulative_net_usd": 1045494508.13, "roi_pct": 98214.61}, {"month": 46, "month_cost_usd": 16500.0, "month_benefit_usd": 28672849.54, "cumulative_cost_usd": 1081000.0, "cumulative_benefit_usd": 1075231857.67, "cumulative_net_usd": 1074150857.67, "roi_pct": 99366.41}, {"month": 47, "month_cost_usd": 16500.0, "month_benefit_usd": 28672849.54, "cumulative_cost_usd": 1097500.0, "cumulative_benefit_usd": 1103904707.21, "cumulative_net_usd": 1102807207.21, "roi_pct": 100483.57}, {"month": 48, "month_cost_usd": 16500.0, "month_benefit_usd": 28672849.54, "cumulative_cost_usd": 1114000.0, "cumulative_benefit_usd": 1132577556.75, "cumulative_net_usd": 1131463556.75, "roi_pct": 101567.64}, {"month": 49, "month_cost_usd": 16500.0, "month_benefit_usd": 28672849.54, "cumulative_cost_usd": 1130500.0, "cumulative_benefit_usd": 1161250406.29, "cumulative_net_usd": 1160119906.29, "roi_pct": 102620.07}, {"month": 50, "month_cost_usd": 16500.0, "month_benefit_usd": 28672849.54, "cumulative_cost_usd": 1147000.0, "cumulative_benefit_usd": 1189923255.82, "cumulative_net_usd": 1188776255.82, "roi_pct": 103642.22}, {"month": 51, "month_cost_usd": 16500.0, "month_benefit_usd": 28672849.54, "cumulative_cost_usd": 1163500.0, "cumulative_benefit_usd": 1218596105.36, "cumulative_net_usd": 1217432605.36, "roi_pct": 104635.38}, {"month": 52, "month_cost_usd": 16500.0, "month_benefit_usd": 28672849.54, "cumulative_cost_usd": 1180000.0, "cumulative_benefit_usd": 1247268954.9, "cumulative_net_usd": 1246088954.9, "roi_pct": 105600.76}, {"month": 53, "month_cost_usd": 16500.0, "month_benefit_usd": 28672849.54, "cumulative_cost_usd": 1196500.0, "cumulative_benefit_usd": 1275941804.44, "cumulative_net_usd": 1274745304.44, "roi_pct": 106539.52}, {"month": 54, "month_cost_usd": 16500.0, "month_benefit_usd": 28672849.54, "cumulative_cost_usd": 1213000.0, "cumulative_benefit_usd": 1304614653.98, "cumulative_net_usd": 1303401653.98, "roi_pct": 107452.73}, {"month": 55, "month_cost_usd": 16500.0, "month_benefit_usd": 28672849.54, "cumulative_cost_usd": 1229500.0, "cumulative_benefit_usd": 1333287503.51, "cumulative_net_usd": 1332058003.51, "roi_pct": 108341.44}, {"month": 56, "month_cost_usd": 16500.0, "month_benefit_usd": 28672849.54, "cumulative_cost_usd": 1246000.0, "cumulative_benefit_usd": 1361960353.05, "cumulative_net_usd": 1360714353.05, "roi_pct": 109206.61}, {"month": 57, "month_cost_usd": 16500.0, "month_benefit_usd": 28672849.54, "cumulative_cost_usd": 1262500.0, "cumulative_benefit_usd": 1390633202.59, "cumulative_net_usd": 1389370702.59, "roi_pct": 110049.16}, {"month": 58, "month_cost_usd": 16500.0, "month_benefit_usd": 28672849.54, "cumulative_cost_usd": 1279000.0, "cumulative_benefit_usd": 1419306052.13, "cumulative_net_usd": 1418027052.13, "roi_pct": 110869.98}, {"month": 59, "month_cost_usd": 16500.0, "month_benefit_usd": 28672849.54, "cumulative_cost_usd": 1295500.0, "cumulative_benefit_usd": 1447978901.66, "cumulative_net_usd": 1446683401.66, "roi_pct": 111669.89}, {"month": 60, "month_cost_usd": 16500.0, "month_benefit_usd": 28672849.54, "cumulative_cost_usd": 1312000.0, "cumulative_benefit_usd": 1476651751.2, "cumulative_net_usd": 1475339751.2, "roi_pct": 112449.68}]}, "horizons": [{"label": "1 Month", "months": 1}, {"label": "3 Months", "months": 3}, {"label": "6 Months", "months": 6}, {"label": "1 Year", "months": 12}, {"label": "2 Years", "months": 24}, {"label": "3 Years", "months": 36}, {"label": "5 Years", "months": 60}], "payback_by_scenario": {"conservative": 7, "base": 7, "optimistic": 7}, "smart_recommendations": [{"team": "Executive Leadership / CRO", "specific": "Approve production deployment funding based on the modeled 5-year net benefit.", "measurable": "5-year cumulative net benefit $1,134,573,962, ROI 86477%, payback in 7 months (base scenario).", "achievable": "Champion model measured holdout AMEX metric 0.7936, a real, validated result from Notebook 05.", "relevant": "Portfolio-wide default exposure and capital adequacy are the CRO's direct mandate.", "time_bound": "Funding decision within 1 sprint of this report; re-review assumptions annually."}, {"team": "Head of Credit Risk / Underwriting", "specific": "Replace the legacy scorecard's top-4% flagging logic with the new champion model's output.", "measurable": "Measured Top-4% default capture improves from an assumed 25% (legacy) to 66.3% (new model, measured).", "achievable": "No new data collection required -- Notebook 05's model scores directly on the existing feature store.", "relevant": "Directly drives the loss-avoided component of the financial case.", "time_bound": "Cutover during Phase 5-6 of the implementation plan (weeks 11-20)."}, {"team": "Model Risk Management / Independent Validation", "specific": "Complete (or re-confirm) SR 11-7-style independent validation before go-live.", "measurable": "Notebook 07 assigned risk tier 'Tier 2 (Medium)'.", "achievable": "Notebook 07 runs PSI, rank-ordering, sensitivity, and challenger-benchmark checks directly against Notebook 05's saved champion.", "relevant": "Regulatory and internal governance prerequisite for any credit-decisioning model.", "time_bound": "Must complete during Phase 4 (Model Risk Validation & Compliance Review) before Phase 5 begins."}, {"team": "Compliance / Regulatory Affairs", "specific": "Complete Basel III / IFRS 9 capital-treatment mapping and fair-lending review.", "measurable": "0 feature(s) flagged with significant population shift (Notebook 07).", "achievable": "Notebook 08 (Basel III / IFRS 9 Mapping) produces the required documentation trail.", "relevant": "Deployment cannot proceed at a regulated card issuer without this sign-off.", "time_bound": "Complete within Phase 4, in parallel with Model Risk Management."}, {"team": "Collections Operations", "specific": "Build the intervention workflow (outreach, credit-line adjustment) for accounts newly flagged by the improved model.", "measurable": "Assumed 35% intervention success rate drives $262,032,457/year in modeled loss avoidance -- track actual realized success rate against this assumption post go-live.", "achievable": "Workflow changes only, no new systems required beyond the model's output feed.", "relevant": "Realizing the loss-avoided benefit depends entirely on Collections actually acting on the model's flags.", "time_bound": "Operational by end of Phase 6 (UAT & Shadow-Mode)."}, {"team": "Data Engineering", "specific": "Productionize the Notebook 02/04 Polars feature-store pipeline for daily/real-time scoring.", "measurable": "Pipeline must reproduce the same feature set the champion model was trained on (see Notebook 04's engineered feature columns).", "achievable": "Pipeline already exists and runs end-to-end in this platform; this is a hardening/scheduling task, not new development.", "relevant": "Every downstream number in this report assumes the production feature set matches what Notebook 05 trained on.", "time_bound": "Complete during Phase 2 (weeks 2-5)."}, {"team": "MLOps / Platform Engineering", "specific": "Stand up the FastAPI scoring service, Docker packaging, and monitoring pipeline (Notebooks 09-12).", "measurable": "Monthly recurring cost budget: $16,500/month post go-live (assumption, Section 5).", "achievable": "Architecture and monitoring triggers (PSI > 0.25) are already defined in this platform's governance docs.", "relevant": "Deployment reliability and drift monitoring directly protect the modeled financial benefit from decaying silently.", "time_bound": "Complete during Phase 5 (weeks 9-14)."}, {"team": "Card Issuing / Product Business Unit", "specific": "Adjust approval-policy thresholds to capture the modeled incremental-approval opportunity.", "measurable": "$2,640,000/year modeled revenue uplift from a stated 3%-point increase in approvals among 400,000 assumed annual applicants.", "achievable": "Requires only a policy-threshold change once the new model's calibration is validated (Notebook 07).", "relevant": "New-business revenue is the second major component of the financial case, alongside loss avoidance.", "time_bound": "Threshold change effective at go-live (Phase 7)."}, {"team": "Finance / CFO Office", "specific": "Track realized costs and benefits against this report's modeled figures on a monthly cadence.", "measurable": "Total one-time investment $421,000; monthly recurring $16,500; base-scenario payback at month 7.", "achievable": "monthly_financial_model.csv (this notebook's own output) gives a ready-made tracking template.", "relevant": "Validates or corrects this report's assumptions with real realized figures as they become available.", "time_bound": "First realized-vs-modeled variance review at month 3 post go-live, then quarterly."}, {"team": "External Regulator Engagement (e.g. Federal Reserve / OCC)", "specific": "Maintain the full documentation trail (Notebooks 01, 05, 07, 08, 14) as supervisory evidence.", "measurable": "9 governance dimensions tracked in Notebook 07's checklist -- current tier: Tier 2 (Medium).", "achievable": "Every document already exists as a notebook output; no new artifact type required.", "relevant": "SR 11-7 / OCC 2011-12 examinations expect exactly this kind of end-to-end evidentiary trail.", "time_bound": "Documentation package finalized before go-live (end of Phase 6)."}], "risk_tier": "Tier 2 (Medium)", "psi_significant_features": 0, "nb07_available": true};
+const COLORS = { blue: "#2a78d6", red: "#e34948", green: "#3a9e5f", amber: "#d99a2b", purple: "#7d5fd6", grey: "#8b8a82" };
+if (typeof Chart !== "undefined") {
+  if (typeof ChartDataLabels !== "undefined") { Chart.register(ChartDataLabels); }
+  Chart.defaults.font.size = 11;
+  Chart.defaults.color = "#55544c";
+}
+
+document.getElementById("problemNameLine").textContent = DATA.problem_name;
+document.getElementById("generatedLine").textContent = "Generated " + DATA.generated_at +
+  " | Champion model: " + DATA.champion_model + " (measured, Notebook 05)" +
+  (DATA.nb07_available ? " | Model risk tier: " + DATA.risk_tier + " (Notebook 07)" : " | Notebook 07 not yet run");
+
+let state = { scenario: "base", horizonMonths: 60 };
+
+function fmtUsd(v) {
+  if (v === null || v === undefined) return "n/a";
+  const sign = v < 0 ? "-" : "";
+  return sign + "$" + Math.abs(Math.round(v)).toLocaleString();
+}
+function fmtPct(v) { return (v === null || v === undefined) ? "n/a" : v.toFixed(0) + "%"; }
+
+function monthlyRows() { return DATA.monthly_models[state.scenario]; }
+function rowAtMonth(m) {
+  const rows = monthlyRows();
+  return rows.find(function(r) { return r.month === m; }) || rows[rows.length - 1];
+}
+
+function renderHorizonButtons() {
+  const el = document.getElementById("horizonButtons");
+  el.innerHTML = "";
+  DATA.horizons.forEach(function(h) {
+    const b = document.createElement("button");
+    b.textContent = h.label;
+    b.className = (h.months === state.horizonMonths) ? "active" : "";
+    b.onclick = function() { state.horizonMonths = h.months; renderAll(); };
+    el.appendChild(b);
+  });
+}
+
+function renderKpis() {
+  const r = rowAtMonth(state.horizonMonths);
+  const payback = DATA.payback_by_scenario[state.scenario];
+  const captureImprovement = Math.max(0, DATA.measured.holdout_top4pct_capture - DATA.legacy_capture_rate);
+  const cards = [
+    { label: "Total One-Time Investment", value: fmtUsd(DATA.total_one_time_investment), sub: "ASSUMPTION" },
+    { label: "Monthly Recurring Cost", value: fmtUsd(DATA.monthly_recurring_cost) + "/mo", sub: "ASSUMPTION" },
+    { label: "Cumulative Net Benefit", value: fmtUsd(r.cumulative_net_usd), sub: "at selected horizon, " + state.scenario },
+    { label: "ROI at Horizon", value: fmtPct(r.roi_pct), sub: "at selected horizon, " + state.scenario },
+    { label: "Payback Period", value: payback ? (payback + " months") : "not reached (60mo)", sub: state.scenario + " scenario" },
+    { label: "Implementation Duration", value: DATA.implementation_weeks + " weeks", sub: "stated project plan" },
+    { label: "Capture-Rate Improvement", value: (captureImprovement * 100).toFixed(1) + " pts", sub: "MEASURED vs legacy ASSUMPTION" },
+  ];
+  const grid = document.getElementById("kpiGrid");
+  grid.innerHTML = "";
+  cards.forEach(function(c) {
+    const div = document.createElement("div");
+    div.className = "kpi-card";
+    div.innerHTML = "<div class=\"label\">" + c.label + "</div><div class=\"value\">" + c.value + "</div><div class=\"sub\">" + c.sub + "</div>";
+    grid.appendChild(div);
+  });
+}
+
+let charts = {};
+function destroyChart(key) { if (charts[key]) { charts[key].destroy(); } }
+
+function renderNetBenefitChart() {
+  destroyChart("net");
+  const rows = monthlyRows().filter(function(r) { return r.month <= state.horizonMonths; });
+  document.getElementById("chart1Title").textContent = DATA.problem_name + ": Cumulative Net Benefit Over Time";
+  const ctx = document.getElementById("chartNetBenefit").getContext("2d");
+  charts.net = new Chart(ctx, { type: "line",
+    data: { labels: rows.map(function(r) { return "M" + r.month; }),
+            datasets: [{ label: "Cumulative net benefit (USD)", data: rows.map(function(r) { return r.cumulative_net_usd; }),
+                         borderColor: COLORS.blue, backgroundColor: COLORS.blue, tension: 0.15, pointRadius: 0 }] },
+    options: { plugins: { legend: { display: true }, datalabels: { display: false },
+                           tooltip: { callbacks: { label: function(c) { return fmtUsd(c.parsed.y); } } } },
+               scales: { x: { title: { display: true, text: "Month since project start" } },
+                         y: { title: { display: true, text: "Cumulative net benefit (USD)" } } } } });
+}
+
+function renderRoiByHorizonChart() {
+  destroyChart("roi");
+  document.getElementById("chart2Title").textContent = DATA.problem_name + ": ROI by Time Horizon";
+  const rows = DATA.horizons.map(function(h) {
+    return { label: h.label, roi: rowAtMonth(h.months).roi_pct };
+  });
+  const ctx = document.getElementById("chartRoiByHorizon").getContext("2d");
+  charts.roi = new Chart(ctx, { type: "bar",
+    data: { labels: rows.map(function(r) { return r.label; }),
+            datasets: [{ label: "ROI %", data: rows.map(function(r) { return r.roi; }), backgroundColor: COLORS.green }] },
+    options: { plugins: { legend: { display: true },
+                           datalabels: { anchor: "end", align: "top", formatter: function(v) { return v.toFixed(0) + "%"; } },
+                           tooltip: { callbacks: { label: function(c) { return fmtPct(c.parsed.y); } } } },
+               scales: { x: { title: { display: true, text: "Time horizon" } },
+                         y: { title: { display: true, text: "ROI (%)" } } } } });
+}
+
+function renderInvestmentChart() {
+  destroyChart("inv");
+  document.getElementById("chart3Title").textContent = DATA.problem_name + ": One-Time Investment Breakdown (ASSUMPTION)";
+  const ctx = document.getElementById("chartInvestment").getContext("2d");
+  const palette = [COLORS.blue, COLORS.red, COLORS.green, COLORS.amber, COLORS.purple, COLORS.grey];
+  charts.inv = new Chart(ctx, { type: "doughnut",
+    data: { labels: DATA.investment_breakdown.map(function(r) { return r.category; }),
+            datasets: [{ data: DATA.investment_breakdown.map(function(r) { return r.amount_usd; }), backgroundColor: palette }] },
+    options: { plugins: { legend: { display: true, position: "bottom", labels: { boxWidth: 10, font: { size: 9 } } },
+                           datalabels: { formatter: function(v) { return fmtUsd(v); }, font: { size: 9 } },
+                           tooltip: { callbacks: { label: function(c) { return c.label + ": " + fmtUsd(c.parsed); } } } } } });
+}
+
+function renderAnnualBenefitChart() {
+  destroyChart("annual");
+  document.getElementById("chart4Title").textContent = DATA.problem_name + ": Annual Benefit Breakdown, Years 1-5";
+  const rows = monthlyRows();
+  const years = [1, 2, 3, 4, 5];
+  const totalBenefit = DATA.monthly_models.base[DATA.monthly_models.base.length - 1].cumulative_benefit_usd;
+  const lossShare = totalBenefit > 0 ? (rowAtMonth(12).cumulative_benefit_usd > 0 ? 0.5 : 0.5) : 0.5;
+  const perYear = years.map(function(y) {
+    const cur = rows.find(function(r) { return r.month === y * 12; }) || rows[rows.length - 1];
+    const prevMonth = (y - 1) * 12;
+    const prev = prevMonth > 0 ? (rows.find(function(r) { return r.month === prevMonth; }) || { cumulative_benefit_usd: 0 }) : { cumulative_benefit_usd: 0 };
+    return cur.cumulative_benefit_usd - prev.cumulative_benefit_usd;
+  });
+  const ctx = document.getElementById("chartAnnualBenefit").getContext("2d");
+  charts.annual = new Chart(ctx, { type: "bar",
+    data: { labels: years.map(function(y) { return "Year " + y; }),
+            datasets: [{ label: "Total annual benefit (USD)", data: perYear, backgroundColor: COLORS.amber }] },
+    options: { plugins: { legend: { display: true },
+                           datalabels: { anchor: "end", align: "top", formatter: function(v) { return fmtUsd(v); }, font: { size: 9 } },
+                           tooltip: { callbacks: { label: function(c) { return fmtUsd(c.parsed.y); } } } },
+               scales: { x: { title: { display: true, text: "Year" } },
+                         y: { title: { display: true, text: "Annual benefit (USD)" } } } } });
+}
+
+function renderCaptureRateChart() {
+  destroyChart("capture");
+  document.getElementById("chart5Title").textContent = DATA.problem_name + ": Default-Capture Rate, Legacy vs Measured Champion";
+  const ctx = document.getElementById("chartCaptureRate").getContext("2d");
+  charts.capture = new Chart(ctx, { type: "bar",
+    data: { labels: ["Legacy Model (ASSUMPTION)", DATA.champion_model + " (MEASURED)"],
+            datasets: [{ label: "Top-4% default capture rate", data: [DATA.legacy_capture_rate * 100, DATA.measured.holdout_top4pct_capture * 100],
+                         backgroundColor: [COLORS.grey, COLORS.green] }] },
+    options: { plugins: { legend: { display: false },
+                           datalabels: { anchor: "end", align: "top", formatter: function(v) { return v.toFixed(1) + "%"; } },
+                           tooltip: { callbacks: { label: function(c) { return c.parsed.y.toFixed(1) + "%"; } } } },
+               scales: { y: { title: { display: true, text: "Capture rate (%)" } } } } });
+}
+
+function renderTimelineChart() {
+  destroyChart("timeline");
+  document.getElementById("chart6Title").textContent = DATA.problem_name + ": Implementation Timeline (" + DATA.implementation_weeks + " weeks)";
+  const ctx = document.getElementById("chartTimeline").getContext("2d");
+  const phases = DATA.implementation_phases;
+  charts.timeline = new Chart(ctx, { type: "bar",
+    data: { labels: phases.map(function(p) { return p.chart_label; }),
+            datasets: [{ label: "Weeks", data: phases.map(function(p) { return [p.start_week, p.start_week + p.weeks]; }),
+                         backgroundColor: COLORS.blue }] },
+    options: { indexAxis: "y",
+               plugins: { legend: { display: false },
+                          datalabels: { formatter: function(v) { return (v[1] - v[0]) + "w"; }, color: "#fff", font: { size: 9 } },
+                          tooltip: { callbacks: {
+                            title: function(items) { return phases[items[0].dataIndex].phase; },
+                            label: function(c) { return "Weeks " + c.raw[0] + "-" + c.raw[1]; } } } },
+               scales: { x: { title: { display: true, text: "Project week" } } } } });
+}
+
+function renderFinancialTable() {
+  const rows = DATA.horizons.map(function(h) { return rowAtMonth(h.months); });
+  const labels = DATA.horizons.map(function(h) { return h.label; });
+  const table = document.getElementById("financialTable");
+  let sortState = { col: null, dir: 1 };
+  function draw() {
+    let data = rows.map(function(r, i) { return { label: labels[i], r: r }; });
+    if (sortState.col) {
+      data.sort(function(a, b) {
+        const va = sortState.col === "label" ? a.label : a.r[sortState.col];
+        const vb = sortState.col === "label" ? b.label : b.r[sortState.col];
+        return va > vb ? sortState.dir : va < vb ? -sortState.dir : 0;
+      });
+    }
+    let html = "<thead><tr>" +
+      "<th class=\"sortable\" data-col=\"label\">Horizon</th>" +
+      "<th class=\"sortable\" data-col=\"cumulative_cost_usd\">Cumulative Cost</th>" +
+      "<th class=\"sortable\" data-col=\"cumulative_benefit_usd\">Cumulative Benefit</th>" +
+      "<th class=\"sortable\" data-col=\"cumulative_net_usd\">Cumulative Net</th>" +
+      "<th class=\"sortable\" data-col=\"roi_pct\">ROI %</th></tr></thead><tbody>";
+    data.forEach(function(d) {
+      html += "<tr><td>" + d.label + "</td><td>" + fmtUsd(d.r.cumulative_cost_usd) + "</td><td>" +
+        fmtUsd(d.r.cumulative_benefit_usd) + "</td><td>" + fmtUsd(d.r.cumulative_net_usd) + "</td><td>" +
+        fmtPct(d.r.roi_pct) + "</td></tr>";
+    });
+    html += "</tbody>";
+    table.innerHTML = html;
+    table.querySelectorAll("th.sortable").forEach(function(th) {
+      th.onclick = function() {
+        const col = th.getAttribute("data-col");
+        sortState.dir = (sortState.col === col) ? -sortState.dir : 1;
+        sortState.col = col;
+        draw();
+      };
+    });
+  }
+  draw();
+}
+
+function renderSmartTable() {
+  const teamSel = document.getElementById("teamFilter");
+  const search = document.getElementById("teamSearch").value.toLowerCase();
+  const teamValue = teamSel.value;
+  const table = document.getElementById("smartTable");
+  let rows = DATA.smart_recommendations;
+  if (teamValue !== "__all__") { rows = rows.filter(function(r) { return r.team === teamValue; }); }
+  if (search) {
+    rows = rows.filter(function(r) {
+      return (r.team + " " + r.specific + " " + r.measurable + " " + r.achievable + " " + r.relevant + " " + r.time_bound).toLowerCase().indexOf(search) !== -1;
+    });
+  }
+  let html = "<thead><tr><th>Team</th><th>Specific</th><th>Measurable</th><th>Achievable</th><th>Relevant</th><th>Time-Bound</th></tr></thead><tbody>";
+  rows.forEach(function(r) {
+    html += "<tr><td><strong>" + r.team + "</strong></td><td>" + r.specific + "</td><td>" + r.measurable +
+      "</td><td>" + r.achievable + "</td><td>" + r.relevant + "</td><td>" + r.time_bound + "</td></tr>";
+  });
+  html += "</tbody>";
+  table.innerHTML = html;
+}
+
+function populateTeamFilter() {
+  const sel = document.getElementById("teamFilter");
+  sel.innerHTML = "<option value=\"__all__\">All Teams</option>";
+  DATA.smart_recommendations.forEach(function(r) {
+    const opt = document.createElement("option");
+    opt.value = r.team; opt.textContent = r.team;
+    sel.appendChild(opt);
+  });
+}
+
+function renderFooter() {
+  const el = document.getElementById("footerAssumptions");
+  let html = "<strong>Stated assumption constants (edit in Notebook 14, Sections 4-5, and re-run to update this dashboard):</strong><br>";
+  Object.keys(DATA.assumptions).forEach(function(k) {
+    html += k.replace(/_/g, " ") + " = " + DATA.assumptions[k] + " &nbsp;|&nbsp; ";
+  });
+  el.innerHTML = html;
+}
+
+const CHART_LIB_AVAILABLE = (typeof Chart !== "undefined");
+let chartLibWarningShown = false;
+
+function safeRenderChart(fn, label) {
+  if (!CHART_LIB_AVAILABLE) {
+    if (!chartLibWarningShown) {
+      chartLibWarningShown = true;
+      const warn = document.createElement("div");
+      warn.className = "disclaimer";
+      warn.style.margin = "0 0 16px";
+      warn.innerHTML = "<strong>Charts unavailable:</strong> the Chart.js library did not load from its CDN " +
+        "(no internet connection reached it). KPIs, tables, and filters below still work normally -- only " +
+        "the 6 chart panels are affected. Reconnect to the internet and reload this page to see them.";
+      document.querySelector("main").insertBefore(warn, document.querySelector(".kpi-grid"));
+    }
+    return;
+  }
+  try { fn(); } catch (e) { console.error("Chart render failed (" + label + "):", e); }
+}
+
+function renderAll() {
+  renderHorizonButtons();
+  renderKpis();
+  safeRenderChart(renderNetBenefitChart, "net benefit");
+  safeRenderChart(renderRoiByHorizonChart, "roi by horizon");
+  safeRenderChart(renderInvestmentChart, "investment breakdown");
+  safeRenderChart(renderAnnualBenefitChart, "annual benefit");
+  safeRenderChart(renderCaptureRateChart, "capture rate");
+  safeRenderChart(renderTimelineChart, "timeline");
+  renderFinancialTable();
+  renderSmartTable();
+}
+
+document.getElementById("scenarioSelect").addEventListener("change", function(e) { state.scenario = e.target.value; renderAll(); });
+document.getElementById("teamFilter").addEventListener("change", renderSmartTable);
+document.getElementById("teamSearch").addEventListener("input", renderSmartTable);
+
+populateTeamFilter();
+renderFooter();
+renderAll();
+</script>
+</body>
+</html>

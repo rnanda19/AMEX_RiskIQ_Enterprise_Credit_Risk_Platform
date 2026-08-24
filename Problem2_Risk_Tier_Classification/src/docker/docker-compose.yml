@@ -1,0 +1,12 @@
+services:
+  amex-risk-tier-api:
+    build: .
+    image: amex-risk-tier-api:latest
+    container_name: amex-risk-tier-api
+    ports:
+      - "8001:8001"
+    volumes:
+      - ${AMEX_PROJECT_ROOT_HOST}:/mnt/amex-project:ro
+    environment:
+      - AMEX_PROJECT_ROOT=/mnt/amex-project
+    restart: unless-stopped

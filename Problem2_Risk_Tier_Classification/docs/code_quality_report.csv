@@ -1,0 +1,10 @@
+file,type,lines,syntax_valid,functions_defined,pyflakes_warnings,notes
+19_risk_tier_business_understanding.ipynb,notebook,425.0,True,6.0,,
+20_risk_tier_model_development.ipynb,notebook,768.0,True,8.0,,
+21_risk_tier_validation.ipynb,notebook,604.0,True,5.0,,
+22_risk_tier_deployment.ipynb,notebook,865.0,True,5.0,,
+23_risk_tier_monitoring.ipynb,notebook,730.0,True,5.0,,
+24_risk_tier_reporting.ipynb,notebook,499.0,True,4.0,,
+25_risk_tier_packaging.ipynb,notebook,1532.0,True,17.0,,
+risk_tier_service.py,script,115.0,True,4.0,,
+risk_tier_monitoring_job.py,script,,,,,not found -- upstream notebook has not run yet

@@ -1,0 +1,60 @@
+{
+  "generated_at_utc": "2026-08-24T07:12:37.016581+00:00",
+  "problem_number": 2,
+  "problem_name": "Risk Tier Classification",
+  "notebook_status": [
+    {
+      "notebook": 19,
+      "title": "Business Understanding & Policy",
+      "status": "Complete",
+      "summary_file": "notebook_19_summary.json"
+    },
+    {
+      "notebook": 20,
+      "title": "Model Development",
+      "status": "Complete",
+      "summary_file": "notebook_20_summary.json"
+    },
+    {
+      "notebook": 21,
+      "title": "Validation",
+      "status": "Complete",
+      "summary_file": "notebook_21_summary.json"
+    },
+    {
+      "notebook": 22,
+      "title": "Deployment",
+      "status": "Complete",
+      "summary_file": "notebook_22_summary.json"
+    },
+    {
+      "notebook": 23,
+      "title": "Monitoring",
+      "status": "Not Yet Run",
+      "summary_file": "(missing)"
+    }
+  ],
+  "at_a_glance": {
+    "champion_model": "xgboost",
+    "champion_holdout_auc": 0.9620396555226549,
+    "champion_holdout_amex_metric": 0.7935631597243085,
+    "n_tiers": 4,
+    "primary_method": "business_rule",
+    "primary_method_full_kpi_pass": true,
+    "split_half_psi": 0.0002,
+    "chi_square_p_value_nb20": 0.0,
+    "rank_ordering_pass_nb21": true,
+    "cramers_v": 0.7636626665627394,
+    "fair_lending_testing_status": "Not Possible -- Data Limitation (see Section 9)",
+    "api_self_test_passed": true,
+    "api_latency_p50_ms": 12.953
+  },
+  "scenario_assumptions": {
+    "deployment_portfolio_size_accounts": 500000,
+    "avg_exposure_at_default_usd": 3500,
+    "high_risk_tier_population_share": 0.1,
+    "risk_based_repricing_loss_reduction_share": 0.15
+  },
+  "real_bad_rate_spread_pp": 74.963,
+  "annual_illustrative_loss_avoidance_usd": 19877287.5
+}

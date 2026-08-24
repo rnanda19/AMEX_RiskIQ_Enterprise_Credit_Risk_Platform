@@ -1,0 +1,59 @@
+{
+  "generated_at_utc": "2026-08-24T05:24:16.937732+00:00",
+  "n_tiers": 4,
+  "tier_order": [
+    "Prime",
+    "Near-Prime",
+    "Subprime",
+    "High Risk"
+  ],
+  "bucketing_methods": {
+    "quantile": {
+      "description": "ASSUMPTION -- equal-population quartiles of the real holdout PD score distribution; guarantees balanced tier sizes by construction.",
+      "quantile_cutpoints": [
+        0.25,
+        0.5,
+        0.75
+      ]
+    },
+    "business_rule": {
+      "description": "ASSUMPTION -- fixed PD thresholds, chosen for continuity with Notebook 13's illustrative BI bands; population size is whatever the real score distribution puts in each band, not guaranteed balanced.",
+      "pd_thresholds": [
+        {
+          "risk_tier": "Prime",
+          "tier_order": 1,
+          "pd_lower": 0.0,
+          "pd_upper": 0.05
+        },
+        {
+          "risk_tier": "Near-Prime",
+          "tier_order": 2,
+          "pd_lower": 0.05,
+          "pd_upper": 0.15
+        },
+        {
+          "risk_tier": "Subprime",
+          "tier_order": 3,
+          "pd_lower": 0.15,
+          "pd_upper": 0.35
+        },
+        {
+          "risk_tier": "High Risk",
+          "tier_order": 4,
+          "pd_lower": 0.35,
+          "pd_upper": 1.01
+        }
+      ]
+    }
+  },
+  "primary_method": "business_rule",
+  "kpi_targets": {
+    "min_bad_rate_ratio_top_to_bottom_tier": 3.0,
+    "max_tier_population_psi_split_half": 0.1,
+    "min_tier_population_pct": 5.0,
+    "require_strict_monotonicity": true
+  },
+  "champion_model_used": "xgboost",
+  "champion_holdout_auc": 0.9620396555226549,
+  "champion_holdout_amex_metric": 0.7935631597243085
+}
