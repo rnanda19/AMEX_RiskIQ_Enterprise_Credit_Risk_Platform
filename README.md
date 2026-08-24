@@ -1,6 +1,6 @@
 # AMEX RiskIQ: Enterprise Credit Risk Platform
 
-[![Python 3.11](https://img.shields.io/badge/python-3.11-blue.svg)]() [![CRISP-DM](https://img.shields.io/badge/methodology-CRISP--DM-informational.svg)]() [![License: MIT](https://img.shields.io/badge/license-MIT-green.svg)](LICENSE)
+[![Python 3.11](https://img.shields.io/badge/python-3.11-blue.svg)]() [![CRISP-DM](https://img.shields.io/badge/methodology-CRISP--DM-informational.svg)]() [![License: All Rights Reserved](https://img.shields.io/badge/license-All%20Rights%20Reserved-lightgrey.svg)](LICENSE)
 
 An enterprise-grade credit risk platform built end-to-end on the real Kaggle **American Express Default Prediction** dataset. This repository holds **Phase 1: Foundation** of a larger 14-problem, 5-phase roadmap — Problem 1 (Probability of Default) and Problem 2 (Risk Tier Classification), 25 notebooks combined. Later phases (Regulatory & Loss Provisioning, Behavioral Intelligence, Operational Risk Management, Customer & Business Intelligence) are in active development.
 
@@ -56,4 +56,4 @@ Polars (WARP-tuned thread pools), NumPy/Pandas, scikit-learn, XGBoost/LightGBM/C
 
 ## License
 
-MIT — see `LICENSE`.
+All Rights Reserved — this repository is shared publicly for portfolio and demonstration purposes only. It is not licensed for reuse, modification, or redistribution; see `LICENSE` for details.
