@@ -1,0 +1,26 @@
+{
+  "ead_per_account_usd": {
+    "value": 5000,
+    "source": "Notebook 08 (inherited, real value read programmatically)"
+  },
+  "baseline_flat_lgd": {
+    "value": 0.45,
+    "source": "Notebook 08 (inherited, real value read programmatically)"
+  },
+  "analyst_hours_saved_per_cycle": {
+    "value": 250,
+    "source": "ASSUMPTION -- illustrative hours saved per quarterly cycle vs a manual dual-standard (IFRS9 3-stage + CECL lifetime) reserve reconciliation, statistical re-validation (chi-square/z-test/PSI), and audit-trail assembly across two accounting standards; edit to your institution's own process-timing data."
+  },
+  "analyst_hourly_cost_usd": {
+    "value": 100,
+    "source": "ASSUMPTION -- illustrative fully-loaded hourly cost for model-risk/quant-analyst time; edit to your institution's actual cost figure."
+  },
+  "implementation_cost_usd": {
+    "value": 70000,
+    "source": "ASSUMPTION -- illustrative one-time build/validate/deploy cost for a dual-framework (IFRS9+CECL) ECL engine with statistical validation and macro-sensitivity tooling -- larger than Problem 4's single-framework LGD engine; edit to your institution's actual project cost."
+  },
+  "annual_validation_cycles": {
+    "value": 4,
+    "source": "ASSUMPTION -- how many times per year this ECL pipeline is re-run and re-validated against a holdout-sized population (illustrative quarterly cadence); edit to your institution's actual monitoring frequency."
+  }
+}

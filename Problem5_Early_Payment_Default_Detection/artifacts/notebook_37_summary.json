@@ -1,0 +1,25 @@
+{
+  "notebook": "37_early_payment_default_reporting_packaging",
+  "generated_at_utc": "2026-08-24T20:52:38.081792+00:00",
+  "problem_number": 5,
+  "problem_name": "Early Payment Default Detection",
+  "phase": "Phase 2 -- Regulatory & Loss Provisioning",
+  "problem_5_complete": true,
+  "winning_k": 3,
+  "meets_kpi_target": true,
+  "recommended_for_production": true,
+  "months_earlier": 10.0,
+  "defaulters_captured_early": 10884,
+  "loss_prevented_per_cycle_usd": 4898250.0,
+  "roi_year_1_pct": 35523.6,
+  "payback_period_months": 0.03,
+  "output_files": {
+    "financial_assumptions.json": "C:\\Users\\rnand\\Downloads\\amex-default-prediction\\AMEX_Enterprise_Credit_Risk_Platform\\Phase2_Regulatory_Loss_Provisioning\\Problem5_Early_Payment_Default_Detection\\05_Financial_Impact_Reporting_Packaging\\financial_assumptions.json",
+    "p5_smart_suggestions.csv": "C:\\Users\\rnand\\Downloads\\amex-default-prediction\\AMEX_Enterprise_Credit_Risk_Platform\\Phase2_Regulatory_Loss_Provisioning\\Problem5_Early_Payment_Default_Detection\\05_Financial_Impact_Reporting_Packaging\\p5_smart_suggestions.csv",
+    "early_warning_time_gained_chart.png": "C:\\Users\\rnand\\Downloads\\amex-default-prediction\\AMEX_Enterprise_Credit_Risk_Platform\\Phase2_Regulatory_Loss_Provisioning\\Problem5_Early_Payment_Default_Detection\\05_Financial_Impact_Reporting_Packaging\\early_warning_time_gained_chart.png",
+    "defaulters_captured_early_chart.png": "C:\\Users\\rnand\\Downloads\\amex-default-prediction\\AMEX_Enterprise_Credit_Risk_Platform\\Phase2_Regulatory_Loss_Provisioning\\Problem5_Early_Payment_Default_Detection\\05_Financial_Impact_Reporting_Packaging\\defaulters_captured_early_chart.png",
+    "Financial_Impact_Report.docx": "C:\\Users\\rnand\\Downloads\\amex-default-prediction\\AMEX_Enterprise_Credit_Risk_Platform\\Phase2_Regulatory_Loss_Provisioning\\Problem5_Early_Payment_Default_Detection\\05_Financial_Impact_Reporting_Packaging\\Financial_Impact_Report.docx",
+    "AMEX_Problem5_Financial_Impact_Workbook.xlsx": "C:\\Users\\rnand\\Downloads\\amex-default-prediction\\AMEX_Enterprise_Credit_Risk_Platform\\Phase2_Regulatory_Loss_Provisioning\\Problem5_Early_Payment_Default_Detection\\05_Financial_Impact_Reporting_Packaging\\AMEX_Problem5_Financial_Impact_Workbook.xlsx",
+    "financial_impact_dashboard.html": "C:\\Users\\rnand\\Downloads\\amex-default-prediction\\AMEX_Enterprise_Credit_Risk_Platform\\Phase2_Regulatory_Loss_Provisioning\\Problem5_Early_Payment_Default_Detection\\05_Financial_Impact_Reporting_Packaging\\financial_impact_dashboard.html"
+  }
+}

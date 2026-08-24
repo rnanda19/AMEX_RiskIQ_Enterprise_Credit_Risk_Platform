@@ -1,0 +1,41 @@
+{
+  "generated_at_utc": "2026-08-24T09:07:31.588508+00:00",
+  "n_tiers": 3,
+  "tier_order": [
+    "Low Severity",
+    "Moderate Severity",
+    "Severe"
+  ],
+  "severity_score_method": {
+    "description": "ASSUMPTION-free methodology (real data only): for each REAL defaulter (from the real labeled default set), an Escalation Severity Score is computed as a weighted combination of that customer's real D_* trend_slope, trend_delta, and final-statement level features (Notebook 04's real engineered output) -- customers whose D_* signals worsened fastest and ended at the worst levels score highest. Notebook 27 computes the exact weighting from real feature-target correlation on the training split.",
+    "tiering": "ASSUMPTION -- equal-population tertiles (33rd/67th percentile cutpoints) of the real severity score distribution, mirroring Notebook 19's quantile tiering approach."
+  },
+  "lgd_by_tier": {
+    "description": "ASSUMPTION -- illustrative differentiation around Notebook 08's real flat baseline (45%), not a fitted severity model (no real recovery-rate ground truth exists in this dataset to fit one).",
+    "values": [
+      {
+        "tier": "Low Severity",
+        "tier_order": 1,
+        "lgd": 0.3015
+      },
+      {
+        "tier": "Moderate Severity",
+        "tier_order": 2,
+        "lgd": 0.45
+      },
+      {
+        "tier": "Severe",
+        "tier_order": 3,
+        "lgd": 0.648
+      }
+    ]
+  },
+  "ead_per_account_usd": 5000,
+  "kpi_targets": {
+    "min_default_rate_ratio_top_to_bottom_tier": 1.5,
+    "min_tier_population_pct": 15.0,
+    "require_strict_monotonicity": true
+  },
+  "champion_pd_model_used": "xgboost",
+  "baseline_lgd_source": "Problem 1, Notebook 08 (real value, read programmatically)"
+}

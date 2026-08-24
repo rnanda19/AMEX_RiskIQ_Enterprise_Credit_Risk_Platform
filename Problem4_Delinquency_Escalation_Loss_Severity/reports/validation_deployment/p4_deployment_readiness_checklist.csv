@@ -1,0 +1,8 @@
+check,result
+Standalone scorer matches pipeline output,PASS
+  - real (hard) mismatches,"0 of 91,783"
+"  - float-boundary ties (expected, not a defect)",0 (0.0000%)
+Chi-square independence test,p=0.00e+00
+Two-proportion z-test (Severe vs Low),p=0.00e+00
+Split-half PSI,0.0000 (stable)
+Cramér's V effect size,0.6416

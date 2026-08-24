@@ -1,0 +1,22 @@
+{
+  "ead_per_account_usd": {
+    "value": 5000,
+    "source": "Notebook 08 (inherited, real value read programmatically)"
+  },
+  "baseline_flat_lgd": {
+    "value": 0.45,
+    "source": "Notebook 08 (inherited, real value read programmatically)"
+  },
+  "severe_tier_intervention_success_rate": {
+    "value": 0.15,
+    "source": "ASSUMPTION -- illustrative conservative early-intervention efficacy figure for the highest-severity tier; edit to your institution's own collections-outcome data."
+  },
+  "implementation_cost_usd": {
+    "value": 60000,
+    "source": "ASSUMPTION -- illustrative one-time build/validate/deploy cost (data science + risk review time); edit to your institution's actual project cost."
+  },
+  "annual_application_cycles": {
+    "value": 4,
+    "source": "ASSUMPTION -- how many times per year this scoring pipeline is re-run against a holdout-sized population (illustrative quarterly cadence); edit to your institution's actual monitoring frequency."
+  }
+}

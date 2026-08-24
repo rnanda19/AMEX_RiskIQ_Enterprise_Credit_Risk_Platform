@@ -1,0 +1,33 @@
+{
+  "project_name": "AMEX Enterprise Credit Risk Platform",
+  "config_generated_at_utc": "2026-08-24T12:21:31.639586+00:00",
+  "project_root": "C:\\Users\\rnand\\Downloads\\amex-default-prediction\\AMEX_Enterprise_Credit_Risk_Platform",
+  "data_root": "C:\\Users\\rnand\\Downloads\\amex-default-prediction\\Raw Data From Kaggle",
+  "problem_root": "C:\\Users\\rnand\\Downloads\\amex-default-prediction\\AMEX_Enterprise_Credit_Risk_Platform\\Phase2_Regulatory_Loss_Provisioning\\Problem3_Expected_Credit_Loss_IFRS9_CECL",
+  "artifacts_dir": "C:\\Users\\rnand\\Downloads\\amex-default-prediction\\AMEX_Enterprise_Credit_Risk_Platform\\Phase2_Regulatory_Loss_Provisioning\\Problem3_Expected_Credit_Loss_IFRS9_CECL\\artifacts",
+  "random_seed": 42,
+  "hardware": {
+    "platform": "Windows-11-10.0.26200-SP0",
+    "python_version": "3.13.14",
+    "logical_cores_detected": 16,
+    "physical_cores_detected": 8,
+    "total_ram_gb_detected": 31.3
+  },
+  "resource_limits": {
+    "ram_fraction_cap": 0.9,
+    "cpu_fraction_cap": 0.95,
+    "total_ram_bytes_detected": 33598853120,
+    "max_ram_bytes": 30238967808,
+    "max_ram_gb": 28.16,
+    "logical_cores_detected": 16,
+    "warp_thread_count": 15,
+    "clock_speed_note": "CPU clock speed is not application-settable (OS/firmware boost control); only thread count (warp_thread_count) and a RAM ceiling (max_ram_bytes) are actually enforced by this platform's notebooks."
+  },
+  "warp_thread_count": 15,
+  "pillar_dirs": {
+    "p3_policy": "C:\\Users\\rnand\\Downloads\\amex-default-prediction\\AMEX_Enterprise_Credit_Risk_Platform\\Phase2_Regulatory_Loss_Provisioning\\Problem3_Expected_Credit_Loss_IFRS9_CECL\\01_ECL_Policy",
+    "p3_modeling": "C:\\Users\\rnand\\Downloads\\amex-default-prediction\\AMEX_Enterprise_Credit_Risk_Platform\\Phase2_Regulatory_Loss_Provisioning\\Problem3_Expected_Credit_Loss_IFRS9_CECL\\02_ECL_Modeling",
+    "p3_validation_deployment": "C:\\Users\\rnand\\Downloads\\amex-default-prediction\\AMEX_Enterprise_Credit_Risk_Platform\\Phase2_Regulatory_Loss_Provisioning\\Problem3_Expected_Credit_Loss_IFRS9_CECL\\03_Validation_Deployment",
+    "p3_reporting_packaging": "C:\\Users\\rnand\\Downloads\\amex-default-prediction\\AMEX_Enterprise_Credit_Risk_Platform\\Phase2_Regulatory_Loss_Provisioning\\Problem3_Expected_Credit_Loss_IFRS9_CECL\\04_Financial_Impact_Reporting_Packaging"
+  }
+}

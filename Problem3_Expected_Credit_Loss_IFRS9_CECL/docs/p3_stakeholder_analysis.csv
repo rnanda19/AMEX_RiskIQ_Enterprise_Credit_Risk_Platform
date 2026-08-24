@@ -1,0 +1,5 @@
+stakeholder,interest
+Finance / Provisioning,"The IFRS9 vs CECL ECL gap directly changes the quarterly reserve booked under each standard -- needs a defensible, auditable bridge between the two."
+Regulatory Reporting / Basel Desk,Needs Notebook 08's flat-LGD Basel capital figures reconciled against this notebook's tier-LGD ECL -- both must trace to the same real PD.
+Model Risk / Compliance (SR 11-7),Needs the staging rubric documented as outcome-free (no reliance on the known label) before this feeds any regulatory-adjacent provisioning calculation -- exactly the gap this notebook closes versus Notebook 08.
+Executive / CFO,"Needs the dollar impact of moving from Notebook 08's flat LGD to Problem 4's tier-differentiated LGD, and the IFRS9-vs-CECL gap, stated in plain financial terms (Notebook 33)."

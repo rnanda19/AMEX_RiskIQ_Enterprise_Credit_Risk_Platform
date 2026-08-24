@@ -1,0 +1,127 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>Problem 3 -- ECL Financial Impact Dashboard</title>
+<script src="https://cdn.jsdelivr.net/npm/chart.js@4"></script>
+<style>
+  :root { --ink:#0B1F3A; --accent:#C41E3A; --gold:#C9A227; --muted:#8A93A6; --bg:#F2F4F8; --card:#FFFFFF; }
+  body { font-family: Calibri, Arial, sans-serif; background: var(--bg); color: var(--ink); margin: 0; padding: 24px; }
+  h1 { font-size: 22px; margin-bottom: 4px; }
+  .sub { color: var(--muted); margin-bottom: 20px; }
+  .kpi-row { display: flex; flex-wrap: wrap; gap: 14px; margin-bottom: 24px; }
+  .kpi { background: var(--card); border-radius: 10px; padding: 16px 20px; box-shadow: 0 1px 3px rgba(0,0,0,.12); min-width: 190px; flex: 1; }
+  .kpi .label { font-size: 12px; color: var(--muted); text-transform: uppercase; }
+  .kpi .value { font-size: 22px; font-weight: 700; margin-top: 4px; }
+  .panel { background: var(--card); border-radius: 10px; padding: 18px; margin-bottom: 20px; box-shadow: 0 1px 3px rgba(0,0,0,.12); }
+  table { width: 100%; border-collapse: collapse; font-size: 13px; }
+  th, td { text-align: left; padding: 8px 10px; border-bottom: 1px solid #E4E7EE; }
+  th { background: var(--ink); color: #fff; }
+  select { padding: 6px 10px; border-radius: 6px; border: 1px solid var(--muted); font-size: 13px; margin-bottom: 12px; }
+  canvas { max-height: 360px; }
+  .grid2 { display: grid; grid-template-columns: 1fr 1fr; gap: 20px; }
+  @media (max-width: 900px) { .grid2 { grid-template-columns: 1fr; } }
+</style>
+</head>
+<body>
+<h1>AMEX RiskIQ -- Problem 3: Expected Credit Loss (IFRS9/CECL)</h1>
+<div class="sub">Financial Impact Dashboard -- real Notebook 30-32 results, ASSUMPTION values clearly marked</div>
+
+<div class="kpi-row">
+  <div class="kpi"><div class="label">Total ECL -- Flat LGD</div><div class="value">$67,830,906</div></div>
+  <div class="kpi"><div class="label">Total ECL -- IFRS9 Staged</div><div class="value">$72,448,499</div></div>
+  <div class="kpi"><div class="label">Total ECL -- CECL Lifetime</div><div class="value">$73,051,923</div></div>
+  <div class="kpi"><div class="label">Reserve Change (IFRS9-Flat)</div><div class="value">$4,617,593</div></div>
+  <div class="kpi"><div class="label">Stress Buffer</div><div class="value">$3,715,620</div></div>
+  <div class="kpi"><div class="label">Efficiency ROI / Payback</div><div class="value">43% / 8.4 mo</div></div>
+</div>
+
+<div class="grid2">
+  <div class="panel">
+    <h3 style="margin-top:0">Standard Comparison</h3>
+    <canvas id="compChart"></canvas>
+    <table id="compTable"><thead><tr><th>Methodology</th><th>Total ECL</th><th>Delta vs Flat</th></tr></thead>
+      <tbody></tbody></table>
+  </div>
+  <div class="panel">
+    <h3 style="margin-top:0">Macro Scenario Sensitivity</h3>
+    <canvas id="sensChart"></canvas>
+    <table id="sensTable"><thead><tr><th>Scenario</th><th>Probability</th><th>Total IFRS9 ECL</th></tr></thead>
+      <tbody></tbody></table>
+  </div>
+</div>
+
+<div class="panel">
+  <label for="orgFilter"><b>SMART Suggestions -- filter by organizational level</b></label><br/>
+  <select id="orgFilter"></select>
+  <table id="smartTable"><thead><tr><th>Org Level</th><th>Suggestion</th></tr></thead><tbody></tbody></table>
+</div>
+
+<script>
+const compData = [{"methodology": "Notebook 08: Basel/IFRS9, flat 45% LGD, outcome-based Stage 3", "total_ecl_usd": 67830905.87, "delta_vs_notebook_08_usd": 0.0}, {"methodology": "Notebook 31: IFRS9 staged, tier-LGD, outcome-free staging", "total_ecl_usd": 72448498.95, "delta_vs_notebook_08_usd": 4617593.07}, {"methodology": "Notebook 31: CECL lifetime-for-all, tier-LGD, no staging", "total_ecl_usd": 73051922.57, "delta_vs_notebook_08_usd": 5221016.69}];
+const sensData = [{"scenario": "Upside", "probability": 0.2, "pd_multiplier": 0.85, "total_ecl_ifrs9_usd": 62509011.41}, {"scenario": "Baseline", "probability": 0.5, "pd_multiplier": 1.0, "total_ecl_ifrs9_usd": 73540013.42}, {"scenario": "Downside", "probability": 0.3, "pd_multiplier": 1.35, "total_ecl_ifrs9_usd": 77255633.18}];
+const smartData = [{"org_level": "Risk / Quant Analyst", "suggestion": "Re-run Notebooks 30-32 each time Problem 1's champion model or Problem 4's severity tiers refresh; monitor the split-half PSI (last measured 0.0000, 'stable') and re-validate staging if it exceeds 0.10 for two consecutive cycles."}, {"org_level": "Model Risk / Compliance (SR 11-7)", "suggestion": "File this notebook's chi-square (p=0.0e+00) and z-test (p=0.0e+00) results, plus the standalone calculator's 91783/91783 self-test pass, with the model's annual validation packet; re-certify before any change to the frozen ecl_scoring_bundle.json."}, {"org_level": "Finance / Provisioning", "suggestion": "Update the quarterly provisioning workbook to book IFRS9-staged reserve of $72,448,499 (a $4,617,593 change from the flat-LGD baseline); if reporting under US GAAP, additionally plan for the $603,424 CECL day-one reserve build."}, {"org_level": "Regulatory Reporting / Basel Desk", "suggestion": "Reconcile this notebook's tier-LGD, outcome-free-staged ECL against Notebook 08's flat-LGD Basel capital figures each cycle -- both trace to the same real champion PD model ('xgboost'); document the $4,617,593 reconciling difference in the regulatory capital workpapers."}, {"org_level": "Executive / CFO", "suggestion": "Hold a stress capital buffer of at least $3,715,620 above the probability-blended IFRS9 reserve for adverse macro conditions (Notebook 32's Downside scenario); approve the $70,000 automation investment given an estimated 8.4-month payback and 43% Year-1 efficiency ROI."}];
+const orgLevels = ["Executive / CFO", "Finance / Provisioning", "Model Risk / Compliance (SR 11-7)", "Regulatory Reporting / Basel Desk", "Risk / Quant Analyst"];
+
+const fmtUsd = v => "$" + Math.round(v).toLocaleString();
+const fmtPct = v => (v * 100).toFixed(1) + "%";
+const flatUsd = compData[0].total_ecl_usd;
+
+new Chart(document.getElementById("compChart").getContext("2d"), {
+  type: "bar",
+  data: {
+    labels: compData.map(d => d.methodology.replace("Notebook ", "NB")),
+    datasets: [{ label: "Total ECL (USD)", data: compData.map(d => d.total_ecl_usd),
+                 backgroundColor: ["#8A93A6", "#C41E3A", "#C9A227"] }],
+  },
+  options: { plugins: { legend: { display: false } },
+             scales: { y: { ticks: { callback: v => "$" + v.toLocaleString() } } } },
+});
+
+new Chart(document.getElementById("sensChart").getContext("2d"), {
+  type: "bar",
+  data: {
+    labels: sensData.map(d => d.scenario),
+    datasets: [{ label: "Total IFRS9 ECL (USD)", data: sensData.map(d => d.total_ecl_ifrs9_usd),
+                 backgroundColor: ["#8A93A6", "#C9A227", "#C41E3A"] }],
+  },
+  options: { plugins: { legend: { display: false } },
+             scales: { y: { ticks: { callback: v => "$" + v.toLocaleString() } } } },
+});
+
+const compBody = document.querySelector("#compTable tbody");
+compData.forEach(d => {
+  const tr = document.createElement("tr");
+  tr.innerHTML = `<td>${d.methodology}</td><td>${fmtUsd(d.total_ecl_usd)}</td>` +
+    `<td>${fmtUsd(d.delta_vs_notebook_08_usd)}</td>`;
+  compBody.appendChild(tr);
+});
+
+const sensBody = document.querySelector("#sensTable tbody");
+sensData.forEach(d => {
+  const tr = document.createElement("tr");
+  tr.innerHTML = `<td>${d.scenario}</td><td>${fmtPct(d.probability)}</td>` +
+    `<td>${fmtUsd(d.total_ecl_ifrs9_usd)}</td>`;
+  sensBody.appendChild(tr);
+});
+
+function renderSmart(filterLevel) {
+  const tbody = document.querySelector("#smartTable tbody");
+  tbody.innerHTML = "";
+  smartData.filter(r => filterLevel === "All" || r.org_level === filterLevel).forEach(r => {
+    const tr = document.createElement("tr");
+    tr.innerHTML = `<td>${r.org_level}</td><td>${r.suggestion}</td>`;
+    tbody.appendChild(tr);
+  });
+}
+const orgSelect = document.getElementById("orgFilter");
+["All", ...orgLevels].forEach(level => {
+  const opt = document.createElement("option");
+  opt.value = level; opt.textContent = level;
+  orgSelect.appendChild(opt);
+});
+orgSelect.onchange = () => renderSmart(orgSelect.value);
+renderSmart("All");
+</script>
+</body>
+</html>

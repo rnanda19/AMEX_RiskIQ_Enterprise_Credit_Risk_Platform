@@ -1,0 +1,15 @@
+{
+  "notebook": "26_lgd_policy",
+  "generated_at_utc": "2026-08-24T09:07:31.637844+00:00",
+  "problem_number": 4,
+  "problem_name": "Delinquency Escalation / Loss Severity",
+  "phase": "Phase 2 -- Regulatory & Loss Provisioning",
+  "champion_pd_model": "xgboost",
+  "baseline_lgd": 0.45,
+  "n_tiers": 3,
+  "output_files": {
+    "lgd_policy.json": "C:\\Users\\rnand\\Downloads\\amex-default-prediction\\AMEX_Enterprise_Credit_Risk_Platform\\Phase2_Regulatory_Loss_Provisioning\\Problem4_Delinquency_Escalation_Loss_Severity\\01_LGD_Policy\\lgd_policy.json",
+    "p4_stakeholder_analysis.csv": "C:\\Users\\rnand\\Downloads\\amex-default-prediction\\AMEX_Enterprise_Credit_Risk_Platform\\Phase2_Regulatory_Loss_Provisioning\\Problem4_Delinquency_Escalation_Loss_Severity\\01_LGD_Policy\\p4_stakeholder_analysis.csv",
+    "LGD_Policy_Charter.docx": "C:\\Users\\rnand\\Downloads\\amex-default-prediction\\AMEX_Enterprise_Credit_Risk_Platform\\Phase2_Regulatory_Loss_Provisioning\\Problem4_Delinquency_Escalation_Loss_Severity\\01_LGD_Policy\\LGD_Policy_Charter.docx"
+  }
+}

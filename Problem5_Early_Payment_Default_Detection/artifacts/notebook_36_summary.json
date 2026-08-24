@@ -1,0 +1,20 @@
+{
+  "notebook": "36_early_payment_default_validation_deployment.ipynb",
+  "generated_at_utc": "2026-08-24T20:33:36.300370+00:00",
+  "winning_k": 3,
+  "meets_kpi_target": true,
+  "recommended_for_production": true,
+  "reproduced_holdout_auc": 0.9265274920113401,
+  "reproduced_holdout_amex_metric": 0.65550906419563,
+  "bootstrap_auc_ci": [
+    0.9247892198513004,
+    0.9281912251702001
+  ],
+  "mean_calibration_gap": 0.002580582342769738,
+  "split_half_score_psi": 0.0004464256552751534,
+  "model_path": "C:\\Users\\rnand\\Downloads\\amex-default-prediction\\AMEX_Enterprise_Credit_Risk_Platform\\Phase2_Regulatory_Loss_Provisioning\\Problem5_Early_Payment_Default_Detection\\deployment\\models\\early_default_xgboost_k3.joblib",
+  "preprocessing_path": "C:\\Users\\rnand\\Downloads\\amex-default-prediction\\AMEX_Enterprise_Credit_Risk_Platform\\Phase2_Regulatory_Loss_Provisioning\\Problem5_Early_Payment_Default_Detection\\deployment\\models\\preprocessing_artifacts.joblib",
+  "service_py_path": "C:\\Users\\rnand\\Downloads\\amex-default-prediction\\AMEX_Enterprise_Credit_Risk_Platform\\Phase2_Regulatory_Loss_Provisioning\\Problem5_Early_Payment_Default_Detection\\deployment\\api\\early_default_service.py",
+  "report_path": "C:\\Users\\rnand\\Downloads\\amex-default-prediction\\AMEX_Enterprise_Credit_Risk_Platform\\Phase2_Regulatory_Loss_Provisioning\\Problem5_Early_Payment_Default_Detection\\deployment\\Early_Default_Validation_Deployment_Report.docx",
+  "random_seed": 42
+}

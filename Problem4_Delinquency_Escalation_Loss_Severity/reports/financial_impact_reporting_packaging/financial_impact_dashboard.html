@@ -1,0 +1,134 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>Problem 4 -- Financial Impact Dashboard</title>
+<script src="https://cdn.jsdelivr.net/npm/chart.js@4"></script>
+<style>
+  :root { --ink:#0B1F3A; --accent:#C41E3A; --gold:#C9A227; --muted:#8A93A6; --bg:#F2F4F8; --card:#FFFFFF; }
+  body { font-family: Calibri, Arial, sans-serif; background: var(--bg); color: var(--ink); margin: 0; padding: 24px; }
+  h1 { font-size: 22px; margin-bottom: 4px; }
+  .sub { color: var(--muted); margin-bottom: 20px; }
+  .kpi-row { display: flex; flex-wrap: wrap; gap: 14px; margin-bottom: 24px; }
+  .kpi { background: var(--card); border-radius: 10px; padding: 16px 20px; box-shadow: 0 1px 3px rgba(0,0,0,.12); min-width: 190px; flex: 1; }
+  .kpi .label { font-size: 12px; color: var(--muted); text-transform: uppercase; }
+  .kpi .value { font-size: 22px; font-weight: 700; margin-top: 4px; }
+  .panel { background: var(--card); border-radius: 10px; padding: 18px; margin-bottom: 20px; box-shadow: 0 1px 3px rgba(0,0,0,.12); }
+  .filters { display: flex; gap: 8px; flex-wrap: wrap; margin-bottom: 12px; }
+  .filters button { border: 1px solid var(--ink); background: var(--card); color: var(--ink); padding: 6px 14px; border-radius: 18px; cursor: pointer; font-size: 13px; }
+  .filters button.active { background: var(--ink); color: #fff; }
+  table { width: 100%; border-collapse: collapse; font-size: 13px; }
+  th, td { text-align: left; padding: 8px 10px; border-bottom: 1px solid #E4E7EE; }
+  th { background: var(--ink); color: #fff; }
+  select { padding: 6px 10px; border-radius: 6px; border: 1px solid var(--muted); font-size: 13px; margin-bottom: 12px; }
+  canvas { max-height: 360px; }
+</style>
+</head>
+<body>
+<h1>AMEX RiskIQ -- Problem 4: Delinquency Escalation / Loss Severity</h1>
+<div class="sub">Financial Impact Dashboard -- real Notebook 27/28 results, ASSUMPTION values clearly marked</div>
+
+<div class="kpi-row">
+  <div class="kpi"><div class="label">Total Loss -- Flat LGD</div><div class="value">$53,473,500</div></div>
+  <div class="kpi"><div class="label">Total Loss -- Tier LGD</div><div class="value">$72,908,932</div></div>
+  <div class="kpi"><div class="label">Loss Recognition Change</div><div class="value">$19,435,432</div></div>
+  <div class="kpi"><div class="label">Est. Loss Prevented / Cycle</div><div class="value">$9,690,840</div></div>
+  <div class="kpi"><div class="label">Est. Year-1 ROI</div><div class="value">64,506%</div></div>
+  <div class="kpi"><div class="label">Est. Payback</div><div class="value">0.0 mo</div></div>
+</div>
+
+<div class="panel">
+  <div class="filters" id="tierFilters"></div>
+  <canvas id="tierChart"></canvas>
+  <table id="tierTable"><thead><tr><th>Tier</th><th>Population</th><th>Defaulters</th>
+    <th>Default Rate</th><th>LGD</th><th>Loss -- Flat</th><th>Loss -- Tier</th></tr></thead>
+    <tbody></tbody></table>
+</div>
+
+<div class="panel">
+  <label for="orgFilter"><b>SMART Suggestions -- filter by organizational level</b></label><br/>
+  <select id="orgFilter"></select>
+  <table id="smartTable"><thead><tr><th>Org Level</th><th>Suggestion</th></tr></thead><tbody></tbody></table>
+</div>
+
+<script>
+const tierData = [{"tier": "Low Severity", "population": 30328, "defaulters": 407, "observed_default_rate": 0.01342, "lgd_assigned": 0.3015, "loss_flat_lgd_usd": 915750.0, "loss_tier_lgd_usd": 613552.5}, {"tier": "Moderate Severity", "population": 30924, "defaulters": 3422, "observed_default_rate": 0.110658, "lgd_assigned": 0.45, "loss_flat_lgd_usd": 7699500.0, "loss_tier_lgd_usd": 7699500.0}, {"tier": "Severe", "population": 30531, "defaulters": 19937, "observed_default_rate": 0.653008, "lgd_assigned": 0.648, "loss_flat_lgd_usd": 44858250.0, "loss_tier_lgd_usd": 64595880.0}];
+const smartData = [{"org_level": "Collections Agents (Frontline)", "suggestion": "Prioritize outbound contact on the 19,937 real Severe-tier accounts first each day -- their observed default rate (65.3%) is the highest of any tier. Target: attempt contact within 24 hours of a Severe-tier flag."}, {"org_level": "Collections Team Lead / Manager", "suggestion": "Track the 2,991-account early-intervention goal (from the 15% ASSUMPTION success rate) as a weekly team KPI; report actual prevented-default count vs. this target each month to calibrate the assumption."}, {"org_level": "Risk / Credit Analyst", "suggestion": "Re-run Notebook 27's severity scoring each time Notebook 04's engineered features refresh; monitor the split-half PSI (last measured 0.0000, 'stable') and re-tier if it exceeds 0.10 for two consecutive cycles."}, {"org_level": "Model Risk / Compliance (SR 11-7)", "suggestion": "File this notebook's chi-square (p=0.0e+00) and z-test (p=0.0e+00) results with the model's annual validation packet; re-certify before any change to the frozen severity_scoring_bundle.json."}, {"org_level": "Finance / Provisioning Team", "suggestion": "Update the quarterly loss-provisioning workbook to use tier-differentiated LGD instead of the flat 45% -- a $19,435,432 recognition difference was measured on this holdout; reconcile within the next provisioning cycle."}, {"org_level": "CFO / Executive Leadership", "suggestion": "Approve the $60,000 investment given an estimated 0.0-month payback and 64,506% Year-1 ROI from Severe-tier loss prevention alone; revisit the 4x/year cadence ASSUMPTION at the next quarterly business review."}];
+const orgLevels = ["CFO / Executive Leadership", "Collections Agents (Frontline)", "Collections Team Lead / Manager", "Finance / Provisioning Team", "Model Risk / Compliance (SR 11-7)", "Risk / Credit Analyst"];
+let activeTiers = new Set(tierData.map(d => d.tier));
+
+const fmtUsd = v => "$" + Math.round(v).toLocaleString();
+const fmtPct = v => (v * 100).toFixed(1) + "%";
+
+const ctx = document.getElementById("tierChart").getContext("2d");
+const chart = new Chart(ctx, {
+  type: "bar",
+  data: {
+    labels: tierData.map(d => d.tier),
+    datasets: [
+      { label: "Flat LGD Loss", data: tierData.map(d => d.loss_flat_lgd_usd), backgroundColor: "#8A93A6" },
+      { label: "Tier LGD Loss", data: tierData.map(d => d.loss_tier_lgd_usd), backgroundColor: "#C41E3A" },
+    ],
+  },
+  options: { responsive: true, plugins: { legend: { position: "top" } },
+             scales: { y: { ticks: { callback: v => "$" + v.toLocaleString() } } } },
+});
+
+function renderFilters() {
+  const box = document.getElementById("tierFilters");
+  box.innerHTML = "";
+  tierData.forEach(d => {
+    const btn = document.createElement("button");
+    btn.textContent = d.tier;
+    btn.className = activeTiers.has(d.tier) ? "active" : "";
+    btn.onclick = () => {
+      if (activeTiers.has(d.tier)) { activeTiers.delete(d.tier); } else { activeTiers.add(d.tier); }
+      renderFilters(); renderChart(); renderTable();
+    };
+    box.appendChild(btn);
+  });
+}
+
+function renderChart() {
+  const visible = tierData.filter(d => activeTiers.has(d.tier));
+  chart.data.labels = visible.map(d => d.tier);
+  chart.data.datasets[0].data = visible.map(d => d.loss_flat_lgd_usd);
+  chart.data.datasets[1].data = visible.map(d => d.loss_tier_lgd_usd);
+  chart.update();
+}
+
+function renderTable() {
+  const tbody = document.querySelector("#tierTable tbody");
+  tbody.innerHTML = "";
+  tierData.filter(d => activeTiers.has(d.tier)).forEach(d => {
+    const tr = document.createElement("tr");
+    tr.innerHTML = `<td>${d.tier}</td><td>${d.population.toLocaleString()}</td>` +
+      `<td>${d.defaulters.toLocaleString()}</td><td>${fmtPct(d.observed_default_rate)}</td>` +
+      `<td>${fmtPct(d.lgd_assigned)}</td><td>${fmtUsd(d.loss_flat_lgd_usd)}</td>` +
+      `<td>${fmtUsd(d.loss_tier_lgd_usd)}</td>`;
+    tbody.appendChild(tr);
+  });
+}
+
+function renderSmart(filterLevel) {
+  const tbody = document.querySelector("#smartTable tbody");
+  tbody.innerHTML = "";
+  smartData.filter(r => filterLevel === "All" || r.org_level === filterLevel).forEach(r => {
+    const tr = document.createElement("tr");
+    tr.innerHTML = `<td>${r.org_level}</td><td>${r.suggestion}</td>`;
+    tbody.appendChild(tr);
+  });
+}
+
+const orgSelect = document.getElementById("orgFilter");
+["All", ...orgLevels].forEach(level => {
+  const opt = document.createElement("option");
+  opt.value = level; opt.textContent = level;
+  orgSelect.appendChild(opt);
+});
+orgSelect.onchange = () => renderSmart(orgSelect.value);
+
+renderFilters(); renderChart(); renderTable(); renderSmart("All");
+</script>
+</body>
+</html>

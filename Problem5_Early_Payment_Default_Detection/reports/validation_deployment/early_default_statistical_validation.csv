@@ -1,0 +1,6 @@
+test,value,target,pass
+Holdout AUC (reproduced),0.9265,>0.5,True
+Holdout AUC 95% CI lower bound,0.9248,>0.5,True
+Mean calibration gap (deciles),0.0026,<0.05,True
+Split-half score PSI,0.0004,<0.1,True
+AUC retention vs. full history (K=3),96.3,>=80%,True

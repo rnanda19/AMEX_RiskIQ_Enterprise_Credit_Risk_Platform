@@ -1,0 +1,7 @@
+org_level,suggestion
+Early-Warning Ops / Frontline Risk Analysts,"Work the top-4% highest-risk flag list from the K=3 model daily -- it needs only a customer's first 3 statements, so accounts can be worked ~10 months sooner than waiting for full history. Target: contact attempt within 48 hours of a new top-4% flag."
+Collections/Risk Team Lead,"Track the 2,177-account early-intervention goal (from the 20% ASSUMPTION success rate) as a weekly KPI; report actual prevented-default count vs. this target each month to calibrate the assumption."
+Risk / Credit Analyst,"Re-run this early-window scoring each time new statement data lands; monitor the split-half score PSI (Notebook 36 measured 0.0004) and the bootstrap AUC CI (last measured [0.9248, 0.9282]) -- re-validate if either drifts materially."
+Model Risk / Compliance (SR 11-7),"File Notebook 36's bootstrap CI, calibration gap (0.0026), and AUC-retention KPI result (MET) with the model's annual validation packet; this model is currently RECOMMENDED for production use."
+Finance / Provisioning Team,Use the early-flagged population to time reserve builds ~10 months sooner than the full-history model would allow -- coordinate with Problem 4's tier-differentiated LGD work for the $ reserve amount per flagged account.
+CFO / Executive Leadership,"Approve the $55,000 investment given an estimated 0.0 months payback and 35,524% Year-1 ROI from early intervention alone; revisit the 4x/year cadence ASSUMPTION at the next quarterly business review."

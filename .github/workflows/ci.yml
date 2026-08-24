@@ -37,6 +37,15 @@ jobs:
       - name: Problem 2 tests
         run: python -m pytest Problem2_Risk_Tier_Classification/tests -v
         if: hashFiles('Problem2_Risk_Tier_Classification/tests/**') != ''
+      - name: Problem 3 tests
+        run: python -m pytest Problem3_Expected_Credit_Loss_IFRS9_CECL/tests -v
+        if: hashFiles('Problem3_Expected_Credit_Loss_IFRS9_CECL/tests/**') != ''
+      - name: Problem 4 tests
+        run: python -m pytest Problem4_Delinquency_Escalation_Loss_Severity/tests -v
+        if: hashFiles('Problem4_Delinquency_Escalation_Loss_Severity/tests/**') != ''
+      - name: Problem 5 tests
+        run: python -m pytest Problem5_Early_Payment_Default_Detection/tests -v
+        if: hashFiles('Problem5_Early_Payment_Default_Detection/tests/**') != ''
 
   lint:
     name: Lint (pyflakes -- unused imports, undefined names)
@@ -48,4 +57,7 @@ jobs:
           python-version: "3.11"
       - run: pip install pyflakes
       - run: pyflakes shared/ scripts/ Problem1_Credit_Scoring_PD_Prediction/src Problem1_Credit_Scoring_PD_Prediction/tests
+          Problem3_Expected_Credit_Loss_IFRS9_CECL/src Problem3_Expected_Credit_Loss_IFRS9_CECL/tests
+          Problem4_Delinquency_Escalation_Loss_Severity/src Problem4_Delinquency_Escalation_Loss_Severity/tests
+          Problem5_Early_Payment_Default_Detection/src Problem5_Early_Payment_Default_Detection/tests
         continue-on-error: true  # advisory for now -- see ROADMAP.md "make lint blocking"

@@ -1,0 +1,36 @@
+{
+  "generated_at_utc": "2026-08-24T19:06:28.343302+00:00",
+  "problem": "Problem 5 -- Early Payment Default Detection",
+  "data_limitation_statement": "This dataset has no account-origination date. 'Early' is defined as each customer's earliest N available monthly statements (by real chronological S_2 order), not time-since-account-opening, tested across the candidate window lengths in early_window_candidates below rather than a single fixed N. See this notebook's Section 3 and Section 5 for the full reasoning, including why a single percentile-derived N was rejected.",
+  "early_window_candidates": [
+    3,
+    6,
+    9,
+    12
+  ],
+  "early_window_coverage_by_k": {
+    "3": 97.55552795410023,
+    "6": 94.26035000098058,
+    "9": 90.59451355703587,
+    "12": 86.43402997953861
+  },
+  "statement_count_stats": {
+    "n_customers": 458913,
+    "min": 1,
+    "p10": 9.0,
+    "p25": 13.0,
+    "median": 13.0,
+    "mean": 12.053376130116165,
+    "max": 13
+  },
+  "target_definition": "Same eventual-default target as Problem 1 (train_labels.csv) -- only the FEATURES available differ (first K statements vs. full history), not the outcome being predicted.",
+  "kpi_targets": {
+    "min_auc_retention_vs_full_history": 0.8,
+    "description": "ASSUMPTION -- the early-window model (Notebook 35) should retain at least 80% of Notebook 05's full-history champion holdout AUC (i.e. early_auc / full_history_auc >= 0.80) to be considered operationally useful for early risk flagging. Below that threshold, the honest conclusion is 'not enough signal yet at this window length' -- Notebook 35 must report that outcome plainly if it happens, not obscure it.",
+    "full_history_reference_auc": 0.9620396555226549
+  },
+  "champion_model_reference": "xgboost",
+  "champion_holdout_auc_reference": 0.9620396555226549,
+  "champion_holdout_amex_metric_reference": 0.7935631597243085,
+  "random_seed": 42
+}

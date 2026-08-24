@@ -1,0 +1,68 @@
+{
+  "generated_at_utc": "2026-08-24T12:21:32.805780+00:00",
+  "framework": "IFRS 9 (3-stage: 12-month ECL for Stage 1, lifetime ECL for Stage 2/3) computed side by side with CECL (lifetime ECL for 100% of the portfolio from day one, no staging) -- Notebook 31 computes both from the identical real PD/tier inputs.",
+  "staging_criteria": {
+    "description": "Outcome-free by design: every criterion below uses only signals a real institution has BEFORE a default happens (real PD from Problem 1, real escalation severity tier from Problem 4). The real observed default label is used later, in Notebook 31, only to VALIDATE that the resulting stages rank-order with real outcomes -- never to decide a stage. This is the specific shortcut Notebook 08 took and flagged (its Stage 3 used the real known outcome directly) -- this policy does not take it.",
+    "stage_1_performing": "Not Stage 2 or Stage 3 (see below).",
+    "stage_2_sicr": "PD > sicr_pd_multiple (below) times the portfolio-average PD, OR severity tier is Moderate or Severe (Problem 4). Either condition alone is a real, pre-default signal of significant increase in credit risk.",
+    "stage_3_credit_impaired": "Severity tier is Severe AND PD > stage3_pd_threshold (below) -- an absolute, not relative, threshold; both conditions together are a defensible outcome-free proxy for objective evidence of impairment.",
+    "sicr_pd_multiple": 3.0,
+    "stage3_pd_threshold": 0.5
+  },
+  "lifetime_pd": {
+    "description": "ASSUMPTION -- lifetime PD approximated as min(1, PD_12m * lifetime_pd_multiplier), the same illustrative approach Notebook 08 used (no PD term-structure data exists in this single-snapshot dataset to fit a real survival curve).",
+    "lifetime_pd_multiplier": 3.0
+  },
+  "lgd_by_tier": {
+    "description": "Real values, read programmatically from Problem 4's lgd_policy.json -- not re-typed or re-invented here.",
+    "tier_order": [
+      "Low Severity",
+      "Moderate Severity",
+      "Severe"
+    ],
+    "values": {
+      "Low Severity": 0.3015,
+      "Moderate Severity": 0.45,
+      "Severe": 0.648
+    },
+    "source": "Problem 4, Notebook 26 (real value, read programmatically)"
+  },
+  "ead_per_account_usd": 5000,
+  "discount_rate": {
+    "description": "ASSUMPTION -- effective interest rate (EIR) used to discount expected cash shortfalls to present value (IFRS9 \u00a75.5.17); dataset has no real EIR, so a representative unsecured-revolving-credit annual rate is used. Discounting needs a TIME as well as a rate -- Stage 1's 12-month loss is discounted from the mid-point of the 12-month collection window (a standard simplifying convention); Stage 2/3's lifetime loss is discounted from an average-remaining-life ASSUMPTION, since this dataset has no real account-tenure data to compute one.",
+    "annual_rate": 0.199,
+    "stage1_discount_period_years": 0.5,
+    "stage23_avg_remaining_life_years": 2.0
+  },
+  "macro_overlay": {
+    "description": "ASSUMPTION -- forward-looking macroeconomic scenario weighting, required by both IFRS9 \u00a75.5.17(c) and CECL's forward-looking-information requirement. No real macro data feed exists for this dataset, so probability-weighted PD multipliers stand in for a real macro model's output -- editable to one directly.",
+    "scenarios": [
+      {
+        "scenario": "Upside",
+        "probability": 0.2,
+        "pd_multiplier": 0.85
+      },
+      {
+        "scenario": "Baseline",
+        "probability": 0.5,
+        "pd_multiplier": 1.0
+      },
+      {
+        "scenario": "Downside",
+        "probability": 0.3,
+        "pd_multiplier": 1.35
+      }
+    ]
+  },
+  "kpi_targets": {
+    "require_strict_monotonicity_default_rate_by_stage": true,
+    "min_stage3_population_pct": 0.5,
+    "max_stage3_population_pct": 25.0
+  },
+  "champion_pd_model_used": "xgboost",
+  "flat_lgd_comparison_baseline": {
+    "source": "Problem 1, Notebook 08 (real value, read programmatically)",
+    "lgd_flat": 0.45,
+    "total_ecl_usd": 67830905.87421922
+  }
+}

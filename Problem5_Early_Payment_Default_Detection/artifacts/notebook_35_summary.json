@@ -1,0 +1,67 @@
+{
+  "notebook": "35_early_payment_default_modeling.ipynb",
+  "generated_at_utc": "2026-08-24T19:43:47.718532+00:00",
+  "champion_architecture_used": "xgboost",
+  "results_by_k": {
+    "3": {
+      "k": 3,
+      "coverage_pct": 97.55552795410023,
+      "train_customers": 367130,
+      "holdout_customers": 91783,
+      "feature_count": 1804,
+      "holdout_auc": 0.9265274920113401,
+      "holdout_amex_metric": 0.65550906419563,
+      "holdout_top4pct_capture": 0.45796516031305223,
+      "auc_retention_pct_of_full_history": 96.30865907580267,
+      "meets_kpi_target": true,
+      "train_seconds": 208.0
+    },
+    "6": {
+      "k": 6,
+      "coverage_pct": 94.26035000098058,
+      "train_customers": 367130,
+      "holdout_customers": 91783,
+      "feature_count": 1804,
+      "holdout_auc": 0.9373678532760492,
+      "holdout_amex_metric": 0.6925003757748489,
+      "holdout_top4pct_capture": 0.5102667676512666,
+      "auc_retention_pct_of_full_history": 97.43546930680294,
+      "meets_kpi_target": true,
+      "train_seconds": 221.3
+    },
+    "9": {
+      "k": 9,
+      "coverage_pct": 90.59451355703587,
+      "train_customers": 367130,
+      "holdout_customers": 91783,
+      "feature_count": 1804,
+      "holdout_auc": 0.9471784132937713,
+      "holdout_amex_metric": 0.7309654531481787,
+      "holdout_top4pct_capture": 0.5675755280653034,
+      "auc_retention_pct_of_full_history": 98.45523600367494,
+      "meets_kpi_target": true,
+      "train_seconds": 216.5
+    },
+    "12": {
+      "k": 12,
+      "coverage_pct": 86.43402997953861,
+      "train_customers": 367130,
+      "holdout_customers": 91783,
+      "feature_count": 1804,
+      "holdout_auc": 0.9576145306827872,
+      "holdout_amex_metric": 0.7728121329710698,
+      "holdout_top4pct_capture": 0.6303963645544055,
+      "auc_retention_pct_of_full_history": 99.54002677390012,
+      "meets_kpi_target": true,
+      "train_seconds": 218.6
+    }
+  },
+  "ks_meeting_kpi_target": [
+    3,
+    6,
+    9,
+    12
+  ],
+  "modeling_results_path": "C:\\Users\\rnand\\Downloads\\amex-default-prediction\\AMEX_Enterprise_Credit_Risk_Platform\\Phase2_Regulatory_Loss_Provisioning\\Problem5_Early_Payment_Default_Detection\\modeling\\early_window_modeling_results.json",
+  "random_seed": 42
+}

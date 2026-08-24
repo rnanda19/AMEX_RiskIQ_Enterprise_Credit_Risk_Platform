@@ -1,0 +1,28 @@
+{
+  "notebook": "32_validation_deployment",
+  "generated_at_utc": "2026-08-24T12:23:51.533739+00:00",
+  "problem_number": 3,
+  "problem_name": "Expected Credit Loss (IFRS9/CECL)",
+  "phase": "Phase 2 -- Regulatory & Loss Provisioning",
+  "chi_square_p_value": 0.0,
+  "cramers_v": 0.7289977841059684,
+  "z_test_p_value": 0.0,
+  "psi": 1.278534602748648e-05,
+  "psi_verdict": "stable",
+  "self_test_passed": true,
+  "self_test_customers_checked": 91783,
+  "self_test_hard_mismatches": 0,
+  "self_test_boundary_ties": 0,
+  "macro_sensitivity_range_usd": [
+    62509011.40669476,
+    77255633.18109769
+  ],
+  "output_files": {
+    "p3_statistical_validation.csv": "C:\\Users\\rnand\\Downloads\\amex-default-prediction\\AMEX_Enterprise_Credit_Risk_Platform\\Phase2_Regulatory_Loss_Provisioning\\Problem3_Expected_Credit_Loss_IFRS9_CECL\\03_Validation_Deployment\\p3_statistical_validation.csv",
+    "p3_macro_sensitivity.csv": "C:\\Users\\rnand\\Downloads\\amex-default-prediction\\AMEX_Enterprise_Credit_Risk_Platform\\Phase2_Regulatory_Loss_Provisioning\\Problem3_Expected_Credit_Loss_IFRS9_CECL\\03_Validation_Deployment\\p3_macro_sensitivity.csv",
+    "ecl_scoring_bundle.json": "C:\\Users\\rnand\\Downloads\\amex-default-prediction\\AMEX_Enterprise_Credit_Risk_Platform\\Phase2_Regulatory_Loss_Provisioning\\Problem3_Expected_Credit_Loss_IFRS9_CECL\\03_Validation_Deployment\\ecl_scoring_bundle.json",
+    "ecl_calculator.py": "C:\\Users\\rnand\\Downloads\\amex-default-prediction\\AMEX_Enterprise_Credit_Risk_Platform\\Phase2_Regulatory_Loss_Provisioning\\Problem3_Expected_Credit_Loss_IFRS9_CECL\\03_Validation_Deployment\\ecl_calculator.py",
+    "p3_deployment_readiness_checklist.csv": "C:\\Users\\rnand\\Downloads\\amex-default-prediction\\AMEX_Enterprise_Credit_Risk_Platform\\Phase2_Regulatory_Loss_Provisioning\\Problem3_Expected_Credit_Loss_IFRS9_CECL\\03_Validation_Deployment\\p3_deployment_readiness_checklist.csv",
+    "macro_sensitivity_chart.png": "C:\\Users\\rnand\\Downloads\\amex-default-prediction\\AMEX_Enterprise_Credit_Risk_Platform\\Phase2_Regulatory_Loss_Provisioning\\Problem3_Expected_Credit_Loss_IFRS9_CECL\\03_Validation_Deployment\\macro_sensitivity_chart.png"
+  }
+}

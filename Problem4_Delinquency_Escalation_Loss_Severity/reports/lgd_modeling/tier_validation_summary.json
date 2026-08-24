@@ -1,0 +1,45 @@
+{
+  "generated_at_utc": "2026-08-24T11:18:27.659548+00:00",
+  "n_features_used": 243,
+  "cutpoints": {
+    "low_upper_bound": -0.19992248141200356,
+    "moderate_upper_bound": 0.057923893301003955
+  },
+  "tier_stats": [
+    {
+      "tier": "Low Severity",
+      "population": 30328,
+      "population_pct_of_holdout": 33.04,
+      "defaulters_in_tier": 407,
+      "pct_of_all_defaulters": 1.71,
+      "observed_default_rate": 0.01342,
+      "lgd_assigned": 0.3015
+    },
+    {
+      "tier": "Moderate Severity",
+      "population": 30924,
+      "population_pct_of_holdout": 33.69,
+      "defaulters_in_tier": 3422,
+      "pct_of_all_defaulters": 14.4,
+      "observed_default_rate": 0.110658,
+      "lgd_assigned": 0.45
+    },
+    {
+      "tier": "Severe",
+      "population": 30531,
+      "population_pct_of_holdout": 33.26,
+      "defaulters_in_tier": 19937,
+      "pct_of_all_defaulters": 83.89,
+      "observed_default_rate": 0.653008,
+      "lgd_assigned": 0.648
+    }
+  ],
+  "monotonic": true,
+  "severe_to_low_ratio": 48.65931445603577,
+  "min_tier_defaulter_share_pct": 1.71,
+  "kpi_targets": {
+    "min_default_rate_ratio_top_to_bottom_tier": 1.5,
+    "min_tier_population_pct": 15.0,
+    "require_strict_monotonicity": true
+  }
+}

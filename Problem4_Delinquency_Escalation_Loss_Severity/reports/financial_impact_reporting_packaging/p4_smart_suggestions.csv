@@ -1,0 +1,7 @@
+org_level,suggestion
+Collections Agents (Frontline),"Prioritize outbound contact on the 19,937 real Severe-tier accounts first each day -- their observed default rate (65.3%) is the highest of any tier. Target: attempt contact within 24 hours of a Severe-tier flag."
+Collections Team Lead / Manager,"Track the 2,991-account early-intervention goal (from the 15% ASSUMPTION success rate) as a weekly team KPI; report actual prevented-default count vs. this target each month to calibrate the assumption."
+Risk / Credit Analyst,"Re-run Notebook 27's severity scoring each time Notebook 04's engineered features refresh; monitor the split-half PSI (last measured 0.0000, 'stable') and re-tier if it exceeds 0.10 for two consecutive cycles."
+Model Risk / Compliance (SR 11-7),File this notebook's chi-square (p=0.0e+00) and z-test (p=0.0e+00) results with the model's annual validation packet; re-certify before any change to the frozen severity_scoring_bundle.json.
+Finance / Provisioning Team,"Update the quarterly loss-provisioning workbook to use tier-differentiated LGD instead of the flat 45% -- a $19,435,432 recognition difference was measured on this holdout; reconcile within the next provisioning cycle."
+CFO / Executive Leadership,"Approve the $60,000 investment given an estimated 0.0-month payback and 64,506% Year-1 ROI from Severe-tier loss prevention alone; revisit the 4x/year cadence ASSUMPTION at the next quarterly business review."

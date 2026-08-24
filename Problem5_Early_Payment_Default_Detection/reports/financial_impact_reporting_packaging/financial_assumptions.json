@@ -1,0 +1,22 @@
+{
+  "ead_per_account_usd": {
+    "value": 5000,
+    "source": "Notebook 08 (inherited, real value read programmatically)"
+  },
+  "lgd_assumption": {
+    "value": 0.45,
+    "source": "Notebook 08 (inherited, real value read programmatically)"
+  },
+  "early_intervention_success_rate": {
+    "value": 0.2,
+    "source": "ASSUMPTION -- illustrative efficacy of an early-warning intervention (credit-line reduction, payment-plan offer, outreach call) when applied this many months earlier than a full-history model would have flagged the same account; edit to your institution's own collections-outcome data."
+  },
+  "implementation_cost_usd": {
+    "value": 55000,
+    "source": "ASSUMPTION -- illustrative one-time build/validate/deploy cost for the early-warning scoring service (data science + risk review time); edit to your institution's actual project cost."
+  },
+  "annual_application_cycles": {
+    "value": 4,
+    "source": "ASSUMPTION -- how many times per year this scoring pipeline is re-run against a holdout-sized population (illustrative quarterly cadence); edit to your institution's actual monitoring frequency."
+  }
+}
