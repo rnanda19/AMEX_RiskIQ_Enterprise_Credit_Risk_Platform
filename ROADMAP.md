@@ -113,7 +113,7 @@ work, not as progress toward an unverified number.
 |---|---|---|
 | Phase 1 — Foundation | Problem 1 (PD Prediction), Problem 2 (Risk Tier Classification) | Complete, pushed to GitHub (25 notebooks) |
 | Phase 2 — Regulatory & Loss Provisioning | Problem 3 (ECL/IFRS9/CECL), Problem 4 (Delinquency/Loss Severity), Problem 5 (Early Payment Default) | **Complete, pushed to GitHub 2026-08-25** (12 notebooks + Global Standard hardening pass) |
-| Phase 3 — Behavioral Intelligence | Problems 6, 7, 8 | **Scoped, 2026-08-25** — folders scaffolded (structure only), notebooks not yet built |
+| Phase 3 — Behavioral Intelligence | Problems 6, 7, 8 | **In progress, 2026-08-25** — Problem 6 complete (Notebooks 38-41); Problem 7 complete (Notebooks 42-45), concluded NOT RECOMMENDED FOR PRODUCTION (honest result -- real default-rate lift below KPI target; a v2 enhancement attempt, Notebooks 46-47, was built, showed genuine but insufficient improvement, and was deliberately abandoned per user decision, freeing 46-49 for Problem 8); Problem 8 not yet built |
 | Phase 4 — Operational Risk Management | Problems 9, 10, 11 | Not started |
 | Phase 5 — Customer & Business Intelligence | Problems 12, 13, 14 | Not started |
 
@@ -147,5 +147,5 @@ governance files, BENCHMARKS.md entries) is deliberately deferred until
 after all 3 problems' base notebooks are built and verified, matching how
 Phase 2 was hardened only after Notebook 37 shipped.
 
-Next problem-roadmap item: Notebook 38 (Problem 6, Business Understanding
+Next problem-roadmap item: Notebook 46 (Problem 8, Business Understanding
 & Policy).
