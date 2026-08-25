@@ -29,13 +29,24 @@ narrative version of both.
 | Problem 5 `MODEL_CARD.md` / `CHANGELOG.md` | Done, 2026-08-24, updated 2026-08-25 | `Problem5_.../` |
 | Root governance files (issue templates, PR template, `setup.py`, `pyproject.toml`, `Makefile`) | Done, 2026-08-25 | repo root, `.github/` |
 | `BENCHMARKS.md` (real baseline-vs-model comparisons, all 5 problems) | Done, 2026-08-25 | repo root |
+| Problem 6 tests (real FastAPI service, driven by the real trained W=3 model) | Done, 2026-08-25 (6 tests) | `Problem6_.../tests/` |
+| Problem 6 Docker (service already existed; container packaging new) | Done, 2026-08-25 (new) | `Problem6_.../src/docker/` |
+| Problem 6 `MODEL_CARD.md` / `CHANGELOG.md` / `requirements.txt` | Done, 2026-08-25 | `Problem6_.../` |
+| Problem 7 tests (real FastAPI alert service, driven by the real frozen policy JSON) | Done, 2026-08-25 (7 tests) | `Problem7_.../tests/` |
+| Problem 7 Docker (service already existed; container packaging new, self-contained bundle pattern) | Done, 2026-08-25 (new) | `Problem7_.../src/docker/` |
+| Problem 7 `MODEL_CARD.md` / `CHANGELOG.md` / `requirements.txt` | Done, 2026-08-25 | `Problem7_.../` |
+| Problem 8 tests (real FastAPI scoring service, driven by the real frozen policy JSON) | Done, 2026-08-25 (8 tests) | `Problem8_.../tests/` |
+| Problem 8 Docker (service already existed; container packaging new, self-contained bundle pattern) | Done, 2026-08-25 (new) | `Problem8_.../src/docker/` |
+| Problem 8 `MODEL_CARD.md` / `CHANGELOG.md` / `requirements.txt` | Done, 2026-08-25 | `Problem8_.../` |
+| `BENCHMARKS.md` entries for Problems 6, 7, 8 | Done, 2026-08-25 | repo root |
+| CI (`ci.yml`, `code-quality.yml`) + `Makefile` wired for Problems 6, 7, 8 | Done, 2026-08-25 | `.github/workflows/`, `Makefile` |
 | **Push this commit to GitHub** | **Not started — needs a fresh PAT** | — |
 | Wire existing notebooks to import from `shared/` instead of inline copies | **Deliberately deferred** — see below | — |
 | Real `docker build`/smoke test of any Dockerfile (this sandbox has no Docker Hub registry access; static build-context verification passed for all 3 new Dockerfiles — see below) | **Blocked on environment, not on the work** | — |
 | Repo-wide `black` reformatting | **Deliberately deferred** — advisory-only for now, see below | — |
 | Pre-commit hooks (pyflakes, notebook syntax check, before every commit) | **Not started** | — |
 
-Total: 73 tests passing across `shared/` and all five problems as of
+Total: 94 tests passing across `shared/` and all eight problems as of
 2026-08-25 (`python -m pytest shared/tests Problem*/tests`, or `make test-all`).
 
 ### A real bug found (and fixed) while building this pass
@@ -58,6 +69,28 @@ designed and statically verified against this exact failure mode (every `COPY` s
 checked to actually resolve against its stated build context) specifically because this bug was
 found first.
 
+### Two more real bugs found (and fixed) during the Phase 3 hardening pass (2026-08-25)
+
+(1) All three of Problems 6, 7, and 8's deployable service files
+(`dynamic_behavioral_service.py`, `real_time_alert_service.py`,
+`roll_rate_scoring_service.py`) hardcoded the author's real local Windows
+path (`C:\Users\rnand\...`) as their model/policy-file default — the
+exact same privacy-leak bug class already found and fixed once for
+Problem 5's `early_default_service.py` during the Phase 2 pass, but it
+had crept back in for all three Phase 3 services and was live on GitHub
+before this pass. Fixed to default to each repo's own `models/`/`src/`
+folder instead (self-contained), matching the established pattern.
+(2) Problem 6 and Problem 7's services declared ports (`8003`, `8004`)
+that collide with Problem 3's and Problem 4's already-running services —
+undetected until this pass cross-checked every service's port against
+the platform's full port list while writing their Dockerfiles.
+Reassigned to `8006` and `8007` respectively (Problem 8's `8005` was
+already free). Neither bug affected any notebook's own output or any
+already-computed real number — both were caught in the deployable
+service layer only, and both are now covered by this pass's own tests
+(which import each service module fresh and would fail to even load a
+policy/model file with a bad default).
+
 ### Why the notebooks aren't wired to `shared/` yet
 
 `shared/metrics.py`, `shared/config.py`, and `shared/monitoring.py` are
@@ -76,24 +109,30 @@ immediately, not discovered after the fact.
 1. ~~Problem 2 tests~~ — done, 2026-08-24.
 2. ~~Package Problems 3, 4, 5 with the same hardening pattern as Phase 1,
    plus deployable APIs, Docker, and root governance files for all~~ —
-   done, 2026-08-25. **Push to GitHub itself still needs a fresh PAT**
-   (the prior ones were revoked after Phase 1's push).
-3. Real `docker build`/compose smoke test for all 4 Dockerfiles (Problems
-   1, 3, 4, 5) once run somewhere with real Docker Hub registry access —
-   this pass could only statically verify build-context correctness, not
-   actually pull a base image and build.
-4. Fix Problem 1's `src/docker/Dockerfile` build-context bug (see above) —
+   done, 2026-08-25, pushed to GitHub 2026-08-25.
+3. ~~Build Phase 3 (Problems 6, 7, 8): 12 notebooks + real notebook-output
+   artifacts + full Global Standard hardening pass (tests, Docker,
+   MODEL_CARD/CHANGELOG/requirements.txt, BENCHMARKS.md, CI wiring)~~ —
+   done, 2026-08-25, pushed to GitHub 2026-08-25.
+4. Real `docker build`/compose smoke test for all 7 Dockerfiles (Problems
+   1, 3, 4, 5, 6, 7, 8) once run somewhere with real Docker Hub registry
+   access — this pass, like the Phase 2 one before it, could only
+   statically verify build-context correctness, not actually pull a base
+   image and build (this sandbox's Docker CLI has no daemon access).
+5. Fix Problem 1's `src/docker/Dockerfile` build-context bug (see above) —
    flagged, not fixed, in this pass.
-5. Pre-commit hook: run `check_notebook_syntax.py` + `pyflakes` on
+6. Pre-commit hook: run `check_notebook_syntax.py` + `pyflakes` on
    `git commit`, so a broken notebook or an unused import is caught
    before it's even pushed, not just in CI after the fact.
-6. Repo-wide `black` reformatting pass, once deliberately scheduled (not
+7. Repo-wide `black` reformatting pass, once deliberately scheduled (not
    as a side effect of another change) — then flip `format-check` from
    advisory to blocking.
-7. Wire all five problems' notebooks to `shared/` (see above) — now that
+8. Wire all eight problems' notebooks to `shared/` (see above) — now that
    every problem has its own test safety net.
-8. Kaggle notebook(s) and LinkedIn write-ups showcasing the platform
-   (tracked outside this repo — see the project's own working notes).
+9. Phase 4 (Problems 9, 10, 11) and Phase 5 (Problems 12, 13, 14) — not
+   started.
+10. Kaggle notebook(s) and LinkedIn write-ups showcasing the platform
+    (tracked outside this repo — see the project's own working notes).
 
 ### On the "Global Standard" repository score
 
@@ -113,7 +152,7 @@ work, not as progress toward an unverified number.
 |---|---|---|
 | Phase 1 — Foundation | Problem 1 (PD Prediction), Problem 2 (Risk Tier Classification) | Complete, pushed to GitHub (25 notebooks) |
 | Phase 2 — Regulatory & Loss Provisioning | Problem 3 (ECL/IFRS9/CECL), Problem 4 (Delinquency/Loss Severity), Problem 5 (Early Payment Default) | **Complete, pushed to GitHub 2026-08-25** (12 notebooks + Global Standard hardening pass) |
-| Phase 3 — Behavioral Intelligence | Problems 6, 7, 8 | **Complete, pushed to GitHub 2026-08-25** (12 notebooks + real notebook-output artifacts; hardening pass -- tests, Docker, MODEL_CARD/CHANGELOG -- not yet started) — Problem 6 complete (Notebooks 38-41), RECOMMENDED FOR PRODUCTION (W=3 trailing window, 99.2% AUC retention); Problem 7 complete (Notebooks 42-45), concluded NOT RECOMMENDED FOR PRODUCTION (honest result -- real default-rate lift below KPI target; a v2 enhancement attempt, Notebooks 46-47, was built, showed genuine but insufficient improvement, and was deliberately abandoned per user decision, freeing 46-49 for Problem 8); Problem 8 complete -- Notebooks 46 (Business Understanding & Policy), 47 (Modeling), 48 (Validation & Deployment), and 49 (Financial-Impact Reporting & Packaging) all shipped, RECOMMENDED FOR PRODUCTION on this run (both hard-gate KPIs -- monotonicity and coherence -- met; Severe/Low default ratio 107.2x). All 12 Phase 3 notebooks (38-49) verified: syntax-clean, idempotent, pyflakes-clean. |
+| Phase 3 — Behavioral Intelligence | Problems 6, 7, 8 | **Complete, pushed to GitHub 2026-08-25** (12 notebooks + real notebook-output artifacts + Global Standard hardening pass, all pushed 2026-08-25) — Problem 6 complete (Notebooks 38-41), RECOMMENDED FOR PRODUCTION (W=3 trailing window, 99.2% AUC retention); Problem 7 complete (Notebooks 42-45), concluded NOT RECOMMENDED FOR PRODUCTION (honest result -- real default-rate lift below KPI target; a v2 enhancement attempt, Notebooks 46-47, was built, showed genuine but insufficient improvement, and was deliberately abandoned per user decision, freeing 46-49 for Problem 8); Problem 8 complete -- Notebooks 46 (Business Understanding & Policy), 47 (Modeling), 48 (Validation & Deployment), and 49 (Financial-Impact Reporting & Packaging) all shipped, RECOMMENDED FOR PRODUCTION on this run (both hard-gate KPIs -- monotonicity and coherence -- met; Severe/Low default ratio 107.2x). All 12 Phase 3 notebooks (38-49) verified: syntax-clean, idempotent, pyflakes-clean. Hardening pass: 21 new tests (94 total platform-wide), Docker for all 3 services, MODEL_CARD/CHANGELOG/requirements.txt, BENCHMARKS.md entries, CI wiring -- see "Two more real bugs found" above. |
 | Phase 4 — Operational Risk Management | Problems 9, 10, 11 | Not started |
 | Phase 5 — Customer & Business Intelligence | Problems 12, 13, 14 | Not started |
 

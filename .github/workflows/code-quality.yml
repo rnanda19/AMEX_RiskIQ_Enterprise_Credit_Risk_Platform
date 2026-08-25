@@ -24,6 +24,9 @@ jobs:
           Problem3_Expected_Credit_Loss_IFRS9_CECL/src Problem3_Expected_Credit_Loss_IFRS9_CECL/tests
           Problem4_Delinquency_Escalation_Loss_Severity/src Problem4_Delinquency_Escalation_Loss_Severity/tests
           Problem5_Early_Payment_Default_Detection/src Problem5_Early_Payment_Default_Detection/tests
+          Problem6_Dynamic_Behavioral_Credit_Scoring/src Problem6_Dynamic_Behavioral_Credit_Scoring/tests
+          Problem7_Early_Warning_System/src Problem7_Early_Warning_System/tests
+          Problem8_Roll_Rate_Modeling/src Problem8_Roll_Rate_Modeling/tests
         continue-on-error: true  # advisory for now -- see ROADMAP.md "make lint blocking";
           # one known pre-existing finding logged in docs/known_lint_findings.md
 
@@ -39,7 +42,8 @@ jobs:
       - run: black --check --line-length 120 shared/
           Problem1_Credit_Scoring_PD_Prediction/src Problem2_Risk_Tier_Classification/src
           Problem3_Expected_Credit_Loss_IFRS9_CECL/src Problem4_Delinquency_Escalation_Loss_Severity/src
-          Problem5_Early_Payment_Default_Detection/src
+          Problem5_Early_Payment_Default_Detection/src Problem6_Dynamic_Behavioral_Credit_Scoring/src
+          Problem7_Early_Warning_System/src Problem8_Roll_Rate_Modeling/src
         continue-on-error: true  # advisory: repo-wide reformatting is a deliberate future pass
           # (see ROADMAP.md), not something to apply as a side effect of adding this check
 
@@ -58,4 +62,5 @@ jobs:
       - run: bandit -r shared/config.py shared/metrics.py shared/monitoring.py shared/tiers.py
           Problem1_Credit_Scoring_PD_Prediction/src Problem2_Risk_Tier_Classification/src
           Problem3_Expected_Credit_Loss_IFRS9_CECL/src Problem4_Delinquency_Escalation_Loss_Severity/src
-          Problem5_Early_Payment_Default_Detection/src -q
+          Problem5_Early_Payment_Default_Detection/src Problem6_Dynamic_Behavioral_Credit_Scoring/src
+          Problem7_Early_Warning_System/src Problem8_Roll_Rate_Modeling/src -q

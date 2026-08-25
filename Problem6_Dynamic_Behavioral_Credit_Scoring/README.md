@@ -43,6 +43,7 @@ Notebook 38 (Business Understanding & Policy -- defines candidate trailing windo
 Problem6_Dynamic_Behavioral_Credit_Scoring/
 |-- notebooks/          4 notebooks (38-41)
 |-- src/                dynamic_behavioral_service.py -- real, runnable FastAPI scoring service
+|                        src/docker/ -- Dockerfile + docker-compose.yml (port 8006)
 |-- reports/            reports/modeling (results JSON + charts), reports/validation_deployment
 |                        (statistical validation, deployment checklist, Word report, charts),
 |                        reports/financial_impact_reporting_packaging (Excel workbook, Word report,
@@ -51,7 +52,9 @@ Problem6_Dynamic_Behavioral_Credit_Scoring/
 |-- data/                see data/README.md
 |-- models/              dynamic_behavioral_xgboost_w3.joblib + preprocessing_artifacts.joblib (real)
 |-- artifacts/           reserved for future notebook_38-41_summary.json exports
-`-- tests/               reserved -- pytest suite not yet built for this problem (see note below)
+`-- tests/               pytest (6 tests) -- drives the real FastAPI service end-to-end against
+                         the real trained model, including a bit-exact match against direct
+                         model inference
 ```
 
 ## 6. Deployable Scorer
@@ -72,7 +75,7 @@ Every number above is computed live by that notebook's own code on the real data
 
 ## 9. Hardening Status
 
-This problem's real notebook outputs (reports, model artifacts, deployed service) are live in this structure. A pytest suite, `src/docker/` container, `MODEL_CARD.md`, `CHANGELOG.md`, and `requirements.txt` -- matching the pattern already shipped for Problems 1-5 -- have not been built yet; that hardening pass is planned but not started.
+Complete, matching the pattern already shipped for Problems 1-5: `tests/` (6 pytest tests, driven by the real trained model), `src/docker/` (Dockerfile + docker-compose.yml), `MODEL_CARD.md`, `CHANGELOG.md`, and `requirements.txt` are all in place -- see `CHANGELOG.md` for the two real bugs (a hardcoded local-path privacy leak, a port collision with Problem 3) found and fixed during this pass.
 
 ## License
 

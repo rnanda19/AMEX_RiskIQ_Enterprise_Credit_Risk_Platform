@@ -1,0 +1,10 @@
+services:
+  amex-rr-api:
+    build:
+      context: ..
+      dockerfile: docker/Dockerfile
+    image: amex-rr-api:latest
+    container_name: amex-rr-api
+    ports:
+      - "8005:8005"
+    restart: unless-stopped

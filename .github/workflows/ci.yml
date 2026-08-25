@@ -3,9 +3,9 @@ name: CI
 # Runs on every push/PR touching main. Two checks (notebook syntax + tests), both fast
 # (seconds, not minutes) because neither touches the real Kaggle dataset or the real multi-GB
 # trained model artifacts -- see shared/tests/ and each Problem's tests/ for how
-# synthetic-but-structurally-real (or, for Problems 3-5, the real small deployable artifacts
-# shipped in-repo) fixtures make that possible. Lint/format/security checks live in a separate
-# workflow -- see code-quality.yml.
+# synthetic-but-structurally-real (or, for Problems 3-8, the real small deployable artifacts --
+# trained models or frozen policy JSON -- shipped in-repo) fixtures make that possible.
+# Lint/format/security checks live in a separate workflow -- see code-quality.yml.
 on:
   push:
     branches: [main]
@@ -48,3 +48,12 @@ jobs:
       - name: Problem 5 tests
         run: python -m pytest Problem5_Early_Payment_Default_Detection/tests -v
         if: hashFiles('Problem5_Early_Payment_Default_Detection/tests/**') != ''
+      - name: Problem 6 tests
+        run: python -m pytest Problem6_Dynamic_Behavioral_Credit_Scoring/tests -v
+        if: hashFiles('Problem6_Dynamic_Behavioral_Credit_Scoring/tests/**') != ''
+      - name: Problem 7 tests
+        run: python -m pytest Problem7_Early_Warning_System/tests -v
+        if: hashFiles('Problem7_Early_Warning_System/tests/**') != ''
+      - name: Problem 8 tests
+        run: python -m pytest Problem8_Roll_Rate_Modeling/tests -v
+        if: hashFiles('Problem8_Roll_Rate_Modeling/tests/**') != ''

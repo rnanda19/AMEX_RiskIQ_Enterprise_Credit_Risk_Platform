@@ -43,7 +43,9 @@ Notebook 46 (Business Understanding & Policy -- defines the composite severity s
 ```
 Problem8_Roll_Rate_Modeling/
 |-- notebooks/          4 notebooks (46-49)
-|-- src/                roll_rate_scoring_service.py -- real, runnable FastAPI scoring service
+|-- src/                roll_rate_scoring_service.py -- real, runnable FastAPI scoring service, plus
+|                        a self-contained copy of roll_rate_deployment_policy.json
+|                        src/docker/ -- Dockerfile + docker-compose.yml (port 8005)
 |-- reports/            reports/modeling (results JSON + transition-matrix/escalation/default-rate
 |                        charts), reports/validation_deployment (statistical validation, deployment
 |                        checklist, Word report, bootstrap charts), reports/financial_impact_reporting_packaging
@@ -53,7 +55,9 @@ Problem8_Roll_Rate_Modeling/
 |-- models/              no trained classifier artifacts -- this technique is a fitted composite score
 |                        plus an empirical Markov transition matrix, both frozen in docs/
 |-- artifacts/           reserved for future notebook_46-49_summary.json exports
-`-- tests/               reserved -- pytest suite not yet built for this problem (see note below)
+`-- tests/               pytest (8 tests) -- drives the real FastAPI scoring service end-to-end
+                         against the real frozen policy and transition matrix, including a
+                         bit-exact match against direct computation
 ```
 
 ## 6. Deployable Scorer
@@ -74,7 +78,7 @@ Every number above is computed live by that notebook's own code on the real data
 
 ## 9. Hardening Status
 
-This problem's real notebook outputs (reports, deployed service) are live in this structure. A pytest suite, `src/docker/` container, `MODEL_CARD.md`, `CHANGELOG.md`, and `requirements.txt` -- matching the pattern already shipped for Problems 1-5 -- have not been built yet; that hardening pass is planned but not started.
+Complete, matching the pattern already shipped for Problems 1-5: `tests/` (8 pytest tests, driven by the real frozen policy), `src/docker/` (Dockerfile + docker-compose.yml), `MODEL_CARD.md`, `CHANGELOG.md`, and `requirements.txt` are all in place -- see `CHANGELOG.md` for the real bug (a hardcoded local-path privacy leak) found and fixed during this pass; unlike Problems 6 and 7, no port reassignment was needed here since 8005 was already free.
 
 ## License
 

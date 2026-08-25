@@ -1,0 +1,10 @@
+services:
+  amex-ews-api:
+    build:
+      context: ..
+      dockerfile: docker/Dockerfile
+    image: amex-ews-api:latest
+    container_name: amex-ews-api
+    ports:
+      - "8007:8007"
+    restart: unless-stopped

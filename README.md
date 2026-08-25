@@ -67,40 +67,46 @@ AMEX_RiskIQ_Enterprise_Credit_Risk_Platform/
 ├── setup.py, pyproject.toml, Makefile           Packaging + `make test` / `make lint` / `make test-all`
 ├── CONTRIBUTING.md                              Engineering standards this repo follows
 ├── ROADMAP.md                                   Hardening-track + problem-roadmap status, both tracks
-├── BENCHMARKS.md                                Real baseline-vs-model comparisons, all 5 problems
+├── BENCHMARKS.md                                Real baseline-vs-model comparisons, all 8 problems
 ├── LICENSE
 └── README.md   (this file)
 ```
 
-Each subfolder is a complete, independently runnable package with its own `README.md`, `notebooks/`, `src/` (deployable scorer/service — Problems 3, 4, and 5 each also ship a `src/docker/` container for their service), `reports/` (real Word reports, Excel workbooks, HTML dashboards per pillar), and `docs/`. Problems 1-5 additionally ship `tests/` (pytest), `models/`, `MODEL_CARD.md`, `CHANGELOG.md`, and `requirements.txt`; Problems 6, 7, and 8 (Phase 3) have their real notebook outputs in place but not yet that hardening pass — see each subfolder's own README for exactly what's shipped. Start with each subfolder's own README for full detail.
+Each subfolder is a complete, independently runnable package with its own `README.md`, `notebooks/`, `src/` (deployable scorer/service, each with a `src/docker/` container), `tests/` (pytest), `reports/` (real Word reports, Excel workbooks, HTML dashboards per pillar), `docs/`, `MODEL_CARD.md`, `CHANGELOG.md`, and `requirements.txt`. Problems with a small enough real trained artifact (3, 4, 5, 6, 7, 8) ship it directly in `models/` or self-contained in `src/`; Problems 1 and 2's larger champion model is mounted at runtime instead. Start with each subfolder's own README for full detail.
 
 ## Engineering & Testing
 
 - **CI** is split across two workflows: `.github/workflows/ci.yml` (a
   syntax check of every code cell in every notebook via
-  `scripts/check_notebook_syntax.py`, 37 notebooks, plus the unit test
-  suite across all five problems) and `.github/workflows/code-quality.yml`
+  `scripts/check_notebook_syntax.py`, 49 notebooks, plus the unit test
+  suite across all eight problems) and `.github/workflows/code-quality.yml`
   (pyflakes lint — advisory, see `docs/known_lint_findings.md`; `black
   --check` format check — advisory, repo-wide reformatting is a deliberate
   future pass, see `ROADMAP.md`; and a `bandit` security scan of every
   problem's real deployable `src/` — currently blocking, 0 findings).
-- **Tests** (73 passing across all five problems + `shared/` as of this
+- **Tests** (94 passing across all eight problems + `shared/` as of this
   writing) cover the parts of this platform that are already standalone,
   real Python (not notebook cells): every problem's deployable scorer or
   FastAPI service, tested either against small, genuinely-fit synthetic
   fixtures (Problems 1/2, whose champion model exceeds this package's
-  size-safety cap) or — for Problems 3, 4, and 5, whose deployable
-  artifacts are small enough to ship directly — against the **real,
-  measured scoring bundle or trained model itself**, not a mock. See each
+  size-safety cap) or — for Problems 3–8, whose deployable artifacts (a
+  scoring bundle, a trained model, or a frozen policy JSON) are small
+  enough to ship directly — against the **real, measured scoring bundle,
+  trained model, or frozen policy itself**, not a mock. See each
   problem's `tests/conftest.py` for which, and each problem's
   `MODEL_CARD.md` for the real trained numbers.
-- **Deployment**: Problems 1, 3, 4, and 5 each ship a runnable FastAPI
-  service in `src/`, with a `src/docker/` Dockerfile + docker-compose.yml.
-  Problems 3, 4, and 5's real deployable artifacts (scoring bundles / the
-  real trained early-default model) are small enough to bake directly into
-  the image — fully self-contained, no volume mount required. Problem 1's
-  much larger champion model is instead mounted at runtime. `make help`
-  (or each problem's own README/MODEL_CARD) lists the exact run commands.
+- **Deployment**: every problem ships a runnable FastAPI service in
+  `src/`, with a `src/docker/` Dockerfile + docker-compose.yml. Problems
+  3–8's real deployable artifacts (scoring bundles, the real trained
+  early-default/behavioral models, or frozen policy JSON) are small
+  enough to bake directly into the image — fully self-contained, no
+  volume mount required. Problems 1 and 2's larger champion model is
+  instead mounted at runtime. Docker images are statically build-context
+  verified (every `COPY` source path checked against its declared build
+  context) but not yet smoke-tested with a real `docker build` — this
+  sandbox's Docker CLI has no daemon/registry access; see `ROADMAP.md`.
+  `make help` (or each problem's own README/MODEL_CARD) lists the exact
+  run commands.
 - **`shared/`** holds logic extracted, byte-verified-identical (or, for
   Problem 2's tier assignment, generalized with the exact same behavior),
   from the notebooks/services that first defined it: the official AMEX
@@ -134,7 +140,7 @@ Polars (WARP-tuned thread pools), NumPy/Pandas, scikit-learn, XGBoost/LightGBM/C
 
 - **Phase 1 — Foundation** (this repository): Problem 1 (Probability of Default), Problem 2 (Risk Tier Classification) — complete.
 - **Phase 2 — Regulatory & Loss Provisioning** (this repository): Problem 3 (Expected Credit Loss, IFRS9/CECL), Problem 4 (Delinquency Escalation / Loss Severity), Problem 5 (Early Payment Default Detection) — **complete**.
-- **Phase 3 — Behavioral Intelligence** (this repository): Problem 6 (Dynamic/Behavioral Credit Scoring), Problem 7 (Early Warning System), Problem 8 (Roll-Rate Modeling) — **complete**; hardening pass (tests, Docker, MODEL_CARD/CHANGELOG) not yet started.
+- **Phase 3 — Behavioral Intelligence** (this repository): Problem 6 (Dynamic/Behavioral Credit Scoring), Problem 7 (Early Warning System), Problem 8 (Roll-Rate Modeling) — **complete**, including the Global Standard hardening pass (tests, Docker, MODEL_CARD/CHANGELOG).
 - **Phase 4 — Operational Risk Management**, **Phase 5 — Customer & Business Intelligence**: planned.
 
 ## License

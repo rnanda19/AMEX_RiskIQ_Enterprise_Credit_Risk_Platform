@@ -4,7 +4,10 @@ PROBLEMS := Problem1_Credit_Scoring_PD_Prediction \
             Problem2_Risk_Tier_Classification \
             Problem3_Expected_Credit_Loss_IFRS9_CECL \
             Problem4_Delinquency_Escalation_Loss_Severity \
-            Problem5_Early_Payment_Default_Detection
+            Problem5_Early_Payment_Default_Detection \
+            Problem6_Dynamic_Behavioral_Credit_Scoring \
+            Problem7_Early_Warning_System \
+            Problem8_Roll_Rate_Modeling
 
 help:
 	@echo "Targets:"

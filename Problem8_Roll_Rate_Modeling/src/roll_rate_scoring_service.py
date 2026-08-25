@@ -13,7 +13,10 @@ from typing import Dict, Optional
 from fastapi import FastAPI, HTTPException
 from pydantic import BaseModel, create_model
 
-POLICY_PATH = Path(os.environ.get("AMEX_RR_POLICY_PATH", r"C:\Users\rnand\Downloads\amex-default-prediction\AMEX_Enterprise_Credit_Risk_Platform\Phase3_Behavioral_Intelligence\Problem8_Roll_Rate_Modeling\deployment\policy_artifacts\roll_rate_deployment_policy.json"))
+# Self-contained default: the real frozen policy ships alongside this file in src/ (see
+# docs/roll_rate_deployment_policy.json for the original copy). Override with
+# AMEX_RR_POLICY_PATH to point elsewhere in production.
+POLICY_PATH = Path(os.environ.get("AMEX_RR_POLICY_PATH", str(Path(__file__).parent / "roll_rate_deployment_policy.json")))
 with open(POLICY_PATH, "r", encoding="utf-8") as _f:
     _POLICY = json.load(_f)
 

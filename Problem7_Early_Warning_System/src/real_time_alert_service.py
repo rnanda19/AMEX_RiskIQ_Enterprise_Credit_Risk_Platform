@@ -4,7 +4,7 @@
 # records), not a single flat feature row -- the baseline is computed from that history at scoring
 # time, exactly reproducing Notebooks 43/44's rolling z-score computation.
 # Run with:
-#     uvicorn real_time_alert_service:app --host 0.0.0.0 --port 8004
+#     uvicorn real_time_alert_service:app --host 0.0.0.0 --port 8007
 import json
 import os
 from pathlib import Path
@@ -14,7 +14,10 @@ import numpy as np
 from fastapi import FastAPI, HTTPException
 from pydantic import BaseModel
 
-POLICY_PATH = Path(os.environ.get("AMEX_EWS_POLICY_PATH", r"C:\Users\rnand\Downloads\amex-default-prediction\AMEX_Enterprise_Credit_Risk_Platform\Phase3_Behavioral_Intelligence\Problem7_Early_Warning_System\models\early_warning_deployment_policy.json"))
+# Self-contained default: the real frozen policy ships alongside this file in src/ (see
+# docs/early_warning_deployment_policy.json for the original copy). Override with
+# AMEX_EWS_POLICY_PATH to point elsewhere in production.
+POLICY_PATH = Path(os.environ.get("AMEX_EWS_POLICY_PATH", str(Path(__file__).parent / "early_warning_deployment_policy.json")))
 with open(POLICY_PATH, "r", encoding="utf-8") as _f:
     _POLICY = json.load(_f)
 

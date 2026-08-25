@@ -1,0 +1,10 @@
+services:
+  amex-dbs-api:
+    build:
+      context: ../..
+      dockerfile: src/docker/Dockerfile
+    image: amex-dbs-api:latest
+    container_name: amex-dbs-api
+    ports:
+      - "8006:8006"
+    restart: unless-stopped
