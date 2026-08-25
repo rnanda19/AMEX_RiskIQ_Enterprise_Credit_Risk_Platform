@@ -113,7 +113,7 @@ work, not as progress toward an unverified number.
 |---|---|---|
 | Phase 1 — Foundation | Problem 1 (PD Prediction), Problem 2 (Risk Tier Classification) | Complete, pushed to GitHub (25 notebooks) |
 | Phase 2 — Regulatory & Loss Provisioning | Problem 3 (ECL/IFRS9/CECL), Problem 4 (Delinquency/Loss Severity), Problem 5 (Early Payment Default) | **Complete, pushed to GitHub 2026-08-25** (12 notebooks + Global Standard hardening pass) |
-| Phase 3 — Behavioral Intelligence | Problems 6, 7, 8 | **In progress, 2026-08-25** — Problem 6 complete (Notebooks 38-41); Problem 7 complete (Notebooks 42-45), concluded NOT RECOMMENDED FOR PRODUCTION (honest result -- real default-rate lift below KPI target; a v2 enhancement attempt, Notebooks 46-47, was built, showed genuine but insufficient improvement, and was deliberately abandoned per user decision, freeing 46-49 for Problem 8); Problem 8 in progress -- Notebooks 46 (Business Understanding & Policy) and 47 (Modeling) complete, 48-49 pending |
+| Phase 3 — Behavioral Intelligence | Problems 6, 7, 8 | **In progress, 2026-08-25** — Problem 6 complete (Notebooks 38-41); Problem 7 complete (Notebooks 42-45), concluded NOT RECOMMENDED FOR PRODUCTION (honest result -- real default-rate lift below KPI target; a v2 enhancement attempt, Notebooks 46-47, was built, showed genuine but insufficient improvement, and was deliberately abandoned per user decision, freeing 46-49 for Problem 8); Problem 8 in progress -- Notebooks 46 (Business Understanding & Policy), 47 (Modeling), and 48 (Validation & Deployment) complete (NOT RECOMMENDED FOR PRODUCTION on this run -- coherence KPI fails), 49 pending |
 | Phase 4 — Operational Risk Management | Problems 9, 10, 11 | Not started |
 | Phase 5 — Customer & Business Intelligence | Problems 12, 13, 14 | Not started |
 
@@ -154,6 +154,23 @@ tiebreaker, causing Polars' threaded streaming engine to not guarantee
 stable row order across runs) -- fixed via `.with_row_index()` used as a
 tertiary sort key; the identical latent bug exists unfixed in Problem 6's
 already-delivered Notebooks 39/40, flagged for a future hardening pass.
+Running Notebooks 46 and 47 against the real environment also surfaced
+two real path-resolution bugs (Notebook 46 assumed Problem 4's summary
+JSON lived at the flat `PROJECT_ROOT/artifacts/` path this platform's
+Problems 1/2/5/6/7 use, when Problems 3/4 actually nest theirs under
+their own `Phase2.../ProblemN/artifacts/`; Notebook 47 trusted a stale
+absolute path stored in `notebook_02_summary.json` instead of using the
+already-proven `_resolve_pillar_file()` resolver Notebook 39 established)
+-- both fixed and re-delivered same day.
 
-Next problem-roadmap item: Notebook 48 (Problem 8, Validation &
-Deployment).
+Notebook 48 (Validation & Deployment) shipped 2026-08-25, built with
+`_resolve_pillar_file()` from the start (no path bugs this time).
+Independently reproduces Notebook 47's entire pipeline from scratch
+(zero-randomness, so reproduction is checked to 1e-9 with an immediate
+raise on any mismatch), bootstraps 95% CIs on both real hard-gate KPIs,
+and makes the final honest recommendation call -- NOT RECOMMENDED FOR
+PRODUCTION on the fixture run (monotonicity KPI passes, coherence KPI
+fails with a 95% CI entirely below zero).
+
+Next problem-roadmap item: Notebook 49 (Problem 8, Financial-Impact
+Reporting & Packaging -- final notebook of Problem 8, closes Phase 3).
