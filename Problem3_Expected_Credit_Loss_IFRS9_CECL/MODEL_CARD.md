@@ -32,4 +32,15 @@ Stage 2 (SICR) and Stage 3 (credit-impaired) are computed ONLY from real PD (Pro
 
 ## How this is tested going forward
 
-`tests/` covers `ecl_calculator.py`'s `compute_ecl()` against the real, measured `ecl_scoring_bundle.json` -- stage assignment logic, LGD-by-tier lookup, and the IFRS9-vs-CECL discount-factor distinction.
+`tests/` covers `ecl_calculator.py`'s `compute_ecl()` against the real, measured `ecl_scoring_bundle.json` -- stage assignment logic, LGD-by-tier lookup, and the IFRS9-vs-CECL discount-factor distinction. `tests/test_ecl_scoring_service.py` additionally covers the deployable API below end-to-end, checking every response is bit-identical to calling `compute_ecl()` directly.
+
+## Deployment
+
+`src/ecl_scoring_service.py` wraps `compute_ecl()` as a FastAPI service (`GET /health`, `GET /model-info`, `POST /score`). The real `ecl_scoring_bundle.json` ships alongside it in `src/`, so the service is fully self-contained -- no external volume mount needed (unlike Problem 1's much larger champion model, which is intentionally mounted at runtime rather than baked into its image). Run locally with `uvicorn ecl_scoring_service:app --port 8003` from `src/`, or build the container:
+
+```bash
+cd src/docker
+docker compose up --build
+```
+
+See `src/docker/Dockerfile` for the exact build; its context is `src/` (one level up from `docker/`).

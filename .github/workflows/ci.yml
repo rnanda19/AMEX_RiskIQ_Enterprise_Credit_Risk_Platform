@@ -1,9 +1,11 @@
 name: CI
 
-# Runs on every push/PR touching main. Three checks, all fast (seconds, not
-# minutes) because none of them touch the real Kaggle dataset or the real
-# multi-GB trained model artifacts -- see shared/tests/ and each Problem's
-# tests/ for how synthetic-but-structurally-real fixtures make that possible.
+# Runs on every push/PR touching main. Two checks (notebook syntax + tests), both fast
+# (seconds, not minutes) because neither touches the real Kaggle dataset or the real multi-GB
+# trained model artifacts -- see shared/tests/ and each Problem's tests/ for how
+# synthetic-but-structurally-real (or, for Problems 3-5, the real small deployable artifacts
+# shipped in-repo) fixtures make that possible. Lint/format/security checks live in a separate
+# workflow -- see code-quality.yml.
 on:
   push:
     branches: [main]
@@ -46,18 +48,3 @@ jobs:
       - name: Problem 5 tests
         run: python -m pytest Problem5_Early_Payment_Default_Detection/tests -v
         if: hashFiles('Problem5_Early_Payment_Default_Detection/tests/**') != ''
-
-  lint:
-    name: Lint (pyflakes -- unused imports, undefined names)
-    runs-on: ubuntu-latest
-    steps:
-      - uses: actions/checkout@v4
-      - uses: actions/setup-python@v5
-        with:
-          python-version: "3.11"
-      - run: pip install pyflakes
-      - run: pyflakes shared/ scripts/ Problem1_Credit_Scoring_PD_Prediction/src Problem1_Credit_Scoring_PD_Prediction/tests
-          Problem3_Expected_Credit_Loss_IFRS9_CECL/src Problem3_Expected_Credit_Loss_IFRS9_CECL/tests
-          Problem4_Delinquency_Escalation_Loss_Severity/src Problem4_Delinquency_Escalation_Loss_Severity/tests
-          Problem5_Early_Payment_Default_Detection/src Problem5_Early_Payment_Default_Detection/tests
-        continue-on-error: true  # advisory for now -- see ROADMAP.md "make lint blocking"

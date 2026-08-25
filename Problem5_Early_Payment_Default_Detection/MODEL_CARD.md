@@ -38,3 +38,14 @@ Score default risk for a customer using only their first 3 monthly statements, s
 ## How this is tested going forward
 
 `tests/` drives the REAL trained model end-to-end via the FastAPI `TestClient` (not a synthetic fixture -- this problem's model is small enough to ship in this repository), covering `/health`, `/model-info`, and `/score` against the real preprocessing artifacts.
+
+## Deployment
+
+`src/early_default_service.py` defaults `AMEX_EPD_MODELS_DIR` to this repo's own `models/` folder (self-contained -- no local machine path needed; override the env var to point elsewhere in production). Run locally with `uvicorn early_default_service:app --port 8002` from `src/`, or build the container:
+
+```bash
+cd src/docker
+docker compose up --build
+```
+
+The build context is the problem root (not `src/`), since the image needs both `src/` and the real `models/` artifacts -- see `src/docker/Dockerfile`'s header comment.

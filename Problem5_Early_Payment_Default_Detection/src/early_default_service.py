@@ -12,7 +12,11 @@ import numpy as np
 from fastapi import FastAPI, HTTPException
 from pydantic import BaseModel, create_model
 
-MODELS_DIR = Path(os.environ.get("AMEX_EPD_MODELS_DIR", r"C:\Users\rnand\Downloads\amex-default-prediction\AMEX_Enterprise_Credit_Risk_Platform\Phase2_Regulatory_Loss_Provisioning\Problem5_Early_Payment_Default_Detection\deployment\models"))
+# Self-contained default: the repo's own models/ folder (real trained artifacts ship there,
+# see models/README.md). Override with AMEX_EPD_MODELS_DIR to point elsewhere (e.g. a separate
+# model registry volume in production). Never hardcode a local machine's path here -- this file
+# is published publicly.
+MODELS_DIR = Path(os.environ.get("AMEX_EPD_MODELS_DIR", str(Path(__file__).resolve().parents[1] / "models")))
 
 preprocessing_artifacts = joblib.load(MODELS_DIR / "preprocessing_artifacts.joblib")
 label_encoders = preprocessing_artifacts["label_encoders"]
@@ -65,7 +69,7 @@ def model_info():
 
 @app.post("/score", response_model=EarlyDefaultResponse)
 def score(features: CustomerFeatures, customer_id: Optional[str] = None):
-    row = features.dict() if hasattr(features, "dict") else features.model_dump()
+    row = features.model_dump() if hasattr(features, "model_dump") else features.dict()
     x = np.zeros((1, len(all_feature_cols)), dtype=np.float32)
     for i, col in enumerate(all_feature_cols):
         val = row.get(col)

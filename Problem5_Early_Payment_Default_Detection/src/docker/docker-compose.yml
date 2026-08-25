@@ -1,0 +1,10 @@
+services:
+  amex-epd-api:
+    build:
+      context: ../..
+      dockerfile: src/docker/Dockerfile
+    image: amex-epd-api:latest
+    container_name: amex-epd-api
+    ports:
+      - "8002:8002"
+    restart: unless-stopped

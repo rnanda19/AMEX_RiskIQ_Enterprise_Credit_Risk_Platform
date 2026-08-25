@@ -1,0 +1,10 @@
+services:
+  amex-severity-api:
+    build:
+      context: ..
+      dockerfile: docker/Dockerfile
+    image: amex-severity-api:latest
+    container_name: amex-severity-api
+    ports:
+      - "8004:8004"
+    restart: unless-stopped

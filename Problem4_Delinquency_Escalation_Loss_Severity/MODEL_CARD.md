@@ -33,4 +33,13 @@ Assign a severity tier and corresponding LGD to each customer, replacing Problem
 
 ## How this is tested going forward
 
-`tests/` covers `severity_scorer.py`'s `score_customer()` against the real, measured `severity_scoring_bundle.json` -- tier-boundary behavior, missing-value handling (None and NaN), and full-precision weight/mean/std consumption.
+`tests/` covers `severity_scorer.py`'s `score_customer()` against the real, measured `severity_scoring_bundle.json` -- tier-boundary behavior, missing-value handling (None and NaN), and full-precision weight/mean/std consumption. `tests/test_severity_scoring_service.py` additionally covers the deployable API below end-to-end, including that omitted features are imputed identically through the live HTTP path as through direct calls.
+
+## Deployment
+
+`src/severity_scoring_service.py` wraps `score_customer()` as a FastAPI service (`GET /health`, `GET /model-info`, `POST /score`, accepting any subset of the 243 real features -- missing ones are imputed to their real training mean). The real `severity_scoring_bundle.json` ships alongside it in `src/`, fully self-contained. Run locally with `uvicorn severity_scoring_service:app --port 8004` from `src/`, or build the container:
+
+```bash
+cd src/docker
+docker compose up --build
+```

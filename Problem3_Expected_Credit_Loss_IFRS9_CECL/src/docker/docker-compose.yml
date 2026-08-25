@@ -1,0 +1,10 @@
+services:
+  amex-ecl-api:
+    build:
+      context: ..
+      dockerfile: docker/Dockerfile
+    image: amex-ecl-api:latest
+    container_name: amex-ecl-api
+    ports:
+      - "8003:8003"
+    restart: unless-stopped

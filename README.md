@@ -1,6 +1,6 @@
 # AMEX RiskIQ: Enterprise Credit Risk Platform
 
-[![CI](https://github.com/rnanda19/AMEX_RiskIQ_Enterprise_Credit_Risk_Platform/actions/workflows/ci.yml/badge.svg)](https://github.com/rnanda19/AMEX_RiskIQ_Enterprise_Credit_Risk_Platform/actions/workflows/ci.yml) [![Python 3.11](https://img.shields.io/badge/python-3.11-blue.svg)]() [![CRISP-DM](https://img.shields.io/badge/methodology-CRISP--DM-informational.svg)]() [![License: All Rights Reserved](https://img.shields.io/badge/license-All%20Rights%20Reserved-lightgrey.svg)](LICENSE)
+[![CI](https://github.com/rnanda19/AMEX_RiskIQ_Enterprise_Credit_Risk_Platform/actions/workflows/ci.yml/badge.svg)](https://github.com/rnanda19/AMEX_RiskIQ_Enterprise_Credit_Risk_Platform/actions/workflows/ci.yml) [![Code Quality](https://github.com/rnanda19/AMEX_RiskIQ_Enterprise_Credit_Risk_Platform/actions/workflows/code-quality.yml/badge.svg)](https://github.com/rnanda19/AMEX_RiskIQ_Enterprise_Credit_Risk_Platform/actions/workflows/code-quality.yml) [![Python 3.11](https://img.shields.io/badge/python-3.11-blue.svg)]() [![CRISP-DM](https://img.shields.io/badge/methodology-CRISP--DM-informational.svg)]() [![License: All Rights Reserved](https://img.shields.io/badge/license-All%20Rights%20Reserved-lightgrey.svg)](LICENSE)
 
 An enterprise-grade credit risk platform built end-to-end on the real Kaggle **American Express Default Prediction** dataset. This repository holds **Phase 1: Foundation** and **Phase 2: Regulatory & Loss Provisioning** of a larger 14-problem, 5-phase roadmap — five problems, 37 notebooks combined. Later phases (Behavioral Intelligence, Operational Risk Management, Customer & Business Intelligence) are planned.
 
@@ -46,37 +46,57 @@ AMEX_RiskIQ_Enterprise_Credit_Risk_Platform/
 ├── shared/                                      Cross-problem library (metrics, config, monitoring),
 │                                                 extracted & unit-tested -- see shared/tests/
 ├── scripts/                                     CI helper scripts (notebook syntax checker)
-├── .github/workflows/                           CI: notebook syntax check, unit tests, lint
+├── .github/workflows/                           ci.yml (tests, notebook syntax) +
+│                                                 code-quality.yml (lint, format check, security scan)
+├── .github/ISSUE_TEMPLATE/, PULL_REQUEST_TEMPLATE.md
+├── setup.py, pyproject.toml, Makefile           Packaging + `make test` / `make lint` / `make test-all`
 ├── CONTRIBUTING.md                              Engineering standards this repo follows
 ├── ROADMAP.md                                   Hardening-track + problem-roadmap status, both tracks
+├── BENCHMARKS.md                                Real baseline-vs-model comparisons, all 5 problems
 ├── LICENSE
 └── README.md   (this file)
 ```
 
-Each subfolder is a complete, independently runnable package with its own `README.md`, `notebooks/`, `src/` (deployable scorer/service), `tests/` (pytest), `reports/` (real Word reports, Excel workbooks, HTML dashboards per pillar), `docs/`, `models/`, and `requirements.txt`. Start with each subfolder's own README for full detail.
+Each subfolder is a complete, independently runnable package with its own `README.md`, `notebooks/`, `src/` (deployable scorer/service — Problems 3, 4, and 5 each also ship a `src/docker/` container for their service), `tests/` (pytest), `reports/` (real Word reports, Excel workbooks, HTML dashboards per pillar), `docs/`, `models/`, and `requirements.txt`. Start with each subfolder's own README for full detail.
 
 ## Engineering & Testing
 
-- **CI** (`.github/workflows/ci.yml`) runs on every push: a syntax check of
-  every code cell in every notebook (`scripts/check_notebook_syntax.py`,
-  37 notebooks), the unit test suite across all five problems, and lint
-  (pyflakes, currently advisory — see `docs/known_lint_findings.md`).
-- **Tests** (all five problems + `shared/`) cover the parts of this
-  platform that are already standalone, real Python (not notebook cells):
-  every problem's deployable scorer or FastAPI service, tested either
-  against small, genuinely-fit synthetic fixtures (Problems 1/2, whose
-  champion model exceeds this package's size-safety cap) or — for
-  Problems 3, 4, and 5, whose deployable artifacts are small enough to
-  ship directly — against the **real, measured scoring bundle or trained
-  model itself**, not a mock. See each problem's `tests/conftest.py` for
-  which, and each problem's `MODEL_CARD.md` for the real trained numbers.
+- **CI** is split across two workflows: `.github/workflows/ci.yml` (a
+  syntax check of every code cell in every notebook via
+  `scripts/check_notebook_syntax.py`, 37 notebooks, plus the unit test
+  suite across all five problems) and `.github/workflows/code-quality.yml`
+  (pyflakes lint — advisory, see `docs/known_lint_findings.md`; `black
+  --check` format check — advisory, repo-wide reformatting is a deliberate
+  future pass, see `ROADMAP.md`; and a `bandit` security scan of every
+  problem's real deployable `src/` — currently blocking, 0 findings).
+- **Tests** (73 passing across all five problems + `shared/` as of this
+  writing) cover the parts of this platform that are already standalone,
+  real Python (not notebook cells): every problem's deployable scorer or
+  FastAPI service, tested either against small, genuinely-fit synthetic
+  fixtures (Problems 1/2, whose champion model exceeds this package's
+  size-safety cap) or — for Problems 3, 4, and 5, whose deployable
+  artifacts are small enough to ship directly — against the **real,
+  measured scoring bundle or trained model itself**, not a mock. See each
+  problem's `tests/conftest.py` for which, and each problem's
+  `MODEL_CARD.md` for the real trained numbers.
+- **Deployment**: Problems 1, 3, 4, and 5 each ship a runnable FastAPI
+  service in `src/`, with a `src/docker/` Dockerfile + docker-compose.yml.
+  Problems 3, 4, and 5's real deployable artifacts (scoring bundles / the
+  real trained early-default model) are small enough to bake directly into
+  the image — fully self-contained, no volume mount required. Problem 1's
+  much larger champion model is instead mounted at runtime. `make help`
+  (or each problem's own README/MODEL_CARD) lists the exact run commands.
 - **`shared/`** holds logic extracted, byte-verified-identical (or, for
   Problem 2's tier assignment, generalized with the exact same behavior),
   from the notebooks/services that first defined it: the official AMEX
   competition metric, the platform config loader, the PSI monitoring
   helper, and threshold-band assignment — a single tested copy instead of
-  duplicated inline code. See `shared/__init__.py` and `ROADMAP.md` for why
-  the notebooks aren't wired to import from it yet.
+  duplicated inline code, installable in editable mode via `pip install
+  -e .`. See `shared/__init__.py` and `ROADMAP.md` for why the notebooks
+  aren't wired to import from it yet.
+- **Real, measured comparisons** across all five problems — every
+  baseline-vs-model delta, side by side — are consolidated in
+  `BENCHMARKS.md`.
 
 ## How to Run
 
