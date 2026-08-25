@@ -112,10 +112,40 @@ work, not as progress toward an unverified number.
 | Phase | Problems | Status |
 |---|---|---|
 | Phase 1 — Foundation | Problem 1 (PD Prediction), Problem 2 (Risk Tier Classification) | Complete, pushed to GitHub (25 notebooks) |
-| Phase 2 — Regulatory & Loss Provisioning | Problem 3 (ECL/IFRS9/CECL), Problem 4 (Delinquency/Loss Severity), Problem 5 (Early Payment Default) | **Complete** (12 notebooks), packaged and committed locally, 2026-08-24 -- push pending a fresh PAT |
-| Phase 3 — Behavioral Intelligence | Problems 6, 7, 8 | Not started |
+| Phase 2 — Regulatory & Loss Provisioning | Problem 3 (ECL/IFRS9/CECL), Problem 4 (Delinquency/Loss Severity), Problem 5 (Early Payment Default) | **Complete, pushed to GitHub 2026-08-25** (12 notebooks + Global Standard hardening pass) |
+| Phase 3 — Behavioral Intelligence | Problems 6, 7, 8 | **Scoped, 2026-08-25** — folders scaffolded (structure only), notebooks not yet built |
 | Phase 4 — Operational Risk Management | Problems 9, 10, 11 | Not started |
 | Phase 5 — Customer & Business Intelligence | Problems 12, 13, 14 | Not started |
 
-Next problem-roadmap item: Phase 3 (Problems 6-8, Behavioral Intelligence)
-— not yet scoped in detail.
+## Phase 3 build plan — scoped 2026-08-25
+
+Per `AMEX_Master_Execution_Plan_1.docx` Section 8, Phase 3 moves past a static
+point-in-time PD snapshot to a continuously updated behavioral view:
+
+| # | Problem | Depends on | Core technique (per master plan) | Deliverable |
+|---|---|---|---|---|
+| 6 | Dynamic / Behavioral Credit Scoring | #1, #4 | Windowed GBM on each customer's real multi-statement panel (reuses Problem 1's champion architecture, same scope-decision pattern as Problem 5 — LSTM explicitly noted as a future extension, not built here) | Monthly-refreshed dynamic PD |
+| 7 | Early Warning System | #6 | Rolling z-score trend-deviation detection on Problem 6's real panel scores | Real-time alert service |
+| 8 | Roll-Rate Modeling | #4, #6 | Markov transition matrix across Problem 4's real severity/delinquency buckets | Bucket-transition probability model |
+
+Same 4-notebook-per-problem pattern as Phase 2 (Business Understanding &
+Policy → Modeling → Validation & Deployment → Financial-Impact Reporting &
+Packaging), continuing the numbering sequence: Notebooks 38-41 (Problem 6),
+42-45 (Problem 7), 46-49 (Problem 8) — 12 notebooks total. Same standing
+rules apply unchanged: zero-fabrication, Claude generates code only (user
+runs every notebook locally), WARP optimization standard, `random_state=42`,
+one notebook = one idempotent code cell, no local/absolute paths in any
+publicly-shared file.
+
+Repository-packaging skeleton for all 3 problems (`notebooks/`, `src/`,
+`tests/`, `reports/`, `docs/`, `artifacts/`, `models/`, `data/`,
+`.gitignore`, `LICENSE`) created and committed locally 2026-08-25 — content
+is empty by design (no notebooks built yet); **not pushed to GitHub** until
+each problem has real content, same practice as every prior phase. The
+Global Standard hardening pass (deployable APIs, Docker, CI, root
+governance files, BENCHMARKS.md entries) is deliberately deferred until
+after all 3 problems' base notebooks are built and verified, matching how
+Phase 2 was hardened only after Notebook 37 shipped.
+
+Next problem-roadmap item: Notebook 38 (Problem 6, Business Understanding
+& Policy).
