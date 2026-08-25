@@ -1,0 +1,26 @@
+# Python
+__pycache__/
+*.py[cod]
+*.egg-info/
+.Python
+build/
+dist/
+
+# Environments
+.env
+.venv
+venv/
+env/
+
+# Jupyter
+.ipynb_checkpoints/
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Unlike Phase 1, this problem deliberately commits its small, curated real
+# report CSVs/models (all individually reviewed and under the 20MB
+# size-safety cap) -- so no blanket *.csv/*.joblib exclusion here. Large
+# per-customer data files were never copied into this folder in the first
+# place (see data/README.md).
