@@ -25,8 +25,11 @@ Every number in this repository is either computed live by that notebook's own c
 
 - 📊 [Financial Impact Dashboard](https://rnanda19.github.io/AMEX_RiskIQ_Enterprise_Credit_Risk_Platform/Problem1_Credit_Scoring_PD_Prediction/reports/executive_reports/Financial_Impact_Dashboard.html) — interactive ROI, revenue-impact, and loss-reduction dashboard for Problem 1
 - 📈 [Power BI Dashboard Preview](https://rnanda19.github.io/AMEX_RiskIQ_Enterprise_Credit_Risk_Platform/Problem1_Credit_Scoring_PD_Prediction/reports/powerbi_dashboard/PowerBI_Dashboard_Preview.html) — star-schema data model and dashboard preview
+- 📊 [ECL Financial Impact Dashboard](https://rnanda19.github.io/AMEX_RiskIQ_Enterprise_Credit_Risk_Platform/Problem3_Expected_Credit_Loss_IFRS9_CECL/reports/financial_impact_reporting_packaging/ecl_financial_impact_dashboard.html) — IFRS9/CECL reserve-change and stress-buffer dashboard for Problem 3
+- 📊 [Loss Severity Financial Impact Dashboard](https://rnanda19.github.io/AMEX_RiskIQ_Enterprise_Credit_Risk_Platform/Problem4_Delinquency_Escalation_Loss_Severity/reports/financial_impact_reporting_packaging/financial_impact_dashboard.html) — tiered-LGD vs flat-LGD loss-severity dashboard for Problem 4
+- 📊 [Early Payment Default Financial Impact Dashboard](https://rnanda19.github.io/AMEX_RiskIQ_Enterprise_Credit_Risk_Platform/Problem5_Early_Payment_Default_Detection/reports/financial_impact_reporting_packaging/financial_impact_dashboard.html) — early-warning value and loss-prevention ROI dashboard for Problem 5
 
-(Served via GitHub Pages — click through to view them rendered directly in your browser.)
+(Served via GitHub Pages — click through to view them rendered directly in your browser. **Note:** clicking an `.html` file directly in GitHub's file browser shows raw source code, not the rendered page — always use these `github.io` links, or any problem's own README, to view a dashboard rendered.)
 
 ## Repository Structure
 

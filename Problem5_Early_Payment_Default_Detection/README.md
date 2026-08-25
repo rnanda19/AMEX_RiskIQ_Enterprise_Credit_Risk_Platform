@@ -11,6 +11,12 @@ Phase 2, Problem 5 of a 14-problem enterprise credit risk platform (the final pr
 - **Holdout AUC at K=3 (measured):** 0.9265274920113401 (96.31% retention of Problem 1's full-history 0.9620396555226549)
 - **Deployment status (measured):** RECOMMENDED FOR PRODUCTION
 
+## Live Dashboard
+
+- 📊 [Early Payment Default Financial Impact Dashboard](https://rnanda19.github.io/AMEX_RiskIQ_Enterprise_Credit_Risk_Platform/Problem5_Early_Payment_Default_Detection/reports/financial_impact_reporting_packaging/financial_impact_dashboard.html) — interactive early-warning value and loss-prevention ROI dashboard
+
+(Served via GitHub Pages — click the link above to view it rendered in your browser. Opening the `.html` file directly in GitHub's own file browser shows raw source code instead.)
+
 ## 2. Problem Statement
 
 This dataset has no account-origination date, so literal "default within N months of opening" isn't computable -- honestly reframed as: can default be predicted using only a customer's earliest K statements (chronological order), instead of waiting for their full history? If so, a credit-risk team can flag and intervene on high-risk accounts months earlier than a full-history-only model would allow.

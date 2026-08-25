@@ -13,6 +13,12 @@ Phase 2, Problem 3 of a 14-problem enterprise credit risk platform: a **4-notebo
 - **Total ECL, CECL (measured):** $73,051,922.57
 - **Total ECL, Notebook 08 flat-LGD baseline (measured):** $67,830,905.87
 
+## Live Dashboard
+
+- 📊 [ECL Financial Impact Dashboard](https://rnanda19.github.io/AMEX_RiskIQ_Enterprise_Credit_Risk_Platform/Problem3_Expected_Credit_Loss_IFRS9_CECL/reports/financial_impact_reporting_packaging/ecl_financial_impact_dashboard.html) — interactive IFRS9/CECL reserve-change and stress-buffer dashboard
+
+(Served via GitHub Pages — click the link above to view it rendered in your browser. Opening the `.html` file directly in GitHub's own file browser shows raw source code instead.)
+
 ## 2. Problem Statement
 
 A single flat LGD assumption (Problem 1's Notebook 08) understates loss provisioning for higher-severity accounts and overstates it for lower-severity ones. This build computes a real, dual-standard (IFRS9-staged and CECL lifetime) Expected Credit Loss figure per customer, using Problem 4's real tier-differentiated LGD instead of one flat number, and an outcome-free staging rubric (SICR/Stage 2 and credit-impaired/Stage 3 triggers computed only from real PD + real severity tier, never the known default outcome).

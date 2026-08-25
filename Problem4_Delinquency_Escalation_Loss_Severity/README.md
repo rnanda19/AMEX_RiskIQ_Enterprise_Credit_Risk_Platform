@@ -11,6 +11,12 @@ Phase 2, Problem 4 of a 14-problem enterprise credit risk platform: a **4-notebo
 - **Severe-to-Low default-rate ratio (measured):** 48.66x
 - **Real features used (measured):** 243 correlation-filtered D_* engineered columns
 
+## Live Dashboard
+
+- 📊 [Loss Severity Financial Impact Dashboard](https://rnanda19.github.io/AMEX_RiskIQ_Enterprise_Credit_Risk_Platform/Problem4_Delinquency_Escalation_Loss_Severity/reports/financial_impact_reporting_packaging/financial_impact_dashboard.html) — interactive tiered-LGD vs flat-LGD loss-severity dashboard
+
+(Served via GitHub Pages — click the link above to view it rendered in your browser. Opening the `.html` file directly in GitHub's own file browser shows raw source code instead.)
+
 ## 2. Problem Statement
 
 Not every default is equally costly -- a flat LGD hides real severity variation across accounts. This build derives an outcome-aware, monotonic Escalation Severity Score from real delinquency-adjacent engineered features, buckets it into 3 tiers, and validates that tier assignment is a statistically real, monotonic proxy for eventual loss severity, then deploys it as a standalone scorer.
