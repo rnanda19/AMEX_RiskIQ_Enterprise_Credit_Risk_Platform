@@ -1,0 +1,14 @@
+test,value,target,pass
+Severe/Low default-rate ratio (reproduced),107.214,>=1.5x,True
+Severe/Low ratio 95% CI lower bound,92.776,>1.0 (no-effect),True
+Monotonic default rate Low < Moderate < Severe (reproduced),True,True,True
+Minimum tier population share (reproduced),31.0,>=15.0%,True
+P(Severe -> Severe) [persistence] (reproduced),0.9558,reported,True
+P(Low -> Severe) [single-step jump] (reproduced),0.0,reported,True
+Coherence gap P(Sev->Sev) - P(Low->Sev) (reproduced),0.9557,>0.0,True
+Coherence gap 95% CI lower bound,0.955,>0.0 (no-effect),True
+Escalation-magnitude ROC-AUC (reproduced),0.5126,>0.5,True
+Escalation-magnitude ROC-AUC 95% CI lower bound,0.5109,>0.5 (random),True
+Escalation-magnitude PR-AUC (reproduced),0.2635,>0.2584 (no-skill),True
+Escalation-magnitude PR-AUC 95% CI lower bound,0.2608,>0.2584 (no-skill),True
+Split-half severity-score PSI,0.0001,<0.1,True

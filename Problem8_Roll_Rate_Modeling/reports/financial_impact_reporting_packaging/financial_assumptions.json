@@ -1,0 +1,26 @@
+{
+  "ead_per_account_usd": {
+    "value": 5000,
+    "source": "Notebook 08 (inherited, real value read programmatically)"
+  },
+  "lgd_assumption": {
+    "value": 0.45,
+    "source": "Notebook 08 (inherited, real value read programmatically)"
+  },
+  "escalation_intervention_success_rate": {
+    "value": 0.18,
+    "source": "ASSUMPTION -- illustrative efficacy of a same-cycle collections outreach or credit-line action triggered when a customer's OBSERVED last transition moved to a strictly worse delinquency severity tier; set between Problem 7's 15% (a statistical z-score deviation, a lighter-touch signal) and Problem 6's 20% (a trained, calibrated PD model) because an observed roll-rate escalation is a realized behavioral event, not a probabilistic score, but is not as feature-rich as a fully trained supervised classifier -- edit to your institution's own outcome data."
+  },
+  "false_positive_review_cost_usd": {
+    "value": 20,
+    "source": "ASSUMPTION -- illustrative staff-time cost of a quick triage review on one escalated account this technique flags that does NOT go on to default -- set between Problem 7's $15 (single-deviation-count check) and Problem 6's $35 (full account re-underwrite), since reviewing an escalation requires checking the transition history across states, a bit more than a single flag but still short of a full re-underwrite; edit to your institution's actual cost."
+  },
+  "implementation_cost_usd": {
+    "value": 40000,
+    "source": "ASSUMPTION -- illustrative one-time build/validate/deploy cost for the real-time roll-rate scoring service and its transition-matrix monitoring; set between Problem 7's $30,000 (a stateless rule-based service) and Problem 6's $60,000 (a full model training/retraining pipeline), since this technique fits per-statement severity-score weights AND maintains an empirical transition matrix, but does not retrain a supervised classifier -- edit to your institution's actual project cost."
+  },
+  "annual_application_cycles": {
+    "value": 12,
+    "source": "ASSUMPTION -- monthly re-scoring cadence, matching Problems 6 and 7's own statement-driven, ongoing existing-book monitoring cadence; edit to your institution's actual cadence."
+  }
+}

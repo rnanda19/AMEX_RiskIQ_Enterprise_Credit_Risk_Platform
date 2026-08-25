@@ -1,0 +1,83 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>Problem 6 -- Financial Impact Dashboard</title>
+<script src="https://cdn.jsdelivr.net/npm/chart.js@4"></script>
+<style>
+  :root { --ink:#0B1F3A; --accent:#C41E3A; --gold:#C9A227; --muted:#8A93A6; --bg:#F2F4F8; --card:#FFFFFF; }
+  body { font-family: Calibri, Arial, sans-serif; background: var(--bg); color: var(--ink); margin: 0; padding: 24px; }
+  h1 { font-size: 22px; margin-bottom: 4px; }
+  .sub { color: var(--muted); margin-bottom: 20px; }
+  .kpi-row { display: flex; flex-wrap: wrap; gap: 14px; margin-bottom: 24px; }
+  .kpi { background: var(--card); border-radius: 10px; padding: 16px 20px; box-shadow: 0 1px 3px rgba(0,0,0,.12); min-width: 190px; flex: 1; }
+  .kpi .label { font-size: 12px; color: var(--muted); text-transform: uppercase; }
+  .kpi .value { font-size: 22px; font-weight: 700; margin-top: 4px; }
+  .panel { background: var(--card); border-radius: 10px; padding: 18px; margin-bottom: 20px; box-shadow: 0 1px 3px rgba(0,0,0,.12); }
+  table { width: 100%; border-collapse: collapse; font-size: 13px; }
+  th, td { text-align: left; padding: 8px 10px; border-bottom: 1px solid #E4E7EE; }
+  th { background: var(--ink); color: #fff; }
+  select { padding: 6px 10px; border-radius: 6px; border: 1px solid var(--muted); font-size: 13px; margin-bottom: 12px; }
+  canvas { max-height: 360px; }
+  .badge { display: inline-block; padding: 3px 10px; border-radius: 12px; font-size: 12px; font-weight: 700; }
+</style>
+</head>
+<body>
+<h1>AMEX RiskIQ -- Problem 6: Dynamic / Behavioral Credit Scoring</h1>
+<div class="sub">Financial Impact Dashboard -- real Notebook 38-40 results, ASSUMPTION values clearly marked</div>
+
+<div class="kpi-row">
+  <div class="kpi"><div class="label">Trailing Window</div><div class="value">W=3</div></div>
+  <div class="kpi"><div class="label">Defaulters Captured (Exact)</div><div class="value">19,337</div></div>
+  <div class="kpi"><div class="label">Net Benefit / Cycle</div><div class="value">$8,491,170</div></div>
+  <div class="kpi"><div class="label">Est. Year-1 ROI</div><div class="value">169,723%</div></div>
+  <div class="kpi"><div class="label">Est. Payback</div><div class="value">0.0 months</div></div>
+  <div class="kpi"><div class="label">Deployment Status</div><div class="value"><span class="badge" style="background:#16a34a;color:#fff;">RECOMMENDED</span></div></div>
+</div>
+
+<div class="panel">
+  <canvas id="captureChart"></canvas>
+</div>
+
+<div class="panel">
+  <label for="orgFilter"><b>SMART Suggestions -- filter by organizational level</b></label><br/>
+  <select id="orgFilter"></select>
+  <table id="smartTable"><thead><tr><th>Org Level</th><th>Suggestion</th></tr></thead><tbody></tbody></table>
+</div>
+
+<script>
+const smartData = [{"org_level": "Behavioral Monitoring Ops / Frontline Risk Analysts", "suggestion": "Work the 25,325-account flag list from the W=3 recency model (83.8% real defaulter capture at the F1-optimal threshold) each monthly re-scoring cycle -- this is an EXISTING-book monitoring signal, not a new-account screen, so route flags to account review, not new-application underwriting."}, {"org_level": "Portfolio Risk Team Lead", "suggestion": "Track the 3,867-account behavioral-intervention goal (from the 20% ASSUMPTION success rate) and the 5,988 real false positives (review-cost exposure) as paired weekly KPIs -- both numbers came from the same real confusion matrix, so tightening the threshold trades one against the other."}, {"org_level": "Risk / Credit Analyst", "suggestion": "Re-run this trailing-window scoring monthly as new statement data lands; monitor the split-half score PSI (Notebook 40 measured 0.0003) and the bootstrap AUC CI (last measured [0.9528, 0.9553]) -- re-validate if either drifts materially."}, {"org_level": "Model Risk / Compliance (SR 11-7)", "suggestion": "File Notebook 40's bootstrap AUC/PR-AUC CIs, calibration gap (0.0037), and AUC-retention KPI result (MET) with the model's annual validation packet; this model is currently RECOMMENDED for production use, and is explicitly a RECENCY score complementary to Problem 1's full-history champion, not a replacement for it."}, {"org_level": "Finance / Provisioning Team", "suggestion": "Use the 19,337 recency-flagged real defaulters to trigger early reserve-timing reviews on accounts whose FULL-HISTORY score may not yet reflect their recent deterioration -- coordinate with Problem 3's ECL work and Problem 4's tier-differentiated LGD for the $ reserve amount per flagged account."}, {"org_level": "CFO / Executive Leadership", "suggestion": "Approve the $60,000 investment given an estimated 0.0 months payback and 169,723% Year-1 ROI (net of estimated false-positive review cost) from monthly behavioral re-scoring; revisit the 12x/year cadence ASSUMPTION at the next quarterly business review."}];
+const orgLevels = ["Behavioral Monitoring Ops / Frontline Risk Analysts", "CFO / Executive Leadership", "Finance / Provisioning Team", "Model Risk / Compliance (SR 11-7)", "Portfolio Risk Team Lead", "Risk / Credit Analyst"];
+
+const ctx = document.getElementById("captureChart").getContext("2d");
+new Chart(ctx, {
+  type: "bar",
+  data: {
+    labels: ["True Positives (defaulters flagged)", "False Positives (review cost)"],
+    datasets: [{ data: [19337, 5988], backgroundColor: ["#C41E3A", "#8A93A6"] }],
+  },
+  options: { responsive: true, plugins: { legend: { display: false } },
+             scales: { y: { ticks: { callback: v => v.toLocaleString() } } } },
+});
+
+function renderSmart(filterLevel) {
+  const tbody = document.querySelector("#smartTable tbody");
+  tbody.innerHTML = "";
+  smartData.filter(r => filterLevel === "All" || r.org_level === filterLevel).forEach(r => {
+    const tr = document.createElement("tr");
+    tr.innerHTML = `<td>${r.org_level}</td><td>${r.suggestion}</td>`;
+    tbody.appendChild(tr);
+  });
+}
+
+const orgSelect = document.getElementById("orgFilter");
+["All", ...orgLevels].forEach(level => {
+  const opt = document.createElement("option");
+  opt.value = level; opt.textContent = level;
+  orgSelect.appendChild(opt);
+});
+orgSelect.onchange = () => renderSmart(orgSelect.value);
+renderSmart("All");
+</script>
+</body>
+</html>

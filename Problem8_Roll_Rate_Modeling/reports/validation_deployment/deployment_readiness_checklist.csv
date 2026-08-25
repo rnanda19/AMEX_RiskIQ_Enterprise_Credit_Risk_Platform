@@ -1,0 +1,9 @@
+dimension,status
+Notebook 47 reproduction (zero-randomness pipeline),PASS
+Monotonicity KPI (Notebook 46 target),MET
+Coherence KPI (Notebook 46 target),MET
+Full metrics-suite statistical validation (all checks),PASS
+Deployment policy artifact persisted,PASS
+"API self-test (live, generated service)",PASS
+API p99 latency < 500ms,PASS
+Overall recommendation,RECOMMENDED FOR PRODUCTION

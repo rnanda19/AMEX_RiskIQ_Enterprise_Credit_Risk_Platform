@@ -1,0 +1,9 @@
+dimension,status
+Notebook 43 reproduction (deterministic),PASS
+Winning candidate reproduction,PASS
+Full statistical validation (all checks),FAIL
+Default-rate lift KPI (Notebook 42 target),NOT MET
+Deployment policy artifact persisted,PASS
+"API self-test (live, generated service, real customer)",PASS
+API p99 latency < 500ms,PASS
+Overall recommendation,NOT RECOMMENDED FOR PRODUCTION

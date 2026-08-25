@@ -1,0 +1,5 @@
+# Minimal runtime dependencies for real_time_alert_service.py -- auto-generated 2026-08-25 12:54
+fastapi==0.141.1
+uvicorn==0.52.1
+pydantic==2.13.4
+numpy==2.4.6

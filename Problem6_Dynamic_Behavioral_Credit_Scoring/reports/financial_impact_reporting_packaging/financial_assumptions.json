@@ -1,0 +1,26 @@
+{
+  "ead_per_account_usd": {
+    "value": 5000,
+    "source": "Notebook 08 (inherited, real value read programmatically)"
+  },
+  "lgd_assumption": {
+    "value": 0.45,
+    "source": "Notebook 08 (inherited, real value read programmatically)"
+  },
+  "behavioral_intervention_success_rate": {
+    "value": 0.2,
+    "source": "ASSUMPTION -- illustrative efficacy of a recency-triggered intervention (credit-line reduction, proactive outreach, reserve pre-build) on an EXISTING account flagged by recent behavioral deterioration; edit to your institution's own outcome data."
+  },
+  "false_positive_review_cost_usd": {
+    "value": 35,
+    "source": "ASSUMPTION -- illustrative staff-time cost of manually reviewing one account the model flags that does NOT go on to default (a false positive at the F1-optimal threshold) -- unlike Problem 5's report, this one nets this cost against the loss-prevention benefit since Notebook 40's real confusion matrix makes the false-positive count directly measurable, not just the true-positive count."
+  },
+  "implementation_cost_usd": {
+    "value": 60000,
+    "source": "ASSUMPTION -- illustrative one-time build/validate/deploy cost for the dynamic/behavioral scoring service (data science + risk review time); edit to your institution's actual project cost."
+  },
+  "annual_application_cycles": {
+    "value": 12,
+    "source": "ASSUMPTION -- monthly re-scoring cadence, matching Notebook 38's original 'monthly refreshed PD' business framing for this problem (Problem 5's early-window model, by contrast, used a quarterly cadence -- these are different use cases: new-account screening vs. ongoing existing-book monitoring); edit to your institution's actual cadence."
+  }
+}

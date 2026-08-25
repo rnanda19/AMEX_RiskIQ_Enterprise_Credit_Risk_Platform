@@ -1,0 +1,26 @@
+{
+  "ead_per_account_usd": {
+    "value": 5000,
+    "source": "Notebook 08 (inherited, real value read programmatically)"
+  },
+  "lgd_assumption": {
+    "value": 0.45,
+    "source": "Notebook 08 (inherited, real value read programmatically)"
+  },
+  "alert_intervention_success_rate": {
+    "value": 0.15,
+    "source": "ASSUMPTION -- illustrative efficacy of a lightweight early-warning-triggered check-in (a proactive phone/email outreach or a soft credit-line freeze) on an account whose LATEST statement deviated from its own recent baseline; set lower than Problem 6's 20% recency-model assumption since an early-warning alert is a much lighter-touch signal (a statistical deviation, not a trained model's calibrated PD) -- edit to your institution's own outcome data."
+  },
+  "false_positive_review_cost_usd": {
+    "value": 15,
+    "source": "ASSUMPTION -- illustrative staff-time cost of a quick triage check on one account this technique flags that does NOT go on to default -- set lower than Problem 6's $35 assumption because an early-warning alert review is a fast automated-then-human triage step, not a full account re-underwrite; edit to your institution's actual cost."
+  },
+  "implementation_cost_usd": {
+    "value": 30000,
+    "source": "ASSUMPTION -- illustrative one-time build/validate/deploy cost for the real-time alert service; set lower than Problem 6's $60,000 since this is a stateless, rule-based service (no model training/retraining pipeline to build or maintain) -- edit to your institution's actual project cost."
+  },
+  "annual_application_cycles": {
+    "value": 12,
+    "source": "ASSUMPTION -- monthly re-scoring cadence, matching Problem 6's own monitoring cadence (both are statement-driven, ongoing existing-book monitoring signals, unlike Problem 5's quarterly new-account screening cadence); edit to your institution's actual cadence."
+  }
+}

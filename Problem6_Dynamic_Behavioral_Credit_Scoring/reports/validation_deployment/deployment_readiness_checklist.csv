@@ -1,0 +1,8 @@
+dimension,status
+Model reproducibility,PASS
+Full metrics-suite statistical validation (all checks),PASS
+AUC-retention KPI (Notebook 38 target),MET
+Model + preprocessing artifacts persisted,PASS
+"API self-test (live, generated service)",PASS
+API p99 latency < 500ms,PASS
+Overall recommendation,RECOMMENDED FOR PRODUCTION
