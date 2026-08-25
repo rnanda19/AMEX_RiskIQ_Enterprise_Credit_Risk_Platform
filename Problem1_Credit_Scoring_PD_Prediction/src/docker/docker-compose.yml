@@ -9,4 +9,8 @@ services:
       - ${AMEX_PROJECT_ROOT_HOST}:/mnt/amex-project:ro
     environment:
       - AMEX_PROJECT_ROOT=/mnt/amex-project
+      # Required -- never baked into the image (see the Dockerfile: no ENV API_KEY line
+      # exists, deliberately, so it never lands in a layer). Set it in your shell or a
+      # .env file next to this docker-compose.yml before running.
+      - API_KEY=${API_KEY:?Set API_KEY before running -- see src/.env.example}
     restart: unless-stopped

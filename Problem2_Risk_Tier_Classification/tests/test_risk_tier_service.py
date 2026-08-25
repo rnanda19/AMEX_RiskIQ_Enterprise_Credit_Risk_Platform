@@ -23,6 +23,9 @@ def _expected_tier_for(pd_value):
     )
 
 
+AUTH = {"X-API-Key": "pytest-only-test-key"}  # must match conftest.py's TEST_API_KEY
+
+
 def test_health_reports_champion_model(risk_tier_app):
     client = TestClient(risk_tier_app.app)
     resp = client.get("/health")
@@ -32,13 +35,19 @@ def test_health_reports_champion_model(risk_tier_app):
 
 def test_policy_info_reports_real_tier_order_and_thresholds(risk_tier_app):
     client = TestClient(risk_tier_app.app)
-    resp = client.get("/policy-info")
+    resp = client.get("/policy-info", headers=AUTH)
     assert resp.status_code == 200
     body = resp.json()
     assert body["n_tiers"] == 4
     assert body["tier_order"] == ["Prime", "Near-Prime", "Subprime", "High Risk"]
     assert body["primary_method"] == "business_rule"
     assert len(body["business_rule_thresholds"]) == 4
+
+
+def test_policy_info_without_api_key_is_rejected(risk_tier_app):
+    client = TestClient(risk_tier_app.app)
+    resp = client.get("/policy-info")
+    assert resp.status_code == 401
 
 
 def test_risk_tier_returns_a_tier_consistent_with_the_real_policy_bands(risk_tier_app):
@@ -52,6 +61,7 @@ def test_risk_tier_returns_a_tier_consistent_with_the_real_policy_bands(risk_tie
         "/risk-tier",
         params={"customer_id": "cust_001"},
         json={"balance": 800.0, "spend_last_month": 150.0, "region": "north"},
+        headers=AUTH,
     )
     assert resp.status_code == 200
     body = resp.json()
@@ -62,12 +72,33 @@ def test_risk_tier_returns_a_tier_consistent_with_the_real_policy_bands(risk_tie
     assert body["risk_tier"] == _expected_tier_for(body["predicted_pd"])
 
 
+def test_risk_tier_without_api_key_is_rejected(risk_tier_app):
+    client = TestClient(risk_tier_app.app)
+    resp = client.post("/risk-tier", json={"balance": 800.0, "spend_last_month": 150.0, "region": "north"})
+    assert resp.status_code == 401
+
+
+def test_risk_tier_returns_top_reasons_that_explain_the_prediction(risk_tier_app):
+    client = TestClient(risk_tier_app.app)
+    resp = client.post(
+        "/risk-tier",
+        json={"balance": 5000.0, "spend_last_month": 900.0, "region": "north"},
+        headers=AUTH,
+    )
+    assert resp.status_code == 200
+    reasons = resp.json()["top_reasons"]
+    assert 1 <= len(reasons) <= 3
+    magnitudes = [abs(r["contribution_to_predicted_pd"]) for r in reasons]
+    assert magnitudes == sorted(magnitudes, reverse=True)
+
+
 def test_risk_tier_handles_missing_features_via_median_imputation(risk_tier_app):
     client = TestClient(risk_tier_app.app)
-    resp = client.post("/risk-tier", json={})
+    resp = client.post("/risk-tier", json={}, headers=AUTH)
     assert resp.status_code == 200
     body = resp.json()
     assert body["risk_tier"] == _expected_tier_for(body["predicted_pd"])
+    assert body["top_reasons"] == []
 
 
 def test_risk_tier_handles_unseen_category_gracefully(risk_tier_app):
@@ -75,6 +106,7 @@ def test_risk_tier_handles_unseen_category_gracefully(risk_tier_app):
     resp = client.post(
         "/risk-tier",
         json={"balance": 300.0, "spend_last_month": 50.0, "region": "never_seen_before"},
+        headers=AUTH,
     )
     assert resp.status_code == 200
     assert 0.0 <= resp.json()["predicted_pd"] <= 1.0

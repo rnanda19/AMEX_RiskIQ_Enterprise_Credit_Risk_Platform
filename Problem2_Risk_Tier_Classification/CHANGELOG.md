@@ -3,6 +3,22 @@
 Dates below are real commit dates from this repository's git history, not
 estimated.
 
+## 2026-08-25 — Authentication + explainability hardening
+
+- Added real API-key authentication (`X-API-Key` header) to
+  `/policy-info` and `/risk-tier` — `/health` stays open. Same design
+  as Problem 1's service (see that CHANGELOG entry for the fallback-key
+  and warning-log behavior).
+- Added real, per-request reason codes to `/risk-tier`: the same exact
+  marginal-contribution technique as Problem 1's PD service, applied to
+  the same champion model, so a customer's tier placement carries the
+  same real explanation its underlying PD does.
+- **Real bug found and fixed**: `risk_tier_service.py`'s
+  `AMEX_PROJECT_ROOT` default still hardcoded the author's real local
+  Windows path — same bug, same fix as Problem 1 (see that entry).
+- Added `.env.example` (previously missing) and 3 new regression tests
+  (8 total for this problem) covering both fixes.
+
 ## 2026-08-24 — Enterprise hardening (this pass)
 
 - Added `tests/` (pytest): risk-tier FastAPI service (health, policy-info,

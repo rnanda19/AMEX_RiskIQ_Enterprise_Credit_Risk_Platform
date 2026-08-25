@@ -68,6 +68,8 @@ Problem8_Roll_Rate_Modeling/
 uvicorn roll_rate_scoring_service:app --reload
 ```
 
+Every endpoint except `/health` requires a valid `X-API-Key` header (see `.env.example`). `/score` also returns a real `top_reasons` field -- the exact per-feature terms (weight x direction x z-score) that drove this customer's own severity score (see `CHANGELOG.md`).
+
 ## 7. Reproducing This
 
 Raw Kaggle data is not redistributed here (see `data/README.md`). Run Problem 1's Notebooks 01-05 first, then Problem 6's Notebooks 38-41 (this problem cross-stratifies against Problem 6's real dynamic PD output), then this problem's Notebooks 46-49, against your own local copy of the platform folder.
@@ -78,7 +80,7 @@ Every number above is computed live by that notebook's own code on the real data
 
 ## 9. Hardening Status
 
-Complete, matching the pattern already shipped for Problems 1-5: `tests/` (8 pytest tests, driven by the real frozen policy), `src/docker/` (Dockerfile + docker-compose.yml), `MODEL_CARD.md`, `CHANGELOG.md`, and `requirements.txt` are all in place -- see `CHANGELOG.md` for the real bug (a hardcoded local-path privacy leak) found and fixed during this pass; unlike Problems 6 and 7, no port reassignment was needed here since 8005 was already free.
+Complete, matching the pattern already shipped for Problems 1-5: `tests/` (11 pytest tests, driven by the real frozen policy), `src/docker/` (Dockerfile + docker-compose.yml), `MODEL_CARD.md`, `CHANGELOG.md`, and `requirements.txt` are all in place -- see `CHANGELOG.md` for the real bug (a hardcoded local-path privacy leak) found and fixed; unlike Problems 6 and 7, no port reassignment was needed here since 8005 was already free. The service now also requires real API-key authentication and returns real per-request explainability (`top_reasons`) on every score -- see `CHANGELOG.md`'s 2026-08-25 "Authentication + explainability hardening" entry.
 
 ## License
 

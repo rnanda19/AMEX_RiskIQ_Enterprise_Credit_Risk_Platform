@@ -55,6 +55,8 @@ Problem4_Delinquency_Escalation_Loss_Severity/
 
 `src/severity_scorer.py` scores one customer's real D_* engineered features into a severity tier and LGD, loading every weight/mean/std/cutpoint from `reports/validation_deployment/severity_scoring_bundle.json` at full float precision -- deliberately NOT re-derived or rounded, after a real bug (see project history) was found and fixed where a rounded display copy of the weights caused real-size score drift.
 
+The deployed `severity_scoring_service.py` API requires a valid `X-API-Key` header on every endpoint except `/health` (see `.env.example`), and its `/score` response includes a real `top_reasons` field -- the exact per-feature weight*direction*z terms that drove this customer's own severity score (see `CHANGELOG.md`).
+
 ## 7. Reproducing This
 
 Raw Kaggle data is not redistributed here (see `data/README.md`). Run Problem 1's Notebooks 01-05 first, then this problem's Notebooks 26-29 against your own local copy of the platform folder.

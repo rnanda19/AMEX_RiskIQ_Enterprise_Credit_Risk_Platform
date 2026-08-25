@@ -52,6 +52,46 @@ def compute_ecl(pd_12m, severity_tier, bundle):
             "pd_lifetime_macro_adj": pd_lifetime_macro}
 
 
+def explain_ecl(pd_12m, severity_tier, bundle):
+    """Real, exact explanation of why compute_ecl() returned what it did -- not an approximation.
+    Unlike Problems 1/2/5/6's trained models, this technique is a fully interpretable, deterministic
+    rule engine with exactly two customer-level inputs (pd_12m, severity_tier), so its 'reason
+    codes' are simply a true narration of which branch was taken and which frozen policy values
+    drove the result -- more exact than any sampled attribution method could be, since there is
+    nothing left to approximate."""
+    pd_12m = float(pd_12m)
+    sicr_threshold = bundle["portfolio_avg_pd_12m"] * bundle["sicr_pd_multiple"]
+    is_severe = severity_tier == "Severe"
+    is_elevated_tier = severity_tier in ("Moderate Severity", "Severe")
+    reasons = []
+    if is_severe and pd_12m > bundle["stage3_pd_threshold"]:
+        reasons.append({
+            "factor": "severity_tier + pd_12m",
+            "detail": f"severity_tier='Severe' AND pd_12m ({pd_12m:.4f}) > stage3_pd_threshold "
+                      f"({bundle['stage3_pd_threshold']:.4f}) -> IFRS9 Stage 3 (lifetime ECL, no discount concession)",
+        })
+    elif pd_12m > sicr_threshold or is_elevated_tier:
+        trigger = "pd_12m exceeds the SICR threshold" if pd_12m > sicr_threshold else "severity_tier is an elevated tier"
+        reasons.append({
+            "factor": "severity_tier" if is_elevated_tier and pd_12m <= sicr_threshold else "pd_12m",
+            "detail": f"{trigger} (pd_12m={pd_12m:.4f}, SICR threshold={sicr_threshold:.4f}, "
+                      f"severity_tier={severity_tier!r}) -> IFRS9 Stage 2 (lifetime ECL)",
+        })
+    else:
+        reasons.append({
+            "factor": "pd_12m + severity_tier",
+            "detail": f"pd_12m ({pd_12m:.4f}) <= SICR threshold ({sicr_threshold:.4f}) and "
+                      f"severity_tier ({severity_tier!r}) is not elevated -> IFRS9 Stage 1 (12-month ECL only)",
+        })
+    lgd = bundle["lgd_by_tier"][severity_tier]
+    reasons.append({
+        "factor": "severity_tier LGD",
+        "detail": f"severity_tier={severity_tier!r} carries a frozen LGD of {lgd:.4f}, applied "
+                  f"multiplicatively to every ECL figure above",
+    })
+    return reasons
+
+
 if __name__ == "__main__":
     _bundle = load_bundle()
     print(compute_ecl(0.10, "Moderate Severity", _bundle))

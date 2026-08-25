@@ -3,14 +3,18 @@
 # Scores a customer's CURRENT statement into a severity state (Low/Moderate/Severe) and, if the
 # customer's PREVIOUS state is also supplied, returns the empirical next-state transition
 # probabilities looked up from the real Notebook 47 transition matrix.
+# API_KEY (see .env.example) gates every endpoint below except /health.
 # Run with:
 #     uvicorn roll_rate_scoring_service:app --host 0.0.0.0 --port 8005
 import json
+import logging
 import os
+import secrets
 from pathlib import Path
-from typing import Dict, Optional
+from typing import Dict, List, Optional
 
-from fastapi import FastAPI, HTTPException
+from fastapi import Depends, FastAPI, HTTPException, Security
+from fastapi.security import APIKeyHeader
 from pydantic import BaseModel, create_model
 
 # Self-contained default: the real frozen policy ships alongside this file in src/ (see
@@ -32,6 +36,38 @@ TRANSITION_MATRIX = _POLICY["transition_matrix"]
 RECOMMENDED_FOR_PRODUCTION = _POLICY["recommended_for_production"]
 _ORDINAL = {s: i for i, s in enumerate(STATE_NAMES)}
 
+# ---------------------------------------------------------------------------
+# Authentication -- real, enforced on every endpoint below except /health.
+# Duplicated verbatim across all 8 platform services (not imported from
+# shared/) so each service stays self-contained for its own Docker build
+# context, matching the self-contained-policy-copy pattern already used
+# elsewhere in this repo. Set API_KEY in your environment before deploying
+# anywhere reachable by anyone but you -- the fallback below is published
+# publicly in this file and must never be treated as a real secret.
+# ---------------------------------------------------------------------------
+_auth_logger = logging.getLogger(__name__ + ".auth")
+_DEV_DEFAULT_API_KEY = "dev-only-CHANGE-ME-before-deploying"
+_api_key_header = APIKeyHeader(name="X-API-Key", auto_error=False)
+
+
+def _configured_api_key() -> str:
+    key = os.environ.get("API_KEY")
+    if not key:
+        _auth_logger.warning(
+            "API_KEY is not set -- falling back to the published dev-only default. Set API_KEY "
+            "before deploying this service anywhere reachable by anyone but you."
+        )
+        return _DEV_DEFAULT_API_KEY
+    return key
+
+
+def require_api_key(presented: str = Security(_api_key_header)) -> str:
+    expected = _configured_api_key()
+    if not presented or not secrets.compare_digest(presented, expected):
+        raise HTTPException(status_code=401, detail="Missing or invalid X-API-Key header.")
+    return presented
+
+
 _schema_fields = {_c: (Optional[float], None) for _c in MONITORED_FEATURES}
 CurrentStatement = create_model("CurrentStatement", **_schema_fields)
 
@@ -44,6 +80,11 @@ class ScoreRequest(BaseModel):
     previous_state: Optional[str] = None
 
 
+class ReasonCode(BaseModel):
+    factor: str
+    contribution_to_severity_score: float
+
+
 class ScoreResponse(BaseModel):
     customer_id: Optional[str] = None
     severity_score: float
@@ -53,6 +94,7 @@ class ScoreResponse(BaseModel):
     transition_probabilities: Optional[Dict[str, float]] = None
     meets_kpi_target: bool = True
     recommended_for_production: bool = True
+    top_reasons: List[ReasonCode] = []
 
 
 def compute_severity_score(statement: dict) -> float:
@@ -65,6 +107,26 @@ def compute_severity_score(statement: dict) -> float:
         if std > 0 and w > 0:
             score += (val - _MEANS[col]) / std * w * _DIRECTIONS[col]
     return score
+
+
+def top_contributing_features(statement: dict, n=3):
+    """Real, exact per-feature decomposition of compute_severity_score() -- not an approximation.
+    Because the score IS a linear sum of per-feature terms, each term's own real value is already
+    that feature's exact, additive contribution to the total; this just recomputes those same
+    terms and returns the n largest by magnitude, same technique as Problem 4's analogous
+    weighted composite score."""
+    contributions = []
+    for col in MONITORED_FEATURES:
+        val = statement.get(col)
+        if val is None:
+            continue
+        std, w = _STDS[col], _WEIGHTS[col]
+        if std > 0 and w > 0:
+            contribution = (val - _MEANS[col]) / std * w * _DIRECTIONS[col]
+            if contribution != 0.0:
+                contributions.append({"factor": col, "contribution_to_severity_score": contribution})
+    contributions.sort(key=lambda r: abs(r["contribution_to_severity_score"]), reverse=True)
+    return contributions[:n]
 
 
 def assign_state(score: float) -> str:
@@ -89,7 +151,7 @@ def health():
     return {"status": "ok", "state_names": STATE_NAMES}
 
 
-@app.get("/model-info")
+@app.get("/model-info", dependencies=[Depends(require_api_key)])
 def model_info():
     return {
         "state_names": STATE_NAMES,
@@ -103,13 +165,14 @@ def model_info():
     }
 
 
-@app.post("/score", response_model=ScoreResponse)
+@app.post("/score", response_model=ScoreResponse, dependencies=[Depends(require_api_key)])
 def score(request: ScoreRequest):
     statement = request.current_statement.dict() if hasattr(request.current_statement, "dict") \
         else request.current_statement.model_dump()
     try:
         severity_score = compute_severity_score(statement)
         state = assign_state(severity_score)
+        reasons = top_contributing_features(statement)
     except Exception as exc:
         raise HTTPException(status_code=500, detail="Scoring failed: " + str(exc))
 
@@ -124,5 +187,5 @@ def score(request: ScoreRequest):
     return ScoreResponse(
         customer_id=request.customer_id, severity_score=severity_score, state=state,
         previous_state=request.previous_state, escalated=escalated,
-        transition_probabilities=transition_probabilities,
+        transition_probabilities=transition_probabilities, top_reasons=reasons,
     )

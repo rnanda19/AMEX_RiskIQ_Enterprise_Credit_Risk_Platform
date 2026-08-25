@@ -3,6 +3,20 @@
 Dates below are real commit dates from this repository's git history, not
 estimated.
 
+## 2026-08-25 -- Authentication + explainability hardening (second pass)
+
+- Added real API-key authentication (`X-API-Key` header) to
+  `/model-info` and `/score` -- `/health` stays open.
+- Added `top_contributing_features()`: because the severity score is
+  already a linear sum of per-feature terms, each term's own value IS
+  its exact contribution -- this recomputes and ranks those terms, same
+  technique as Problem 4's analogous weighted composite score.
+- Replaced the real local Windows path shown as the example value in
+  `.env.example` with a generic placeholder (information-leak cleanup,
+  same as Problem 5 -- see that problem's CHANGELOG entry).
+- Added 3 new tests (11 total for this problem) covering the auth gate
+  and reason codes.
+
 ## 2026-08-25 -- Phase 3 hardening pass (this commit)
 
 - Added `tests/` (pytest, 8 tests): the real FastAPI scoring service

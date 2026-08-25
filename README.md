@@ -84,7 +84,7 @@ Each subfolder is a complete, independently runnable package with its own `READM
   --check` format check — advisory, repo-wide reformatting is a deliberate
   future pass, see `ROADMAP.md`; and a `bandit` security scan of every
   problem's real deployable `src/` — currently blocking, 0 findings).
-- **Tests** (94 passing across all eight problems + `shared/` as of this
+- **Tests** (126 passing across all eight problems + `shared/` as of this
   writing) cover the parts of this platform that are already standalone,
   real Python (not notebook cells): every problem's deployable scorer or
   FastAPI service, tested either against small, genuinely-fit synthetic
@@ -118,6 +118,18 @@ Each subfolder is a complete, independently runnable package with its own `READM
 - **Real, measured comparisons** across all five problems — every
   baseline-vs-model delta, side by side — are consolidated in
   `BENCHMARKS.md`.
+- **Authentication & explainability**: every one of the 8 deployed
+  services requires a valid `X-API-Key` header on every business
+  endpoint (`/health` stays open, matching standard load-balancer/k8s
+  probe practice) and returns a real, per-request `top_reasons` field
+  on its scoring endpoint — an exact, live-computed explanation of the
+  specific factors behind that customer's own score (marginal
+  contribution against the real model for Problems 1/2/5/6, an exact
+  linear-term decomposition for Problems 4/7/8, and a deterministic
+  rule narration for Problem 3's fully interpretable ECL engine) —
+  answering the CFPB Circular 2022-03 "specific, principal reason"
+  standard for adverse-action explainability. See each problem's own
+  `CHANGELOG.md` for the exact technique and its regression tests.
 
 ## How to Run
 

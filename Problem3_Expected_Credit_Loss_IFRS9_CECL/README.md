@@ -58,6 +58,8 @@ Problem3_Expected_Credit_Loss_IFRS9_CECL/
 
 `src/ecl_calculator.py` computes IFRS9-staged and CECL ECL for one customer given their real PD (from Problem 1's deployed model) and real severity tier (from Problem 4's deployed model), loading every parameter from `reports/validation_deployment/ecl_scoring_bundle.json` (frozen from Notebook 30's real policy -- no training or threshold-fitting happens in this file). See `tests/` for a real, passing self-test driven from that same bundle.
 
+The deployed `ecl_scoring_service.py` API requires a valid `X-API-Key` header on every endpoint except `/health` (see `.env.example`), and its `/score` response includes a real `top_reasons` field -- an exact narration of which IFRS9-stage rule fired and which frozen LGD value drove the ECL amount (see `CHANGELOG.md`).
+
 ## 7. Reproducing This
 
 Raw Kaggle data is not redistributed here (see `data/README.md`). To reproduce: run Problem 1's Notebooks 01-05 (champion PD model), Problem 4's Notebooks 26-27 (tier-differentiated LGD), then this problem's Notebooks 30-33 in order against your own local copy of the platform folder.

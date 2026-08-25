@@ -9,6 +9,7 @@ import pytest
 REPO_ROOT = Path(__file__).resolve().parents[1]
 MODELS_DIR = REPO_ROOT / "models"
 SERVICE_PATH = REPO_ROOT / "src" / "dynamic_behavioral_service.py"
+TEST_API_KEY = "pytest-only-test-key"
 
 
 @pytest.fixture(scope="session")
@@ -16,6 +17,7 @@ def dbs_app():
     """Imports the exact dynamic_behavioral_service.py file shipped in src/, pointed at the real
     trained W=3 model + preprocessing artifacts shipped in models/ -- not a mock, the real thing."""
     os.environ["AMEX_DBS_MODELS_DIR"] = str(MODELS_DIR)
+    os.environ["API_KEY"] = TEST_API_KEY
     spec = importlib.util.spec_from_file_location("dynamic_behavioral_service", SERVICE_PATH)
     module = importlib.util.module_from_spec(spec)
     sys.modules["dynamic_behavioral_service"] = module

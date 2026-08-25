@@ -3,6 +3,25 @@
 Dates below are real commit dates from this repository's git history, not
 estimated.
 
+## 2026-08-25 -- Authentication + explainability hardening
+
+- Added real API-key authentication (`X-API-Key` header) to
+  `/model-info` and `/score` -- `/health` stays open.
+- Added real, per-request reason codes to `/score`: an exact,
+  live-computed marginal-contribution explanation against the real
+  trained K=3 model, using the same technique now standard across
+  every trained-model service in this platform (see Problem 1's
+  CHANGELOG for the full description).
+- Replaced the real local Windows path previously shown as the example
+  value in `.env.example` with a generic placeholder -- not a code
+  default (this file's own `AMEX_EPD_MODELS_DIR` default was already
+  self-contained from the Phase 2 hardening pass), but committing the
+  author's real folder structure in an example file is its own small
+  information leak, cleaned up here for consistency with every other
+  problem's `.env.example`.
+- Added 5 new tests (9 total for this problem) covering the auth gate
+  and reason codes.
+
 ## 2026-08-24 -- Phase 2 publication + hardening (this pass)
 
 - Initial publication of this problem to the GitHub repository, alongside

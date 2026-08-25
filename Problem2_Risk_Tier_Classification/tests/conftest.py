@@ -16,6 +16,8 @@ import numpy as np
 import pytest
 from sklearn.linear_model import LogisticRegression
 
+TEST_API_KEY = "pytest-only-test-key"
+
 REAL_BUSINESS_RULE_THRESHOLDS = [
     {"risk_tier": "Prime", "tier_order": 1, "pd_lower": 0.0, "pd_upper": 0.05},
     {"risk_tier": "Near-Prime", "tier_order": 2, "pd_lower": 0.05, "pd_upper": 0.15},
@@ -76,6 +78,7 @@ def risk_tier_app(tmp_path, monkeypatch):
         }, f)
 
     monkeypatch.setenv("AMEX_PROJECT_ROOT", str(project_root))
+    monkeypatch.setenv("API_KEY", TEST_API_KEY)
 
     service_path = (
         Path(__file__).resolve().parents[1] / "src" / "fastapi_service" / "risk_tier_service.py"

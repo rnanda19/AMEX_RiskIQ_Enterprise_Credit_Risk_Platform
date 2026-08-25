@@ -19,6 +19,8 @@ import numpy as np
 import pytest
 from sklearn.linear_model import LogisticRegression
 
+TEST_API_KEY = "pytest-only-test-key"
+
 
 @pytest.fixture()
 def fastapi_app(tmp_path, monkeypatch):
@@ -60,6 +62,7 @@ def fastapi_app(tmp_path, monkeypatch):
         }, f)
 
     monkeypatch.setenv("AMEX_PROJECT_ROOT", str(project_root))
+    monkeypatch.setenv("API_KEY", TEST_API_KEY)
 
     # Fresh module import each test (not the cached sys.modules copy) so it
     # re-reads AMEX_PROJECT_ROOT for this test's own tmp_path.

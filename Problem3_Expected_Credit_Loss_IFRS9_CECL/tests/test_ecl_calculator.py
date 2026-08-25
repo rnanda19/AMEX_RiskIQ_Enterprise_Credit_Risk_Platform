@@ -1,4 +1,23 @@
-from ecl_calculator import compute_ecl
+from ecl_calculator import compute_ecl, explain_ecl
+
+
+def test_explain_ecl_severe_above_threshold_cites_stage_3(real_bundle):
+    threshold = real_bundle["stage3_pd_threshold"]
+    reasons = explain_ecl(threshold + 0.05, "Severe", real_bundle)
+    assert any("Stage 3" in r["detail"] for r in reasons)
+    assert any(r["factor"] == "severity_tier LGD" for r in reasons)
+
+
+def test_explain_ecl_low_severity_low_pd_cites_stage_1(real_bundle):
+    reasons = explain_ecl(0.01, "Low Severity", real_bundle)
+    assert any("Stage 1" in r["detail"] for r in reasons)
+
+
+def test_explain_ecl_reasons_always_include_the_real_lgd_value(real_bundle):
+    for tier in real_bundle["tier_order"]:
+        reasons = explain_ecl(0.05, tier, real_bundle)
+        lgd_reason = next(r for r in reasons if r["factor"] == "severity_tier LGD")
+        assert f"{real_bundle['lgd_by_tier'][tier]:.4f}" in lgd_reason["detail"]
 
 
 def test_low_severity_low_pd_is_stage_1(real_bundle):

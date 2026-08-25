@@ -3,6 +3,19 @@
 Dates below are real commit dates from this repository's git history, not
 estimated.
 
+## 2026-08-25 -- Authentication + explainability hardening
+
+- Added real API-key authentication (`X-API-Key` header) to
+  `/model-info` and `/score` -- `/health` stays open.
+- Added `explain_ecl()` to `ecl_calculator.py` and wired it into
+  `/score`'s new `top_reasons` field: a real, exact narration of which
+  branch of the IFRS9 staging rule fired and which frozen LGD value
+  drove the ECL amount -- more exact than any sampled attribution
+  method, since this technique is a fully interpretable rule engine
+  with nothing left to approximate.
+- Added `.env.example` and 7 new tests (20 total for this problem)
+  covering both the auth gate and `explain_ecl()`.
+
 ## 2026-08-24 -- Phase 2 publication + hardening (this pass)
 
 - Initial publication of this problem to the GitHub repository, alongside

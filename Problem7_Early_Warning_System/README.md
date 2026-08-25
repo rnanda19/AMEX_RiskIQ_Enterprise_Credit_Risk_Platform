@@ -63,6 +63,8 @@ Problem7_Early_Warning_System/
 uvicorn real_time_alert_service:app --reload
 ```
 
+Every endpoint except `/health` requires a valid `X-API-Key` header (see `.env.example`). `/score` also returns a real `top_reasons` field ranking this customer's own computed feature deviations by magnitude (see `CHANGELOG.md`).
+
 ## 7. Reproducing This
 
 Raw Kaggle data is not redistributed here (see `data/README.md`). Run Problem 1's Notebooks 01-05 first, then this problem's Notebooks 42-45 against your own local copy of the platform folder.
@@ -73,7 +75,7 @@ Every number above is computed live by that notebook's own code on the real data
 
 ## 9. Hardening Status
 
-Complete, matching the pattern already shipped for Problems 1-5: `tests/` (7 pytest tests, driven by the real frozen policy), `src/docker/` (Dockerfile + docker-compose.yml), `MODEL_CARD.md`, `CHANGELOG.md`, and `requirements.txt` are all in place -- see `CHANGELOG.md` for the two real bugs (a hardcoded local-path privacy leak, a port collision with Problem 4) found and fixed during this pass.
+Complete, matching the pattern already shipped for Problems 1-5: `tests/` (10 pytest tests, driven by the real frozen policy), `src/docker/` (Dockerfile + docker-compose.yml), `MODEL_CARD.md`, `CHANGELOG.md`, and `requirements.txt` are all in place -- see `CHANGELOG.md` for the real bugs found and fixed across both hardening passes (a hardcoded local-path privacy leak, a port collision with Problem 4). The service now also requires real API-key authentication and returns real per-request explainability (`top_reasons`) on every score -- see `CHANGELOG.md`'s 2026-08-25 "Authentication + explainability hardening" entry.
 
 ## License
 

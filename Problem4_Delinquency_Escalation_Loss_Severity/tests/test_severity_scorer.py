@@ -1,6 +1,37 @@
 import math
 
-from severity_scorer import score_customer
+from severity_scorer import score_customer, top_contributing_features
+
+
+def test_top_contributing_features_is_empty_at_the_real_mean(real_bundle, at_mean_features):
+    """Every feature at its own real mean -> every z-score term is exactly 0 -> no feature has a
+    real, non-zero contribution to report."""
+    assert top_contributing_features(at_mean_features, real_bundle) == []
+
+
+def test_top_contributing_features_ranks_by_real_magnitude(real_bundle, at_mean_features):
+    top_feature = max(real_bundle["features"], key=lambda f: real_bundle["weights"][f])
+    direction = real_bundle["directions"][top_feature]
+    pushed = dict(at_mean_features)
+    pushed[top_feature] = (real_bundle["means"][top_feature]
+                            + 3 * real_bundle["stds"][top_feature] * (1 if direction >= 0 else -1))
+    reasons = top_contributing_features(pushed, real_bundle, n=5)
+    assert reasons[0]["factor"] == top_feature
+    magnitudes = [abs(r["contribution_to_severity_score"]) for r in reasons]
+    assert magnitudes == sorted(magnitudes, reverse=True)
+
+
+def test_top_contributing_features_sums_are_real_and_match_manual_recomputation(real_bundle, at_mean_features):
+    """Each reported contribution must equal the exact same weight*direction*z term
+    score_customer() itself sums -- not an approximation."""
+    some_feature = real_bundle["features"][0]
+    pushed = dict(at_mean_features)
+    pushed[some_feature] = real_bundle["means"][some_feature] + 2 * real_bundle["stds"][some_feature]
+    reasons = top_contributing_features(pushed, real_bundle, n=len(real_bundle["features"]))
+    reason_for_feature = next(r for r in reasons if r["factor"] == some_feature)
+    z = (pushed[some_feature] - real_bundle["means"][some_feature]) / real_bundle["stds"][some_feature]
+    expected = real_bundle["weights"][some_feature] * real_bundle["directions"][some_feature] * z
+    assert reason_for_feature["contribution_to_severity_score"] == expected
 
 
 def test_all_features_at_mean_gives_zero_score(real_bundle, at_mean_features):

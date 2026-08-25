@@ -3,6 +3,20 @@
 Dates below are real commit dates from this repository's git history, not
 estimated.
 
+## 2026-08-25 -- Authentication + explainability hardening (second pass)
+
+- Added real API-key authentication (`X-API-Key` header) to
+  `/model-info` and `/score` -- `/health` stays open.
+- Added `top_reason_codes()`: this service already computes an exact
+  per-feature z-score deviation as part of its own scoring, so the new
+  `top_reasons` field simply ranks those already-real values by
+  magnitude -- no new approximation technique needed.
+- Replaced the real local Windows path shown as the example value in
+  `.env.example` with a generic placeholder (information-leak cleanup,
+  same as Problem 5 -- see that problem's CHANGELOG entry).
+- Added 3 new tests (10 total for this problem) covering the auth gate
+  and reason codes.
+
 ## 2026-08-25 -- Phase 3 hardening pass (this commit)
 
 - Added `tests/` (pytest, 7 tests): the real FastAPI alert service

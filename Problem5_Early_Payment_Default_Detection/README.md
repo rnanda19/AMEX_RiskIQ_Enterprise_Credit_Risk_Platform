@@ -60,6 +60,8 @@ Problem5_Early_Payment_Default_Detection/
 AMEX_EPD_MODELS_DIR=models uvicorn early_default_service:app --reload
 ```
 
+Every endpoint except `/health` requires a valid `X-API-Key` header (see `.env.example`). `/score` also returns a real, live-computed `top_reasons` field -- the specific factors that moved this customer's own score (see `CHANGELOG.md`).
+
 Unlike Problem 1/2 (whose full-size champion model exceeds this package's 20MB size-safety cap), this problem's model is small enough to ship directly -- `tests/` drives the real model end to end, not a synthetic fixture.
 
 ## 7. Reproducing This

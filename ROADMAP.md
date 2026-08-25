@@ -40,14 +40,20 @@ narrative version of both.
 | Problem 8 `MODEL_CARD.md` / `CHANGELOG.md` / `requirements.txt` | Done, 2026-08-25 | `Problem8_.../` |
 | `BENCHMARKS.md` entries for Problems 6, 7, 8 | Done, 2026-08-25 | repo root |
 | CI (`ci.yml`, `code-quality.yml`) + `Makefile` wired for Problems 6, 7, 8 | Done, 2026-08-25 | `.github/workflows/`, `Makefile` |
-| **Push this commit to GitHub** | **Not started — needs a fresh PAT** | — |
+| Real API-key authentication on all 8 deployed services (`X-API-Key`, `/health` stays open) | Done, 2026-08-25 | every `Problem*/src/*service.py` |
+| Real, per-request explainability (`top_reasons`) on all 8 deployed services | Done, 2026-08-25 | every `Problem*/src/*service.py` |
+| `.env.example` added for Problems 1-4 (previously missing) + API_KEY documented for all 8 | Done, 2026-08-25 | every `Problem*/src/.env.example` |
+| `docker-compose.yml` updated to require `API_KEY` at runtime (fail loud if unset) for all 8 | Done, 2026-08-25 | every `Problem*/src/docker/docker-compose.yml` |
+| 32 new tests for the auth + explainability pass (126 total) | Done, 2026-08-25 | every `Problem*/tests/` |
 | Wire existing notebooks to import from `shared/` instead of inline copies | **Deliberately deferred** — see below | — |
 | Real `docker build`/smoke test of any Dockerfile (this sandbox has no Docker Hub registry access; static build-context verification passed for all 3 new Dockerfiles — see below) | **Blocked on environment, not on the work** | — |
 | Repo-wide `black` reformatting | **Deliberately deferred** — advisory-only for now, see below | — |
 | Pre-commit hooks (pyflakes, notebook syntax check, before every commit) | **Not started** | — |
 
-Total: 94 tests passing across `shared/` and all eight problems as of
-2026-08-25 (`python -m pytest shared/tests Problem*/tests`, or `make test-all`).
+Total: 126 tests passing across `shared/` and all eight problems as of
+2026-08-25 (`python -m pytest shared/tests Problem*/tests`, or `make test-all`) --
+94 from the prior pass plus 32 new tests from the authentication +
+explainability hardening pass below.
 
 ### A real bug found (and fixed) while building this pass
 
@@ -91,6 +97,70 @@ service layer only, and both are now covered by this pass's own tests
 (which import each service module fresh and would fail to even load a
 policy/model file with a bad default).
 
+### Closing the two hard blockers named by an independent model-risk benchmark (2026-08-25)
+
+A benchmark pass against real external frameworks (Fed/OCC SR 11-7, Basel IRB
+validation standards, CFPB Circular 2022-03 / ECOA-Reg B adverse-action
+requirements, EU AI Act Annex III high-risk credit-scoring requirements)
+scored this platform honestly as strong for a portfolio but named two hard
+blockers for actual production use at a regulated institution: (1) zero
+authentication on any of the 8 deployed FastAPI services, and (2) zero
+adverse-action reason-code/explainability output on any service. Both are
+now closed, for real, across all 8 services -- not just Problems 3-8, which
+had already been hardened in earlier passes, but Problems 1 and 2 as well.
+
+**Authentication.** Every business endpoint (`/model-info`, `/policy-info`,
+`/predict`, `/risk-tier`, `/score`) on all 8 services now requires a valid
+`X-API-Key` header, checked with `secrets.compare_digest` against an
+`API_KEY` environment variable (falls back to a published dev-only default
+with a loud warning log if unset, so a forgotten `API_KEY` fails safe rather
+than silently open). `/health` deliberately stays open on every service,
+matching standard load-balancer / Kubernetes liveness-probe practice.
+`docker-compose.yml` for all 8 services now requires `API_KEY` at container
+start (`${API_KEY:?Set API_KEY before running}`) rather than baking a secret
+into any Dockerfile image layer.
+
+**Explainability.** Every `/predict`/`/risk-tier`/`/score` response now
+returns a real, live-computed `top_reasons` field satisfying CFPB Circular
+2022-03's "specific, principal reasons" standard -- not the `shap` library,
+deliberately, since that would add both a new dependency and approximation
+risk. Instead each service uses whichever technique is exact for its own
+underlying model: occlusion-based marginal contribution (re-score the same
+customer with one real feature at a time reset to its training-set baseline,
+report the resulting change in predicted PD) for Problems 1, 2, 5, and 6's
+real trained classifiers; exact linear-term decomposition (each weighted
+composite score's own `weight * direction * z` terms already sum to the
+score, so ranking those terms by magnitude is exact, not approximate) for
+Problems 4 and 8; deterministic rule narration (a new `explain_ecl()` states
+exactly which IFRS9-stage rule fired and which frozen LGD value drove the
+amount) for Problem 3's fully interpretable branch/lookup engine; and
+ranking of already-computed z-score deviations for Problem 7. Every
+technique is verified bit-exact against direct computation in its own test
+(e.g. `test_score_top_reasons_matches_direct_top_contributing_features`) --
+not just "returns something."
+
+**Two more real bugs found (and fixed) while building this pass.** (1)
+Problem 1's `main.py` and Problem 2's `risk_tier_service.py` still hardcoded
+the author's real local Windows path as their preprocessing-artifacts
+default -- the exact same privacy-leak bug class already found and fixed
+three times elsewhere in this codebase (Problem 5 in the Phase 2 pass,
+Problems 6/7/8 in the Phase 3 pass) but never previously caught for
+Problems 1 and 2, since they predate every prior hardening pass. Fixed to
+raise a clear `RuntimeError` if `AMEX_PROJECT_ROOT` is unset rather than
+silently defaulting to a path that only exists on one machine. (2) The
+`.env.example` files for Problems 5, 6, 7, and 8 displayed the author's real
+local Windows path/username as their "example" value -- a milder
+information-disclosure issue than a hardcoded default, but still a leak in
+a file published publicly as a template. Cleaned up across all 8 problems
+for consistency (Problems 1-4 previously had no `.env.example` at all; all
+4 were created fresh in this pass).
+
+32 new tests cover this pass (8 auth-rejection tests, 8 auth-plus-baseline
+tests, and 16 explainability tests verifying `top_reasons` bit-exact against
+direct computation) -- 126 total, 0 regressions, 0 new `bandit` findings,
+0 new `pyflakes` findings, and zero remaining hardcoded local paths anywhere
+in the repository (`grep -rn "C:\\Users\\rnand"` returns nothing).
+
 ### Why the notebooks aren't wired to `shared/` yet
 
 `shared/metrics.py`, `shared/config.py`, and `shared/monitoring.py` are
@@ -114,24 +184,31 @@ immediately, not discovered after the fact.
    artifacts + full Global Standard hardening pass (tests, Docker,
    MODEL_CARD/CHANGELOG/requirements.txt, BENCHMARKS.md, CI wiring)~~ —
    done, 2026-08-25, pushed to GitHub 2026-08-25.
-4. Real `docker build`/compose smoke test for all 7 Dockerfiles (Problems
+4. ~~Close the two hard blockers named by an independent model-risk
+   benchmark pass: real API-key authentication and real per-request
+   explainability on all 8 deployed services~~ — done, 2026-08-25, see
+   above.
+5. Real `docker build`/compose smoke test for all 7 Dockerfiles (Problems
    1, 3, 4, 5, 6, 7, 8) once run somewhere with real Docker Hub registry
    access — this pass, like the Phase 2 one before it, could only
    statically verify build-context correctness, not actually pull a base
    image and build (this sandbox's Docker CLI has no daemon access).
-5. Fix Problem 1's `src/docker/Dockerfile` build-context bug (see above) —
+6. Fix Problem 1's `src/docker/Dockerfile` build-context bug (see above) —
    flagged, not fixed, in this pass.
-6. Pre-commit hook: run `check_notebook_syntax.py` + `pyflakes` on
+7. Pre-commit hook: run `check_notebook_syntax.py` + `pyflakes` on
    `git commit`, so a broken notebook or an unused import is caught
    before it's even pushed, not just in CI after the fact.
-7. Repo-wide `black` reformatting pass, once deliberately scheduled (not
+8. Repo-wide `black` reformatting pass, once deliberately scheduled (not
    as a side effect of another change) — then flip `format-check` from
    advisory to blocking.
-8. Wire all eight problems' notebooks to `shared/` (see above) — now that
+9. Wire all eight problems' notebooks to `shared/` (see above) — now that
    every problem has its own test safety net.
-9. Phase 4 (Problems 9, 10, 11) and Phase 5 (Problems 12, 13, 14) — not
-   started.
-10. Kaggle notebook(s) and LinkedIn write-ups showcasing the platform
+10. A model inventory document, live/alerting monitoring, `pytest-cov`
+    coverage measurement, and Dependabot — named as lower-priority items
+    by the model-risk benchmark pass, not blockers.
+11. Phase 4 (Problems 9, 10, 11) and Phase 5 (Problems 12, 13, 14) — not
+    started.
+12. Kaggle notebook(s) and LinkedIn write-ups showcasing the platform
     (tracked outside this repo — see the project's own working notes).
 
 ### On the "Global Standard" repository score

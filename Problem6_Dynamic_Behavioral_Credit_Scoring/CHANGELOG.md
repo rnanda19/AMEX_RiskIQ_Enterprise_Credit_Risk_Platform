@@ -3,6 +3,19 @@
 Dates below are real commit dates from this repository's git history, not
 estimated.
 
+## 2026-08-25 -- Authentication + explainability hardening (second pass)
+
+- Added real API-key authentication (`X-API-Key` header) to
+  `/model-info` and `/score` -- `/health` stays open.
+- Added real, per-request reason codes to `/score`: an exact,
+  live-computed marginal-contribution explanation against the real
+  trained W=3 model, same technique as Problem 1's PD service.
+- Replaced the real local Windows path shown as the example value in
+  `.env.example` with a generic placeholder (information-leak cleanup,
+  same as Problem 5 -- see that CHANGELOG entry).
+- Added 3 new tests (9 total for this problem) covering the auth gate
+  and reason codes.
+
 ## 2026-08-25 -- Phase 3 hardening pass (this commit)
 
 - Added `tests/` (pytest, 6 tests): the real FastAPI service (`/health`,

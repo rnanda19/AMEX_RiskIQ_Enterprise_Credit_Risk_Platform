@@ -1,9 +1,16 @@
+import os
+
 from fastapi.testclient import TestClient
 
-from ecl_calculator import compute_ecl
-from ecl_scoring_service import app
+# Must be set before ecl_scoring_service (and its module-level `app`) is imported below, since
+# that import is what the service's own auth dependency will later read API_KEY against.
+os.environ["API_KEY"] = "pytest-only-test-key"
+
+from ecl_calculator import compute_ecl, explain_ecl  # noqa: E402
+from ecl_scoring_service import app  # noqa: E402
 
 client = TestClient(app)
+AUTH = {"X-API-Key": "pytest-only-test-key"}
 
 
 def test_health_endpoint_reports_ok_and_tier_order(real_bundle):
@@ -14,11 +21,16 @@ def test_health_endpoint_reports_ok_and_tier_order(real_bundle):
 
 
 def test_model_info_matches_the_real_bundle(real_bundle):
-    r = client.get("/model-info")
+    r = client.get("/model-info", headers=AUTH)
     assert r.status_code == 200
     body = r.json()
     assert body["lgd_by_tier"] == real_bundle["lgd_by_tier"]
     assert body["ead_per_account_usd"] == real_bundle["ead_per_account_usd"]
+
+
+def test_model_info_without_api_key_is_rejected():
+    r = client.get("/model-info")
+    assert r.status_code == 401
 
 
 def test_score_endpoint_matches_direct_computation_exactly(real_bundle):
@@ -26,7 +38,8 @@ def test_score_endpoint_matches_direct_computation_exactly(real_bundle):
     thin wrapper, not a reimplementation."""
     for tier in real_bundle["tier_order"]:
         for pd_12m in (0.02, 0.15, 0.6):
-            r = client.post("/score", json={"pd_12m": pd_12m, "severity_tier": tier, "customer_id": "T1"})
+            r = client.post("/score", json={"pd_12m": pd_12m, "severity_tier": tier, "customer_id": "T1"},
+                             headers=AUTH)
             assert r.status_code == 200
             api_result = r.json()
             direct_result = compute_ecl(pd_12m, tier, real_bundle)
@@ -34,23 +47,41 @@ def test_score_endpoint_matches_direct_computation_exactly(real_bundle):
                 assert api_result[key] == direct_result[key], f"mismatch on {key} for pd={pd_12m}, tier={tier}"
 
 
+def test_score_without_api_key_is_rejected():
+    r = client.post("/score", json={"pd_12m": 0.1, "severity_tier": "Low Severity"})
+    assert r.status_code == 401
+
+
+def test_score_top_reasons_matches_direct_explain_ecl(real_bundle):
+    """The API's top_reasons must be bit-identical to calling explain_ecl() directly -- same
+    thin-wrapper discipline as the score fields themselves."""
+    r = client.post("/score", json={"pd_12m": 0.4, "severity_tier": "Severe", "customer_id": "T1"},
+                     headers=AUTH)
+    assert r.status_code == 200
+    api_reasons = r.json()["top_reasons"]
+    direct_reasons = explain_ecl(0.4, "Severe", real_bundle)
+    assert api_reasons == direct_reasons
+    assert len(api_reasons) >= 1
+
+
 def test_unknown_severity_tier_returns_422():
-    r = client.post("/score", json={"pd_12m": 0.1, "severity_tier": "Not A Real Tier"})
+    r = client.post("/score", json={"pd_12m": 0.1, "severity_tier": "Not A Real Tier"}, headers=AUTH)
     assert r.status_code == 422
 
 
 def test_pd_out_of_range_is_rejected_by_pydantic():
-    r = client.post("/score", json={"pd_12m": 1.5, "severity_tier": "Low Severity"})
+    r = client.post("/score", json={"pd_12m": 1.5, "severity_tier": "Low Severity"}, headers=AUTH)
     assert r.status_code == 422
-    r = client.post("/score", json={"pd_12m": -0.1, "severity_tier": "Low Severity"})
+    r = client.post("/score", json={"pd_12m": -0.1, "severity_tier": "Low Severity"}, headers=AUTH)
     assert r.status_code == 422
 
 
 def test_customer_id_is_echoed_back_when_provided():
-    r = client.post("/score", json={"pd_12m": 0.1, "severity_tier": "Low Severity", "customer_id": "ABC-123"})
+    r = client.post("/score", json={"pd_12m": 0.1, "severity_tier": "Low Severity", "customer_id": "ABC-123"},
+                     headers=AUTH)
     assert r.json()["customer_id"] == "ABC-123"
 
 
 def test_customer_id_is_none_when_omitted():
-    r = client.post("/score", json={"pd_12m": 0.1, "severity_tier": "Low Severity"})
+    r = client.post("/score", json={"pd_12m": 0.1, "severity_tier": "Low Severity"}, headers=AUTH)
     assert r.json()["customer_id"] is None

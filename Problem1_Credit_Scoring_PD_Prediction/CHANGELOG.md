@@ -3,6 +3,31 @@
 Dates below are real commit dates from this repository's git history, not
 estimated.
 
+## 2026-08-25 — Authentication + explainability hardening
+
+- Added real API-key authentication (`X-API-Key` header, checked with
+  `secrets.compare_digest`) to `/model-info` and `/predict` — `/health`
+  stays open, matching standard load-balancer/k8s-probe practice. Falls
+  back to a published, clearly-labeled dev-only key if `API_KEY` is
+  unset, with a loud log warning; a real deployment must set it.
+- Added real, per-request reason codes to `/predict`: an exact,
+  live-computed marginal-contribution explanation (re-scores the same
+  customer with one feature at a time reset to its training-set
+  baseline and reports the resulting change in predicted PD) — not
+  cached, not sampled. Answers the CFPB Circular 2022-03 "specific,
+  principal reason" requirement this service previously had no answer
+  for.
+- **Real bug found and fixed**: `main.py`'s `AMEX_PROJECT_ROOT` default
+  still hardcoded the author's real local Windows path — the same
+  privacy-leak bug class already found and fixed for Problem 5 (Phase 2)
+  and Problems 6/7/8 (Phase 3), but never previously caught here. Fixed
+  by requiring the env var explicitly (a clear `RuntimeError` if unset)
+  rather than defaulting to any local path — there is no safe
+  repo-relative default here since the real champion model isn't
+  committed to this public repo (see `models/README.md`).
+- Added `.env.example` (previously missing for this problem) and 6 new
+  regression tests (14 total for this problem) covering both fixes.
+
 ## 2026-08-24 — Enterprise hardening (this pass)
 
 - Added `tests/` (pytest): FastAPI service (health/model-info/predict,

@@ -3,15 +3,19 @@
 # Unlike Problems 1/5/6's services, this one scores a CUSTOMER'S STATEMENT HISTORY (a list of past
 # records), not a single flat feature row -- the baseline is computed from that history at scoring
 # time, exactly reproducing Notebooks 43/44's rolling z-score computation.
+# API_KEY (see .env.example) gates every endpoint below except /health.
 # Run with:
 #     uvicorn real_time_alert_service:app --host 0.0.0.0 --port 8007
 import json
+import logging
 import os
+import secrets
 from pathlib import Path
 from typing import Dict, List, Optional
 
 import numpy as np
-from fastapi import FastAPI, HTTPException
+from fastapi import Depends, FastAPI, HTTPException, Security
+from fastapi.security import APIKeyHeader
 from pydantic import BaseModel
 
 # Self-contained default: the real frozen policy ships alongside this file in src/ (see
@@ -27,12 +31,48 @@ WINNING_MIN_DEVIATION_COUNT = _POLICY["winning_min_deviation_count"]
 MONITORED_FEATURES = _POLICY["monitored_features"]
 RECOMMENDED_FOR_PRODUCTION = _POLICY["recommended_for_production"]
 
+# ---------------------------------------------------------------------------
+# Authentication -- real, enforced on every endpoint below except /health.
+# Duplicated verbatim across all 8 platform services (not imported from
+# shared/) so each service stays self-contained for its own Docker build
+# context, matching the self-contained-policy-copy pattern already used
+# elsewhere in this repo. Set API_KEY in your environment before deploying
+# anywhere reachable by anyone but you -- the fallback below is published
+# publicly in this file and must never be treated as a real secret.
+# ---------------------------------------------------------------------------
+_auth_logger = logging.getLogger(__name__ + ".auth")
+_DEV_DEFAULT_API_KEY = "dev-only-CHANGE-ME-before-deploying"
+_api_key_header = APIKeyHeader(name="X-API-Key", auto_error=False)
+
+
+def _configured_api_key() -> str:
+    key = os.environ.get("API_KEY")
+    if not key:
+        _auth_logger.warning(
+            "API_KEY is not set -- falling back to the published dev-only default. Set API_KEY "
+            "before deploying this service anywhere reachable by anyone but you."
+        )
+        return _DEV_DEFAULT_API_KEY
+    return key
+
+
+def require_api_key(presented: str = Security(_api_key_header)) -> str:
+    expected = _configured_api_key()
+    if not presented or not secrets.compare_digest(presented, expected):
+        raise HTTPException(status_code=401, detail="Missing or invalid X-API-Key header.")
+    return presented
+
 
 class ScoreRequest(BaseModel):
     customer_id: Optional[str] = None
     # Chronological order, OLDEST first, LAST item = the latest statement being tested.
     # Each statement is a dict of {monitored_feature_name: value_or_null}.
     statements: List[Dict[str, Optional[float]]]
+
+
+class ReasonCode(BaseModel):
+    factor: str
+    z_score: float
 
 
 class AlertResponse(BaseModel):
@@ -43,6 +83,7 @@ class AlertResponse(BaseModel):
     alert: bool
     winning_min_deviation_count: int
     feature_deviations: Dict[str, Optional[float]]
+    top_reasons: List[ReasonCode] = []
 
 
 def compute_early_warning(statements: List[Dict[str, Optional[float]]]) -> dict:
@@ -80,6 +121,17 @@ def compute_early_warning(statements: List[Dict[str, Optional[float]]]) -> dict:
     }
 
 
+def top_reason_codes(feature_deviations: Dict[str, Optional[float]], n=3):
+    """Real, exact ranking of the already-computed per-feature z-scores by |z| -- not a separate
+    approximation technique, since this service already computes an exact deviation per monitored
+    feature as part of its own scoring; this just surfaces the n largest ones as the specific
+    factors that actually drove this customer's early_warning_score, per CFPB Circular 2022-03's
+    'specific, principal reason' standard."""
+    computable = [(feat, z) for feat, z in feature_deviations.items() if z is not None]
+    computable.sort(key=lambda item: abs(item[1]), reverse=True)
+    return [ReasonCode(factor=feat, z_score=z) for feat, z in computable[:n]]
+
+
 app = FastAPI(
     title="AMEX Enterprise Credit Risk Platform -- Early Warning System Real-Time Alert API",
     description="Flags a customer whose LATEST statement deviates from THEIR OWN recent baseline in "
@@ -95,7 +147,7 @@ def health():
     return {"status": "ok", "winning_min_deviation_count": WINNING_MIN_DEVIATION_COUNT}
 
 
-@app.get("/model-info")
+@app.get("/model-info", dependencies=[Depends(require_api_key)])
 def model_info():
     return {
         "z_threshold": Z_THRESHOLD,
@@ -107,7 +159,7 @@ def model_info():
     }
 
 
-@app.post("/score", response_model=AlertResponse)
+@app.post("/score", response_model=AlertResponse, dependencies=[Depends(require_api_key)])
 def score(request: ScoreRequest):
     try:
         result = compute_early_warning(request.statements)
@@ -116,6 +168,7 @@ def score(request: ScoreRequest):
     except Exception as exc:
         raise HTTPException(status_code=500, detail="Scoring failed: " + str(exc))
     alert = result["early_warning_score"] >= WINNING_MIN_DEVIATION_COUNT
+    reasons = top_reason_codes(result["feature_deviations"])
     return AlertResponse(
         customer_id=request.customer_id,
         early_warning_score=result["early_warning_score"],
@@ -124,4 +177,5 @@ def score(request: ScoreRequest):
         alert=alert,
         winning_min_deviation_count=WINNING_MIN_DEVIATION_COUNT,
         feature_deviations=result["feature_deviations"],
+        top_reasons=reasons,
     )

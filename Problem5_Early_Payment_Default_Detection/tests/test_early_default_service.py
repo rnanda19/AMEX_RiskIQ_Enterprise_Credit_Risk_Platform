@@ -2,6 +2,8 @@ import numpy as np
 import pytest
 from fastapi.testclient import TestClient
 
+AUTH = {"X-API-Key": "pytest-only-test-key"}  # must match conftest.py's TEST_API_KEY
+
 
 def _at_median_payload(preprocessing_artifacts):
     """One synthetic customer built from the real, measured feature medians/first-known-category
@@ -26,7 +28,7 @@ def test_health_reports_the_real_early_window_k(epd_app):
 
 def test_model_info_reports_the_real_measured_metrics(epd_app):
     client = TestClient(epd_app.app)
-    resp = client.get("/model-info")
+    resp = client.get("/model-info", headers=AUTH)
     assert resp.status_code == 200
     body = resp.json()
     assert body["early_window_k"] == 3
@@ -35,10 +37,16 @@ def test_model_info_reports_the_real_measured_metrics(epd_app):
     assert body["holdout_auc"] == 0.9265274920113401
 
 
+def test_model_info_without_api_key_is_rejected(epd_app):
+    client = TestClient(epd_app.app)
+    resp = client.get("/model-info")
+    assert resp.status_code == 401
+
+
 def test_score_returns_a_valid_probability_using_the_real_trained_model(epd_app, preprocessing_artifacts):
     client = TestClient(epd_app.app)
     payload = _at_median_payload(preprocessing_artifacts)
-    resp = client.post("/score", json=payload, params={"customer_id": "TEST-CUSTOMER-001"})
+    resp = client.post("/score", json=payload, params={"customer_id": "TEST-CUSTOMER-001"}, headers=AUTH)
     assert resp.status_code == 200
     body = resp.json()
     assert body["customer_id"] == "TEST-CUSTOMER-001"
@@ -46,11 +54,32 @@ def test_score_returns_a_valid_probability_using_the_real_trained_model(epd_app,
     assert body["early_window_k"] == 3
 
 
+def test_score_without_api_key_is_rejected(epd_app, preprocessing_artifacts):
+    client = TestClient(epd_app.app)
+    resp = client.post("/score", json=_at_median_payload(preprocessing_artifacts))
+    assert resp.status_code == 401
+
+
+def test_score_returns_top_reasons_that_explain_the_prediction(epd_app, preprocessing_artifacts):
+    client = TestClient(epd_app.app)
+    payload = _at_median_payload(preprocessing_artifacts)
+    # Push one numeric feature well off its median so it has a real, non-baseline value.
+    numeric_cols = preprocessing_artifacts["numeric_feature_cols"]
+    if numeric_cols:
+        payload[numeric_cols[0]] = float(payload[numeric_cols[0]]) + 1000.0
+    resp = client.post("/score", json=payload, headers=AUTH)
+    assert resp.status_code == 200
+    reasons = resp.json()["top_reasons"]
+    magnitudes = [abs(r["contribution_to_predicted_pd"]) for r in reasons]
+    assert magnitudes == sorted(magnitudes, reverse=True)
+    assert len(reasons) <= 3
+
+
 def test_score_is_deterministic_for_the_same_real_input(epd_app, preprocessing_artifacts):
     client = TestClient(epd_app.app)
     payload = _at_median_payload(preprocessing_artifacts)
-    pd_1 = client.post("/score", json=payload).json()["predicted_pd"]
-    pd_2 = client.post("/score", json=payload).json()["predicted_pd"]
+    pd_1 = client.post("/score", json=payload, headers=AUTH).json()["predicted_pd"]
+    pd_2 = client.post("/score", json=payload, headers=AUTH).json()["predicted_pd"]
     assert pd_1 == pd_2
 
 
@@ -61,7 +90,7 @@ def test_score_matches_a_direct_computation_against_the_same_real_model(epd_app,
     fields silently omitted from the payload) found and fixed during this problem's build."""
     client = TestClient(epd_app.app)
     payload = _at_median_payload(preprocessing_artifacts)
-    api_pd = client.post("/score", json=payload).json()["predicted_pd"]
+    api_pd = client.post("/score", json=payload, headers=AUTH).json()["predicted_pd"]
 
     all_feature_cols = preprocessing_artifacts["all_feature_cols"]
     categorical_encode_cols = preprocessing_artifacts["categorical_encode_cols"]
@@ -85,6 +114,7 @@ def test_score_matches_a_direct_computation_against_the_same_real_model(epd_app,
 def test_missing_optional_fields_fall_back_to_real_medians_without_error(epd_app, preprocessing_artifacts):
     """Every field is Optional in the real schema -- an empty payload must not 500."""
     client = TestClient(epd_app.app)
-    resp = client.post("/score", json={})
+    resp = client.post("/score", json={}, headers=AUTH)
     assert resp.status_code == 200
     assert 0.0 <= resp.json()["predicted_pd"] <= 1.0
+    assert resp.json()["top_reasons"] == []

@@ -47,6 +47,25 @@ def score_customer(feature_dict, bundle):
     return {"severity_score": score, "severity_tier": tier, "lgd": bundle["lgd_by_tier"][tier]}
 
 
+def top_contributing_features(feature_dict, bundle, n=3):
+    """Real, exact per-feature decomposition of score_customer()'s weighted-sum severity score --
+    not an approximation. Because the score IS a linear sum of weight*direction*z terms, each
+    term's own real value is already the feature's exact, additive contribution to the total; this
+    just recomputes those same terms (same alphabetical summation order as score_customer(), for
+    the identical floating-point result) and returns the n largest by magnitude."""
+    contributions = []
+    for feat in sorted(bundle["features"]):
+        raw = feature_dict.get(feat)
+        if _is_missing(raw):
+            raw = bundle["means"][feat]
+        z = (float(raw) - bundle["means"][feat]) / bundle["stds"][feat]
+        contribution = bundle["weights"][feat] * bundle["directions"][feat] * z
+        if contribution != 0.0:
+            contributions.append({"factor": feat, "contribution_to_severity_score": contribution})
+    contributions.sort(key=lambda r: abs(r["contribution_to_severity_score"]), reverse=True)
+    return contributions[:n]
+
+
 if __name__ == "__main__":
     _bundle = load_bundle()
     _example = {f: _bundle["means"][f] for f in _bundle["features"]}
