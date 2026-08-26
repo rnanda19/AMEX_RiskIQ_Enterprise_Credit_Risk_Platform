@@ -1,10 +1,10 @@
 {
-  "generated_at_utc": "2026-08-25T07:24:44.367309+00:00",
+  "generated_at_utc": "2026-08-26T12:15:32.616583+00:00",
   "z_threshold": 2.0,
   "min_statements_for_baseline": 4,
-  "winning_min_deviation_count": 8,
-  "meets_kpi_target": false,
-  "recommended_for_production": false,
+  "winning_min_deviation_count": 10,
+  "meets_kpi_target": true,
+  "recommended_for_production": true,
   "monitored_features": [
     "D_102",
     "D_103",
@@ -97,23 +97,23 @@
     "D_96"
   ],
   "winning_candidate_metrics": {
-    "candidate_min_deviation_count": 8,
-    "n_alerted": 37675,
-    "pct_alerted": 42.62408218217199,
-    "default_rate_alerted": 0.36055739880557397,
-    "default_rate_lift": 1.4075927707709852,
-    "meets_kpi_target": false,
-    "accuracy": 0.624975958546878,
-    "precision": 0.36055739880557397,
-    "recall": 0.5999734994037366,
-    "f1": 0.45042774719809003,
-    "specificity": 0.6335858124961976,
-    "mcc": 0.20615586705483538,
+    "candidate_min_deviation_count": 10,
+    "n_alerted": 21428,
+    "pct_alerted": 24.242835646969645,
+    "default_rate_alerted": 0.42799141310434946,
+    "default_rate_lift": 1.6708508022119317,
+    "meets_kpi_target": true,
+    "accuracy": 0.7089343696613832,
+    "precision": 0.42799141310434946,
+    "recall": 0.40506161388631245,
+    "f1": 0.41621094193197034,
+    "specificity": 0.8135760783597981,
+    "mcc": 0.22269595362894387,
     "confusion_matrix": {
-      "tn": 41657,
-      "fp": 24091,
-      "fn": 9057,
-      "tp": 13584
+      "tn": 53491,
+      "fp": 12257,
+      "fn": 13470,
+      "tp": 9171
     }
   },
   "random_seed": 42

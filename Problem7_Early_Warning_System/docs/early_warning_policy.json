@@ -1,5 +1,5 @@
 {
-  "generated_at_utc": "2026-08-25T07:10:59.480250+00:00",
+  "generated_at_utc": "2026-08-26T12:01:45.715152+00:00",
   "problem": "Problem 7 -- Early Warning System (Rolling Z-Score Trend-Deviation Detection)",
   "z_threshold": 2.0,
   "min_statements_for_baseline": 4,
@@ -121,7 +121,7 @@
     "secondary_auc_reporting": "Not a pass/fail gate, an honest reporting requirement: Notebook 43 must also report the threshold-free ROC-AUC and PR-AUC of the continuous EARLY_WARNING_SCORE against the real eventual-default label, for comparability with Problems 1/5/6's own AUC figures -- reported plainly even though a lower AUC than those trained models is the honestly expected outcome for a rule-based control-chart technique, not a failure of this notebook.",
     "metrics_suite_requirement": "STANDING RULE (user directive, 2026-08-25, carried from Problem 6): Notebook 43 (Modeling) and Notebook 44 (Validation & Deployment) must compute and DISPLAY -- inline in the notebook AND in this problem's Word/Excel/HTML reports -- the full classification metrics suite treating ALERT (score >= candidate MIN_DEVIATION_COUNT) as the binary prediction at each candidate threshold: ROC-AUC, PR-AUC, Accuracy, Precision, Recall, F1, Specificity, Log Loss, Matthews Correlation Coefficient, and a full confusion matrix -- plus a rendered ROC curve and Precision-Recall curve.",
     "elevated_reporting_requirement": "STANDING RULE (user directive, 2026-08-25): Problem 7's Word report must synthesize MAXIMUM DETAIL from every one of this problem's notebooks (42-45), with a narrative 'story' paragraph below every chart -- not a report scoped to Notebook 45's own financial figures alone. Problem 7's HTML report must be an advanced, 'global standard' interactive dashboard with slicers, filters, full legends, and interactive KPI cards -- built in Notebook 45.",
-    "full_history_reference_auc": 0.9620396555226549,
+    "full_history_reference_auc": 0.9614779100963606,
     "problem_6_reference": {
       "winning_w": 3,
       "recommended_for_production": true

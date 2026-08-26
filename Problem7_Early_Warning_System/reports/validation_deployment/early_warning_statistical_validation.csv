@@ -1,16 +1,16 @@
 test,value,target,pass
-Default-rate lift @ candidate=8 (reproduced),1.408,>=1.5x,False
-Lift 95% CI lower bound,1.394,>1.0x,True
+Default-rate lift @ candidate=10 (reproduced),1.671,>=1.5x,True
+Lift 95% CI lower bound,1.65,>1.0x,True
 "ROC-AUC (reproduced, secondary)",0.6607,>0.5 (reported),True
 ROC-AUC 95% CI lower bound,0.6566,>0.5 (reported),True
 "PR-AUC (reproduced, secondary)",0.4014,">0.2562 (no-skill, reported)",True
 "Log Loss (reproduced, secondary)",0.6793,<0.6931 (reported),True
-Accuracy @ candidate=8,0.625,reported,True
-Precision @ candidate=8,0.3606,reported,True
-Recall @ candidate=8,0.6,reported,True
-F1 @ candidate=8,0.4504,reported,True
-Specificity @ candidate=8,0.6336,reported,True
-MCC @ candidate=8,0.2062,reported,True
+Accuracy @ candidate=10,0.7089,reported,True
+Precision @ candidate=10,0.428,reported,True
+Recall @ candidate=10,0.4051,reported,True
+F1 @ candidate=10,0.4162,reported,True
+Specificity @ candidate=10,0.8136,reported,True
+MCC @ candidate=10,0.2227,reported,True
 Score-rank calibration monotonicity,True,True,True
 Split-half score PSI,0.0002,<0.1,True
-Default-rate lift KPI (Notebook 42 target),1.408,>=1.5x,False
+Default-rate lift KPI (Notebook 42 target),1.671,>=1.5x,True

@@ -1,5 +1,5 @@
 {
-  "generated_at_utc": "2026-08-25T07:20:52.919079+00:00",
+  "generated_at_utc": "2026-08-26T12:13:02.573917+00:00",
   "problem": "Problem 7 -- Early Warning System (Rolling Z-Score Trend-Deviation Detection)",
   "z_threshold": 2.0,
   "min_statements_for_baseline": 4,
@@ -22,8 +22,8 @@
     "roc_auc": 0.6606956921230794,
     "pr_auc": 0.40136844214544143,
     "log_loss": 0.6792533978818713,
-    "auc_retention_pct_of_full_history": 68.67655489358576,
-    "full_history_reference_auc": 0.9620396555226549
+    "auc_retention_pct_of_full_history": 68.71667931059005,
+    "full_history_reference_auc": 0.9614779100963606
   },
   "candidate_results": {
     "1": {
@@ -130,9 +130,98 @@
         "fn": 9057,
         "tp": 13584
       }
+    },
+    "10": {
+      "candidate_min_deviation_count": 10,
+      "n_alerted": 21428,
+      "pct_alerted": 24.242835646969645,
+      "default_rate_alerted": 0.42799141310434946,
+      "base_default_rate_holdout": 0.256151783592981,
+      "default_rate_lift": 1.6708508022119317,
+      "meets_kpi_target": true,
+      "accuracy": 0.7089343696613832,
+      "precision": 0.42799141310434946,
+      "recall": 0.40506161388631245,
+      "f1": 0.41621094193197034,
+      "specificity": 0.8135760783597981,
+      "mcc": 0.22269595362894387,
+      "confusion_matrix": {
+        "tn": 53491,
+        "fp": 12257,
+        "fn": 13470,
+        "tp": 9171
+      }
+    },
+    "12": {
+      "candidate_min_deviation_count": 12,
+      "n_alerted": 11183,
+      "pct_alerted": 12.652026835918496,
+      "default_rate_alerted": 0.49959760350532056,
+      "base_default_rate_holdout": 0.256151783592981,
+      "default_rate_lift": 1.9503967393768729,
+      "meets_kpi_target": true,
+      "accuracy": 0.7437463937820317,
+      "precision": 0.49959760350532056,
+      "recall": 0.2467647188728413,
+      "f1": 0.33035714285714285,
+      "specificity": 0.9148871448561173,
+      "mcc": 0.2122585059508088,
+      "confusion_matrix": {
+        "tn": 60152,
+        "fp": 5596,
+        "fn": 17054,
+        "tp": 5587
+      }
+    },
+    "15": {
+      "candidate_min_deviation_count": 15,
+      "n_alerted": 3783,
+      "pct_alerted": 4.2799443369650065,
+      "default_rate_alerted": 0.577583928099392,
+      "base_default_rate_holdout": 0.256151783592981,
+      "default_rate_lift": 2.2548503078829185,
+      "meets_kpi_target": true,
+      "accuracy": 0.7504893142811888,
+      "precision": 0.577583928099392,
+      "recall": 0.096506338059273,
+      "f1": 0.16537995761429003,
+      "specificity": 0.975695078177283,
+      "mcc": 0.15570983332940855,
+      "confusion_matrix": {
+        "tn": 64150,
+        "fp": 1598,
+        "fn": 20456,
+        "tp": 2185
+      }
+    },
+    "20": {
+      "candidate_min_deviation_count": 20,
+      "n_alerted": 462,
+      "pct_alerted": 0.5226894749346638,
+      "default_rate_alerted": 0.670995670995671,
+      "base_default_rate_holdout": 0.256151783592981,
+      "default_rate_lift": 2.619523712010793,
+      "meets_kpi_target": true,
+      "accuracy": 0.7456357691567955,
+      "precision": 0.670995670995671,
+      "recall": 0.013691974736098228,
+      "f1": 0.026836341600657922,
+      "specificity": 0.9976881426050983,
+      "mcc": 0.06888960587762505,
+      "confusion_matrix": {
+        "tn": 65596,
+        "fp": 152,
+        "fn": 22331,
+        "tp": 310
+      }
     }
   },
-  "candidates_meeting_kpi": [],
+  "candidates_meeting_kpi": [
+    10,
+    12,
+    15,
+    20
+  ],
   "chart_paths": {
     "roc_curve": "C:\\Users\\rnand\\Downloads\\amex-default-prediction\\AMEX_Enterprise_Credit_Risk_Platform\\Phase3_Behavioral_Intelligence\\Problem7_Early_Warning_System\\reports\\charts\\notebook_43_roc_curve.png",
     "pr_curve": "C:\\Users\\rnand\\Downloads\\amex-default-prediction\\AMEX_Enterprise_Credit_Risk_Platform\\Phase3_Behavioral_Intelligence\\Problem7_Early_Warning_System\\reports\\charts\\notebook_43_pr_curve.png",
