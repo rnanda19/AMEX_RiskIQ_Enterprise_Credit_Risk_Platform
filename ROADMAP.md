@@ -230,7 +230,7 @@ work, not as progress toward an unverified number.
 | Phase 1 — Foundation | Problem 1 (PD Prediction), Problem 2 (Risk Tier Classification) | Complete, pushed to GitHub (25 notebooks) |
 | Phase 2 — Regulatory & Loss Provisioning | Problem 3 (ECL/IFRS9/CECL), Problem 4 (Delinquency/Loss Severity), Problem 5 (Early Payment Default) | **Complete, pushed to GitHub 2026-08-25** (12 notebooks + Global Standard hardening pass) |
 | Phase 3 — Behavioral Intelligence | Problems 6, 7, 8 | **Complete, pushed to GitHub 2026-08-25** (12 notebooks + real notebook-output artifacts + Global Standard hardening pass, all pushed 2026-08-25) — Problem 6 complete (Notebooks 38-41), RECOMMENDED FOR PRODUCTION (W=3 trailing window, 99.2% AUC retention); Problem 7 complete (Notebooks 42-45), concluded NOT RECOMMENDED FOR PRODUCTION (honest result -- real default-rate lift below KPI target; a v2 enhancement attempt, Notebooks 46-47, was built, showed genuine but insufficient improvement, and was deliberately abandoned per user decision, freeing 46-49 for Problem 8); Problem 8 complete -- Notebooks 46 (Business Understanding & Policy), 47 (Modeling), 48 (Validation & Deployment), and 49 (Financial-Impact Reporting & Packaging) all shipped, RECOMMENDED FOR PRODUCTION on this run (both hard-gate KPIs -- monotonicity and coherence -- met; Severe/Low default ratio 107.2x). All 12 Phase 3 notebooks (38-49) verified: syntax-clean, idempotent, pyflakes-clean. Hardening pass: 21 new tests (94 total platform-wide), Docker for all 3 services, MODEL_CARD/CHANGELOG/requirements.txt, BENCHMARKS.md entries, CI wiring -- see "Two more real bugs found" above. |
-| Phase 4 — Operational Risk Management | Problems 9, 10, 11 | Not started |
+| Phase 4 — Operational Risk Management | Problems 9, 10, 11 | **In progress, not pushed to GitHub yet.** Problem 9 (Collections Optimization) complete locally -- Notebooks 50-53 all shipped 2026-08-26 (propensity-to-cure scoring + business-rule treatment tiers; two-value-stream financial model distinct from Problem 8's pattern). Problem 10 (Credit Line Management) started 2026-08-26 -- Notebook 54 (Business Understanding & Policy) shipped; Notebooks 55-57 not yet built. Problem 11 (Real-Time Portfolio Monitoring) not started. |
 | Phase 5 — Customer & Business Intelligence | Problems 12, 13, 14 | Not started |
 
 ## Phase 3 build plan — scoped 2026-08-25
@@ -290,3 +290,61 @@ fails with a 95% CI entirely below zero).
 
 Next problem-roadmap item: Notebook 49 (Problem 8, Financial-Impact
 Reporting & Packaging -- final notebook of Problem 8, closes Phase 3).
+
+## Phase 4 build plan — scoped 2026-08-26
+
+Per `AMEX_Master_Execution_Plan.docx`'s Phase 4 table, Phase 4 moves from risk
+*models* to risk *operations* -- running the portfolio day to day:
+
+| # | Problem | Depends on | Core technique (per master plan) | Deliverable |
+|---|---|---|---|---|
+| 9 | Collections Optimization | #4, #8 | Propensity-to-cure scoring + treatment assignment | Collections strategy engine |
+| 10 | Credit Line Management | #1, #6 | Utilization-trend + PD-based limit optimization | Limit recommendation service |
+| 11 | Real-Time Portfolio Monitoring | #7 | Streaming aggregation + threshold alerting | Ops dashboard + alert feed |
+
+Same 4-notebook-per-problem pattern as Phases 2/3, continuing the numbering
+sequence: Notebooks 50-53 (Problem 9), 54-57 (Problem 10), 58-61 (Problem
+11) -- 12 notebooks total. Same standing rules apply unchanged, plus the
+Phase 4 tightened WARP resource cap (92% CPU / 92% RAM, established in
+Notebook 50 after the real Phase 3 hang incident) and the two-tier RAM
+pre-flight guard (established in Notebooks 51/52 after a real 45-minute
+freeze the user hit running Notebook 52, initially misdiagnosed against
+Notebook 51 before the user corrected it).
+
+Problem 9 (Notebooks 50-53) shipped complete 2026-08-26. Real bugs found
+and fixed after the user ran these notebooks on their own machine: Notebook
+50's `roll_rate_deployment_policy.json` path guess (fixed to read the
+canonical path from `notebook_48_summary.json`); Notebook 51's reported
+45-minute freeze (initially misdiagnosed -- the actual freeze was in
+Notebook 52, corrected on the user's follow-up report); Notebook 52's real
+double-CSV-scan bug in its independent-reproduction section (fixed to
+collect once), a real `SchemaError` in that same fix (`pl.concat` on two ID
+frames carrying mismatched-dtype extra columns -- fixed by selecting only
+`customer_ID` before concatenating), and an over-strict RAM guard that
+hard-blocked a workable ~14 GB of available RAM (fixed to a two-tier warn/
+hard-fail check); Notebook 53's real `ValueError` from an Excel sheet title
+containing a forbidden `/` character. See
+`/areas/amex-credit-risk-platform-bugfixes.md` for full detail on each.
+
+Problem 10 (Notebooks 54-57) started 2026-08-26. Notebook 54 (Business
+Understanding & Policy) shipped: composes Problem 1's real static (whole-
+history) PD with Problem 6's real dynamic (monthly-refreshed, trailing-
+window) PD into a risk-level x risk-trend policy. Honest scope note: this
+Kaggle dataset has no true credit-limit or balance-to-limit utilization
+field (by the competition's own anonymization design), so "utilization-
+trend" is reinterpreted as the real, measurable PD_TREND signal (dynamic PD
+minus static PD) rather than a fabricated raw-column proxy -- stated
+plainly in the notebook, the policy artifact, and every downstream report
+for this problem. Two real hard-gating KPIs defined: risk-level
+monotonicity (reused convention from Problems 4/8) and trend coherence (a
+new KPI with no prior platform precedent -- the specific, testable claim
+this problem's whole design depends on). A 9-cell action-tier policy (Low/
+Medium/High Risk x Trending Better/Stable/Trending Worse -> 5 credit-line
+actions) is defined as an honest business-rule layer, explicitly not a
+fitted treatment-response model, matching Problem 9's precedent for the
+same reason (no real limit-change/outcome data exists in this dataset).
+
+Next problem-roadmap item: Notebook 55 (Problem 10, Modeling -- scores the
+real eligible population with both real models, fits the real tertile cut
+values, and validates both hard-gating KPIs against the real observed
+default outcome).
