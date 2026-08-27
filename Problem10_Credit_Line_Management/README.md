@@ -12,6 +12,8 @@ Phase 4, Problem 10 of the platform: a 4-notebook build (Notebooks 54-57) coveri
 
 This problem also received the platform's Global Standard hardening delta (2026-08-27): a real, auth-protected FastAPI recommendation service (`src/credit_line_scoring_service.py`), Docker packaging, real unit tests, and `MODEL_CARD.md`/`CHANGELOG.md`/`requirements.txt` -- deployed here for completeness and honest transparency, matching this platform's standard of shipping every real result, including the ones that didn't clear their KPI bar. See `CHANGELOG.md` for the full detail.
 
+**In progress (2026-08-27):** the real cause of the `trend_coherence` failure below has been root-caused and `PD_TREND` has been redesigned in Notebooks 54-55 (a genuine same-model, two-time-point measure, replacing the original cross-model residual) -- see `CHANGELOG.md`. This fix is syntax-and-logic-verified but **not yet re-run against the real ~448K-customer dataset**, so the results below still reflect the original (pre-redesign) real run until that re-run happens.
+
 ## Project Structure
 
 ```
