@@ -38,14 +38,14 @@ def test_policy_info_without_api_key_is_rejected():
 
 
 def test_recommend_without_api_key_is_rejected():
-    resp = client.post("/recommend", json={"static_pd": 0.1, "dynamic_pd": 0.1})
+    resp = client.post("/recommend", json={"dynamic_pd": 0.1, "dynamic_pd_early": 0.1})
     assert resp.status_code == 401
 
 
 def test_recommend_out_of_range_pd_is_rejected():
-    resp = client.post("/recommend", json={"static_pd": 1.5, "dynamic_pd": 0.1}, headers=AUTH)
+    resp = client.post("/recommend", json={"dynamic_pd": 1.5, "dynamic_pd_early": 0.1}, headers=AUTH)
     assert resp.status_code == 422
-    resp = client.post("/recommend", json={"static_pd": 0.1, "dynamic_pd": -0.1}, headers=AUTH)
+    resp = client.post("/recommend", json={"dynamic_pd": 0.1, "dynamic_pd_early": -0.1}, headers=AUTH)
     assert resp.status_code == 422
 
 
@@ -54,7 +54,7 @@ def test_recommend_at_real_low_risk_boundary_matches_direct_computation(real_pol
     risk level -- matches calling _assign_risk_level() directly."""
     dynamic_pd = real_policy["risk_level_cut_low"]
     resp = client.post(
-        "/recommend", json={"static_pd": dynamic_pd, "dynamic_pd": dynamic_pd}, headers=AUTH
+        "/recommend", json={"dynamic_pd": dynamic_pd, "dynamic_pd_early": dynamic_pd}, headers=AUTH
     )
     assert resp.status_code == 200
     body = resp.json()
@@ -66,7 +66,7 @@ def test_recommend_at_real_low_risk_boundary_matches_direct_computation(real_pol
 
 
 def test_recommend_risk_level_matches_real_cuts_at_stable_trend(real_policy):
-    """Holds trend at exactly 'Stable' (static_pd == dynamic_pd, pd_trend == 0) and sweeps
+    """Holds trend at exactly 'Stable' (dynamic_pd_early == dynamic_pd, pd_trend == 0) and sweeps
     dynamic_pd across the 3 real risk-level brackets."""
     risk_level_names = real_policy["risk_level_names"]
     trend_names = real_policy["trend_names"]
@@ -76,7 +76,9 @@ def test_recommend_risk_level_matches_real_cuts_at_stable_trend(real_policy):
         min(1.0, real_policy["risk_level_cut_high"] + 0.05),
     ]
     for ri, pd_val in enumerate(candidates):
-        resp = client.post("/recommend", json={"static_pd": pd_val, "dynamic_pd": pd_val}, headers=AUTH)
+        resp = client.post(
+            "/recommend", json={"dynamic_pd": pd_val, "dynamic_pd_early": pd_val}, headers=AUTH
+        )
         assert resp.status_code == 200
         body = resp.json()
         assert body["risk_level"] == risk_level_names[ri]
@@ -89,7 +91,7 @@ def test_recommend_risk_level_matches_real_cuts_at_stable_trend(real_policy):
 
 def test_recommend_trend_matches_real_cuts_at_a_safe_mid_range_risk_level(real_policy):
     """Holds dynamic_pd comfortably inside the Medium-risk bracket (away from 0/1, so no
-    static_pd clamping is possible) and sweeps pd_trend across the 3 real trend brackets."""
+    dynamic_pd_early clamping is possible) and sweeps pd_trend across the 3 real trend brackets."""
     trend_names = real_policy["trend_names"]
     dynamic_pd = (real_policy["risk_level_cut_low"] + real_policy["risk_level_cut_high"]) / 2
     trend_deltas = [
@@ -98,10 +100,10 @@ def test_recommend_trend_matches_real_cuts_at_a_safe_mid_range_risk_level(real_p
         real_policy["trend_cut_high"] + 0.01,
     ]
     for ti, delta in enumerate(trend_deltas):
-        static_pd = dynamic_pd - delta
-        assert 0.0 <= static_pd <= 1.0, "test construction error -- static_pd out of range"
+        dynamic_pd_early = dynamic_pd - delta
+        assert 0.0 <= dynamic_pd_early <= 1.0, "test construction error -- dynamic_pd_early out of range"
         resp = client.post(
-            "/recommend", json={"static_pd": static_pd, "dynamic_pd": dynamic_pd}, headers=AUTH
+            "/recommend", json={"dynamic_pd": dynamic_pd, "dynamic_pd_early": dynamic_pd_early}, headers=AUTH
         )
         assert resp.status_code == 200
         body = resp.json()
@@ -112,7 +114,7 @@ def test_recommend_trend_matches_real_cuts_at_a_safe_mid_range_risk_level(real_p
 def test_recommend_response_reasoning_cites_the_real_cuts(real_policy):
     dynamic_pd = real_policy["risk_level_cut_low"]
     resp = client.post(
-        "/recommend", json={"static_pd": dynamic_pd, "dynamic_pd": dynamic_pd}, headers=AUTH
+        "/recommend", json={"dynamic_pd": dynamic_pd, "dynamic_pd_early": dynamic_pd}, headers=AUTH
     )
     body = resp.json()
     assert len(body["reasoning"]) == 3

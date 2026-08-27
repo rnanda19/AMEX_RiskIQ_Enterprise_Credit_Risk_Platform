@@ -2,6 +2,30 @@
 
 Dates below are real commit dates from this repository's git history, not estimated.
 
+## 2026-08-27 -- PD_TREND redefinition, real re-run: genuine partial improvement, still not recommended
+
+- User re-ran Notebooks 54-55 with the redesigned `PD_TREND` on the real ~448K-customer dataset.
+  Real result: eligible population 447,695 -> 432,573 (tighter 2-window coverage bar, as expected).
+  `risk_level_monotonicity` still **PASSED**, and improved (483.36x ratio vs. 461.02x before).
+  `trend_coherence` still **FAILED** overall, but the High Risk tier -- the worst offender before (a
+  real -21 point gap) -- now genuinely passes; Low Risk and Medium Risk tiers are still incoherent.
+  `min_tier_population_pct` still **FAILED**, and got worse: the (Low Risk, Trending Worse) cell
+  shrank to 7 real customers (from 432); a new undersized cell appeared, (High Risk, Stable) at 852.
+- Root cause was directionally confirmed real (the tier with the worst original inversion is the one
+  the fix actually corrected), but a second real issue remains unexplained (Low/Medium Risk
+  incoherence) and the redefinition's tighter coverage bar made the population-sparsity problem
+  worse for at least one real, rare customer segment. Decision: stop iterating here rather than
+  chase diminishing returns -- documented honestly, not resolved.
+- Updated Notebook 56 (independent reproduction, bootstrap CI, and the generated FastAPI service's
+  request schema: `static_pd`+`dynamic_pd` -> `dynamic_pd`+`dynamic_pd_early`) and the already-deployed
+  `src/credit_line_scoring_service.py` + `tests/` to match the redefinition, verified with Python
+  syntax checks and the full existing test suite (9/9 passed). Notebook 57 required no changes (it
+  consumes the deployment JSON generically, no hardcoded formula references).
+- **Not yet re-run:** Notebook 56 (now fixed) and Notebook 57 still need a real re-run to produce a
+  final, internally-consistent `docs/credit_line_deployment_policy.json` and worklist reflecting the
+  redefined `PD_TREND` -- the committed deployment JSON and financial-impact reports still reflect the
+  prior (pre-redesign) run.
+
 ## 2026-08-27 -- PD_TREND redefinition (root-caused, NOT yet re-run with real data)
 
 - **Root cause found for the real `trend_coherence` failure below:** the original `PD_TREND =
