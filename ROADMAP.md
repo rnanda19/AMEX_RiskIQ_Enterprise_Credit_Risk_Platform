@@ -232,7 +232,7 @@ work, not as progress toward an unverified number.
 | Phase 2 — Regulatory & Loss Provisioning | Problem 3 (ECL/IFRS9/CECL), Problem 4 (Delinquency/Loss Severity), Problem 5 (Early Payment Default) | **Complete, pushed to GitHub 2026-08-25** (12 notebooks + Global Standard hardening pass) |
 | Phase 3 — Behavioral Intelligence | Problems 6, 7, 8 | **Complete, pushed to GitHub 2026-08-25** (12 notebooks + real notebook-output artifacts + Global Standard hardening pass, all pushed 2026-08-25) — Problem 6 complete (Notebooks 38-41), RECOMMENDED FOR PRODUCTION (W=3 trailing window, 99.2% AUC retention); Problem 7 complete (Notebooks 42-45), concluded NOT RECOMMENDED FOR PRODUCTION (honest result -- real default-rate lift below KPI target; a v2 enhancement attempt, Notebooks 46-47, was built, showed genuine but insufficient improvement, and was deliberately abandoned per user decision, freeing 46-49 for Problem 8); Problem 8 complete -- Notebooks 46 (Business Understanding & Policy), 47 (Modeling), 48 (Validation & Deployment), and 49 (Financial-Impact Reporting & Packaging) all shipped, RECOMMENDED FOR PRODUCTION on this run (both hard-gate KPIs -- monotonicity and coherence -- met; Severe/Low default ratio 107.2x). All 12 Phase 3 notebooks (38-49) verified: syntax-clean, idempotent, pyflakes-clean. Hardening pass: 21 new tests (94 total platform-wide), Docker for all 3 services, MODEL_CARD/CHANGELOG/requirements.txt, BENCHMARKS.md entries, CI wiring -- see "Two more real bugs found" above. |
 | Phase 4 — Operational Risk Management | Problems 9, 10, 11 | **Complete, pushed to GitHub 2026-08-27** (Problem 11 pushed with real RECOMMENDED FOR PRODUCTION results; Problems 9 and 10 are code-complete, 12 notebooks total, but their real run results are not yet synced into this repository -- see each problem's own README for honest current status). |
-| Phase 5 — Customer & Business Intelligence | Problems 12, 13, 14 | **Started 2026-08-27.** Problem 12 (360° Customer Intelligence): Notebook 62 (Business Understanding & Policy) shipped. Problems 13, 14 not started. |
+| Phase 5 — Customer & Business Intelligence | Problems 12, 13, 14 | **Started 2026-08-27.** Problem 12 (360° Customer Intelligence): code-complete, all 4 notebooks shipped (62-65) -- unified profile composes Problems 1/6/9/10's real outputs, both hard-gating KPIs (profile_completeness, composite_non_inferiority) designed with a 200-resample bootstrap CI, real lookup-by-customer_ID FastAPI service, 3x independent reproduction. Not yet run end-to-end by the user, not yet pushed to GitHub. Problems 13, 14 not started. |
 
 ## Phase 3 build plan — scoped 2026-08-25
 
@@ -452,10 +452,43 @@ holdout customers (with and without a real collections propensity score) plus
 auth-rejection, and unknown-customer-404 checks. All 64 notebooks pass
 `check_notebook_syntax.py`; full local test suite (27 tests) green.
 
+Notebooks 62-64 all written, syntax-checked, and committed locally at this
+point (Notebook 65, the 4th and final notebook, followed once the user
+confirmed real execution through Notebook 64).
+
+Notebook 65 (Financial Impact, Reporting & Packaging) shipped 2026-08-27,
+completing Problem 12, following the standard 15-section elevated-reporting
+template established across Notebooks 29/33/37/41/45/49/53/57/61. Financial
+model has a deliberately different shape from every prior alerting/scoring
+problem (5, 6, 7, 9, 10, 11): Problem 12 gates no action of its own, so
+re-claiming Problem 9/10's already-priced loss-prevention benefit here would
+double-count value already reported in Notebooks 53 and 57. Instead this
+notebook prices real, additive OPERATIONAL EFFICIENCY -- collapsing four
+separate case lookups (Problems 1, 6, 9, 10) into one unified profile --
+using the real, measured collections-eligible population (Notebook 63) as
+the case-lookup volume, with per-lookup time-saved and hourly labor cost as
+explicit ASSUMPTIONs, net of a genuinely new recurring ongoing-hosting-cost
+stream (this platform's first purely read-through aggregation service, vs.
+every prior problem's scored classifier). Section 8 performs a THIRD
+independent reproduction of the unified profile (after Notebooks 63 and
+64): reads the real persisted `unified_customer_profile.parquet` directly
+for the exact full-population `UNIFIED_RISK_GRADE` distribution, then
+imports and live-drives the exact `customer_intelligence_lookup_service.py`
+Notebook 64 generated against a real, grade-stratified sample (up to 100
+customers per grade, deterministic via `RANDOM_SEED`) via its real
+`GET /profile/{customer_id}` endpoint -- every live response cross-checked
+against the persisted profile row, halting the notebook on any mismatch.
+That real grade distribution and live-verified sample are what the packaged
+interactive HTML dashboard (multi-tab: Overview, Grade Distribution, Live
+Sample, Financial Calculator, SMART Suggestions, Policy & Validation)
+embeds, making it the real 360 ops dashboard rather than a mockup. All 65
+notebooks pass `check_notebook_syntax.py`; full local test suite (27 tests)
+green.
+
 This completes Phase 5's first problem (Problem 12, 360 Degree Customer
-Intelligence) end to end: Notebooks 62-64 all written, syntax-checked, and
-committed locally (not yet run by the user, not yet pushed to GitHub, per
-this platform's standing practice).
+Intelligence) end to end: all 4 notebooks (62-65) written, syntax-checked,
+and committed locally (not yet run by the user for Notebook 65 specifically,
+not yet pushed to GitHub, per this platform's standing practice).
 
 Next problem-roadmap item: Problem 13 (Risk-Adjusted Profitability Modeling),
 Notebooks 66-69.
