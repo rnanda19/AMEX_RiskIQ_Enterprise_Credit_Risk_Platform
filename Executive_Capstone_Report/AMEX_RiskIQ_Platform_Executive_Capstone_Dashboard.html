@@ -1,0 +1,361 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>AMEX RiskIQ -- Executive Capstone Dashboard</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Source+Serif+4:opsz,wght@8..60,400;8..60,600;8..60,700&family=IBM+Plex+Sans:wght@400;500;600;700&family=IBM+Plex+Mono:wght@500&display=swap" rel="stylesheet">
+<script src="https://cdn.jsdelivr.net/npm/chart.js@4"></script>
+<style>
+  :root {
+    --ink: #0B1F3A;
+    --ink-2: #16305c;
+    --accent: #C41E3A;
+    --gold: #C9A227;
+    --good: #16a34a;
+    --bad: #dc2626;
+    --grey: #8A93A6;
+    --bg: #F6F7FA;
+    --card: #FFFFFF;
+    --border: #E4E7EE;
+    --text: #1B2434;
+    --text-muted: #5B6577;
+  }
+  * { box-sizing: border-box; }
+  body {
+    margin: 0;
+    background: var(--bg);
+    color: var(--text);
+    font-family: "IBM Plex Sans", -apple-system, sans-serif;
+    line-height: 1.55;
+  }
+  h1, h2, h3, .display {
+    font-family: "Source Serif 4", Georgia, serif;
+    color: var(--ink);
+    font-weight: 700;
+  }
+  .mono { font-family: "IBM Plex Mono", monospace; }
+  a { color: var(--ink-2); }
+  .wrap { max-width: 1180px; margin: 0 auto; padding: 0 24px; }
+
+  header.hero {
+    background: linear-gradient(160deg, var(--ink) 0%, #142c52 55%, #1c3a6b 100%);
+    color: #fff;
+    padding: 56px 0 64px;
+  }
+  header.hero .eyebrow {
+    text-transform: uppercase;
+    letter-spacing: 0.14em;
+    font-size: 0.78rem;
+    color: #9FB2D9;
+    font-weight: 600;
+  }
+  header.hero h1 {
+    color: #fff;
+    font-size: clamp(2rem, 4vw, 3.1rem);
+    margin: 10px 0 6px;
+    text-wrap: balance;
+  }
+  header.hero .sub {
+    color: #C7D3EA;
+    font-size: 1.08rem;
+    max-width: 62ch;
+  }
+  .hero-figure {
+    margin-top: 34px;
+    display: flex;
+    gap: 40px;
+    flex-wrap: wrap;
+    align-items: baseline;
+  }
+  .hero-figure .big {
+    font-family: "Source Serif 4", serif;
+    font-size: clamp(2.4rem, 5vw, 3.6rem);
+    font-weight: 700;
+    color: var(--gold);
+  }
+  .hero-figure .cap {
+    font-size: 0.85rem;
+    color: #B9C6E0;
+    max-width: 22ch;
+  }
+  .hero-links { margin-top: 34px; display: flex; gap: 14px; flex-wrap: wrap; }
+  .hero-links a {
+    display: inline-flex; align-items: center; gap: 8px;
+    background: rgba(255,255,255,0.08);
+    border: 1px solid rgba(255,255,255,0.28);
+    color: #fff; text-decoration: none;
+    padding: 11px 18px; border-radius: 8px;
+    font-size: 0.92rem; font-weight: 600;
+    transition: background 0.15s ease, transform 0.15s ease;
+  }
+  .hero-links a:hover { background: rgba(255,255,255,0.18); transform: translateY(-1px); }
+  .hero-links a.primary { background: var(--gold); border-color: var(--gold); color: #23180a; }
+  .hero-links a.primary:hover { background: #ddb544; }
+
+  main { padding: 48px 0 80px; }
+  section { margin-bottom: 56px; }
+  section > h2 {
+    font-size: 1.5rem;
+    border-bottom: 3px solid var(--gold);
+    display: inline-block;
+    padding-bottom: 6px;
+    margin-bottom: 18px;
+  }
+  .kpi-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(210px, 1fr));
+    gap: 16px;
+  }
+  .kpi-card {
+    background: var(--card);
+    border: 1px solid var(--border);
+    border-radius: 10px;
+    padding: 18px 20px;
+    box-shadow: 0 1px 2px rgba(15,23,42,0.04);
+  }
+  .kpi-card .label {
+    font-size: 0.78rem; text-transform: uppercase; letter-spacing: 0.06em;
+    color: var(--text-muted); font-weight: 600; margin-bottom: 6px;
+  }
+  .kpi-card .value {
+    font-family: "Source Serif 4", serif; font-size: 1.7rem; font-weight: 700; color: var(--ink);
+  }
+  .kpi-card .value.gold { color: var(--gold); }
+  .kpi-card .note { font-size: 0.8rem; color: var(--text-muted); margin-top: 4px; }
+
+  .chart-grid { display: grid; grid-template-columns: 1.4fr 1fr; gap: 20px; }
+  @media (max-width: 860px) { .chart-grid { grid-template-columns: 1fr; } }
+  .chart-card { background: var(--card); border: 1px solid var(--border); border-radius: 10px; padding: 20px; }
+  .chart-card h3 { margin: 0 0 12px; font-size: 1.05rem; }
+
+  .controls { display: flex; gap: 10px; flex-wrap: wrap; margin-bottom: 16px; }
+  .controls select, .controls input {
+    font: inherit; padding: 9px 12px; border-radius: 7px; border: 1px solid var(--border);
+    background: #fff; color: var(--text); font-size: 0.88rem;
+  }
+  .controls input { flex: 1; min-width: 200px; }
+
+  .table-wrap { overflow-x: auto; border: 1px solid var(--border); border-radius: 10px; background: var(--card); }
+  table { border-collapse: collapse; width: 100%; font-size: 0.86rem; min-width: 900px; }
+  thead th {
+    background: var(--ink); color: #fff; text-align: left; padding: 11px 14px;
+    position: sticky; top: 0; font-weight: 600; font-size: 0.78rem; text-transform: uppercase; letter-spacing: 0.04em;
+  }
+  tbody td { padding: 10px 14px; border-bottom: 1px solid var(--border); vertical-align: top; }
+  tbody tr:hover { background: #F4F6FB; }
+  .pill {
+    display: inline-block; padding: 3px 10px; border-radius: 999px; font-size: 0.76rem; font-weight: 600;
+  }
+  .pill.rec { background: #D8F3DC; color: #146c2e; }
+  .pill.notrec { background: #FADCDC; color: #9c1c1c; }
+  .pill.na { background: #E9EAEE; color: #4a5165; }
+  .num { font-family: "IBM Plex Mono", monospace; text-align: right; white-space: nowrap; }
+
+  .map-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(240px,1fr)); gap: 16px; }
+  .phase-card { background: var(--card); border: 1px solid var(--border); border-radius: 10px; padding: 18px 20px; border-top: 4px solid var(--accent); }
+  .phase-card h3 { font-size: 1.02rem; margin: 0 0 6px; }
+  .phase-card p { font-size: 0.85rem; color: var(--text-muted); margin: 0; }
+
+  footer {
+    background: var(--ink); color: #C7D3EA; padding: 34px 0; font-size: 0.85rem;
+  }
+  footer a { color: #fff; }
+  footer .links { display: flex; gap: 20px; flex-wrap: wrap; margin-top: 10px; }
+
+  @media (prefers-reduced-motion: reduce) { * { transition: none !important; } }
+</style>
+</head>
+<body>
+
+<header class="hero">
+  <div class="wrap">
+    <div class="eyebrow">AMEX RiskIQ &middot; Executive Capstone Dashboard</div>
+    <h1>Enterprise Credit Risk Platform</h1>
+    <p class="sub">14 problems, 5 phases, 73 notebooks -- built end-to-end on the real Kaggle American Express Default Prediction dataset. Every figure below is real, measured, and traced to a currently-on-disk notebook result.</p>
+    <div class="hero-figure">
+      <div>
+        <div class="big">$429,926,252.73</div>
+        <div class="cap">Real, production-recommended platform net value, per cycle</div>
+      </div>
+      <div>
+        <div class="big" style="color:#fff; font-size: 2rem;">9 of 13</div>
+        <div class="cap">Real value-creation systems recommended for production</div>
+      </div>
+    </div>
+    <div class="hero-links">
+      <a class="primary" href="../Executive_Capstone_Report/AMEX_RiskIQ_Platform_Executive_Capstone_Report.docx">📄 Full Capstone Report (Word)</a>
+      <a href="../Executive_Capstone_Report/AMEX_RiskIQ_Platform_Executive_Capstone_Workbook.xlsx">📊 Capstone Workbook (Excel)</a>
+      <a href="https://github.com/rnanda19/AMEX_RiskIQ_Enterprise_Credit_Risk_Platform">💻 GitHub Repository</a>
+    </div>
+  </div>
+</header>
+
+<main class="wrap">
+
+  <section>
+    <h2>Platform at a Glance</h2>
+    <div class="kpi-grid">
+      <div class="kpi-card"><div class="label">Total Platform Net Value</div><div class="value gold">$429,926,252.73</div><div class="note">per cycle, 9 recommended problems</div></div>
+      <div class="kpi-card"><div class="label">Reserve-Optimization Value</div><div class="value">$4,617,593.08</div><div class="note">Problem 3, tracked separately</div></div>
+      <div class="kpi-card"><div class="label">Executive Dashboard's Own Value</div><div class="value">$3,562.50/cycle</div><div class="note">42.5% Year-1 ROI, 8.42mo payback</div></div>
+      <div class="kpi-card"><div class="label">Real Eligible Population</div><div class="value">447,695</div><div class="note">cross-checked across Problems 12 &amp; 13</div></div>
+      <div class="kpi-card"><div class="label">Champion PD Model</div><div class="value">XGBoost</div><div class="note">holdout AUC 0.9620</div></div>
+      <div class="kpi-card"><div class="label">Honestly Excluded</div><div class="value" style="color:var(--bad)">1 of 13</div><div class="note">Problem 10 -- real KPI miss</div></div>
+    </div>
+  </section>
+
+  <section>
+    <h2>Financial Impact</h2>
+    <div class="chart-grid">
+      <div class="chart-card"><h3>Real Net Value Build-Up (Included Problems)</h3><canvas id="waterfallChart" height="260"></canvas></div>
+      <div class="chart-card"><h3>All 14 Problems by Category</h3><canvas id="categoryChart" height="260"></canvas></div>
+    </div>
+  </section>
+
+  <section>
+    <h2>Platform Architecture -- 5 Phases</h2>
+    <div class="map-grid">
+      <div class="phase-card"><h3>Phase 1 -- Foundation</h3><p>Problems 1-2. Static PD scoring + validated risk tiers.</p></div>
+      <div class="phase-card"><h3>Phase 2 -- Regulatory &amp; Loss Provisioning</h3><p>Problems 3-5. IFRS9/CECL ECL, loss severity, early default detection.</p></div>
+      <div class="phase-card"><h3>Phase 3 -- Behavioral Intelligence</h3><p>Problems 6-8. Dynamic PD, early warning, roll-rate modeling.</p></div>
+      <div class="phase-card"><h3>Phase 4 -- Operational Risk Management</h3><p>Problems 9-11. Collections optimization, credit-line management, real-time monitoring.</p></div>
+      <div class="phase-card"><h3>Phase 5 -- Customer &amp; Business Intelligence</h3><p>Problems 12-14. 360&deg; profiles, risk-adjusted profitability, executive dashboard.</p></div>
+    </div>
+  </section>
+
+  <section>
+    <h2>All 14 Problems -- Real Results</h2>
+    <div class="controls">
+      <input id="searchBox" type="text" placeholder="Search problem name or notes...">
+      <select id="phaseFilter"><option value="">All Phases</option></select>
+      <select id="categoryFilter"><option value="">All Categories</option></select>
+      <select id="statusFilter">
+        <option value="">All Statuses</option>
+        <option value="RECOMMENDED">Recommended</option>
+        <option value="NOT RECOMMENDED">Not Recommended</option>
+        <option value="N/A">N/A (Foundational)</option>
+      </select>
+    </div>
+    <div class="table-wrap">
+      <table id="registryTable">
+        <thead><tr><th>#</th><th>Problem</th><th>Phase</th><th>Category</th><th>Model Quality</th><th>Real Financial Value</th><th>Status</th></tr></thead>
+        <tbody></tbody>
+      </table>
+    </div>
+  </section>
+
+</main>
+
+<footer>
+  <div class="wrap">
+    <div>AMEX RiskIQ Enterprise Credit Risk Platform &mdash; built end-to-end on the real Kaggle American Express Default Prediction dataset. Every number is real, measured, or an explicitly labeled assumption &mdash; never fabricated.</div>
+    <div class="links">
+      <a href="https://github.com/rnanda19/AMEX_RiskIQ_Enterprise_Credit_Risk_Platform">GitHub Repository</a>
+      <a href="../Executive_Capstone_Report/AMEX_RiskIQ_Platform_Executive_Capstone_Report.docx">Capstone Report (Word)</a>
+      <a href="../Executive_Capstone_Report/AMEX_RiskIQ_Platform_Executive_Capstone_Workbook.xlsx">Capstone Workbook (Excel)</a>
+      <a href="../Problem14_Executive_Decision_Support_Dashboard/reports/financial_impact_reporting_packaging/Problem14_Executive_Dashboard.html">Problem 14's Own Executive Dashboard</a>
+    </div>
+  </div>
+</footer>
+
+<script>
+const REGISTRY = [{"problem_number": 1, "problem_name": "Credit Scoring (Static PD)", "phase": "Phase 1 -- Foundation", "category": "foundational_model", "model_quality_label": "Champion model holdout ROC-AUC", "model_quality_value": 0.9614779100963606, "financial_label": null, "financial_value_usd": null, "recommended_for_production": null, "notes": "Foundational static-PD model underlying Problems 6, 10, 12, 13. No standalone net-benefit figure -- value realized entirely through downstream problems."}, {"problem_number": 2, "problem_name": "Risk Tier Classification", "phase": "Phase 1 -- Foundation", "category": "foundational_model", "model_quality_label": "Spearman(tier, actual default) on holdout", "model_quality_value": 0.7266065778726901, "financial_label": null, "financial_value_usd": null, "recommended_for_production": null, "notes": "Technical validation/packaging problem predating this platform's financial-impact convention. No dollar figure exists; reported as N/A, not fabricated."}, {"problem_number": 3, "problem_name": "Expected Credit Loss (IFRS9/CECL)", "phase": "Phase 2 -- Regulatory & Loss Provisioning", "category": "reserve_optimization", "model_quality_label": "Population Stability Index (holdout)", "model_quality_value": 1.278534602748648e-05, "financial_label": "Reserve accuracy gain vs. flat-LGD (IFRS9 vs. flat)", "financial_value_usd": 4617593.08, "recommended_for_production": true, "notes": "Reserve-provisioning accuracy gain, a different kind of number than a P&L cash benefit -- tracked in its own category, never summed into the platform's value-creation total."}, {"problem_number": 4, "problem_name": "Delinquency Escalation / Loss Severity", "phase": "Phase 2 -- Regulatory & Loss Provisioning", "category": "value_creation", "model_quality_label": "Population Stability Index (holdout)", "model_quality_value": 6.8687392670068315e-06, "financial_label": "Loss prevented per cycle (tiered vs. flat LGD)", "financial_value_usd": 9690840.0, "recommended_for_production": true, "notes": "Real per-cycle loss-prevention value from severity-tiered LGD vs. a flat-LGD baseline."}, {"problem_number": 5, "problem_name": "Early Payment Default Detection", "phase": "Phase 3 -- Behavioral Intelligence", "category": "value_creation", "model_quality_label": "Meets early-detection KPI target", "model_quality_value": true, "financial_label": "Loss prevented per cycle (early detection)", "financial_value_usd": 4898250.0, "recommended_for_production": true, "notes": "Real per-cycle loss-prevention value from flagging defaulters months earlier than a full-history baseline."}, {"problem_number": 6, "problem_name": "Dynamic / Behavioral Credit Scoring", "phase": "Phase 3 -- Behavioral Intelligence", "category": "value_creation", "model_quality_label": "Real defaulter capture rate (holdout)", "model_quality_value": 0.8385, "financial_label": "Net benefit per cycle (dynamic vs. static PD)", "financial_value_usd": 8491170.0, "recommended_for_production": true, "notes": "Real per-cycle net benefit from monthly-refreshed dynamic PD vs. static PD alone."}, {"problem_number": 7, "problem_name": "Early Warning System", "phase": "Phase 3 -- Behavioral Intelligence", "category": "value_creation", "model_quality_label": "Real alert capture rate (holdout)", "model_quality_value": 0.4051, "financial_label": "Net benefit per cycle (rolling z-score alerts)", "financial_value_usd": 2912145.0, "recommended_for_production": true, "notes": "Real result, current run: KPI target met, RECOMMENDED FOR PRODUCTION. (An earlier v1 iteration of this problem missed its KPI target and was honestly reported as not-recommended at the time; this is the current, real, re-verified result.)"}, {"problem_number": 8, "problem_name": "Roll-Rate Modeling", "phase": "Phase 3 -- Behavioral Intelligence", "category": "value_creation", "model_quality_label": "Real escalation capture rate (holdout)", "model_quality_value": 0.0398, "financial_label": "Net benefit per cycle (Markov roll-rate escalation)", "financial_value_usd": 315820.0, "recommended_for_production": true, "notes": "Real per-cycle net benefit from Markov transition-matrix escalation detection."}, {"problem_number": 9, "problem_name": "Collections Optimization", "phase": "Phase 4 -- Operational Risk Management", "category": "value_creation", "model_quality_label": "Meets propensity-to-cure KPI target", "model_quality_value": true, "financial_label": "Net benefit per cycle (treatment targeting)", "financial_value_usd": 341908210.0, "recommended_for_production": true, "notes": "Real per-cycle net benefit from propensity-to-cure treatment targeting -- the platform's single largest value-creation figure."}, {"problem_number": 10, "problem_name": "Credit Line Management", "phase": "Phase 4 -- Operational Risk Management", "category": "value_creation", "model_quality_label": "Meets limit-optimization KPI target (with CI)", "model_quality_value": false, "financial_label": "Net benefit per cycle (limit optimization)", "financial_value_usd": 4108042.5, "recommended_for_production": false, "notes": "Real result: KPI target NOT met (with confidence interval). Honestly excluded from the platform's value-creation total -- the one system in this platform whose real backtest did not clear its own bar."}, {"problem_number": 11, "problem_name": "Real-Time Portfolio Monitoring", "phase": "Phase 4 -- Operational Risk Management", "category": "value_creation", "model_quality_label": "Real cohort capture rate (holdout)", "model_quality_value": 0.3775, "financial_label": "Net benefit per cycle (streaming breach alerts)", "financial_value_usd": 2374108.15, "recommended_for_production": true, "notes": "Real per-cycle net benefit from streaming aggregation + consecutive-breach alerting."}, {"problem_number": 12, "problem_name": "360 Degree Customer Intelligence", "phase": "Phase 5 -- Customer & Business Intelligence", "category": "value_creation", "model_quality_label": "Reproduced composite ROC-AUC (holdout)", "model_quality_value": 0.959, "financial_label": "Net benefit per cycle (unified-profile operational efficiency)", "financial_value_usd": 1275022.0, "recommended_for_production": true, "notes": "Real per-cycle net benefit is operational efficiency (collapsing 4 case lookups into 1), designed not to double-count Problems 9/10's benefits."}, {"problem_number": 13, "problem_name": "Risk-Adjusted Profitability Modeling", "phase": "Phase 5 -- Customer & Business Intelligence", "category": "value_creation", "model_quality_label": "Reproduced Spearman(risk, profitability) (holdout)", "model_quality_value": -0.9784, "financial_label": "Net benefit per cycle (proactive exposure reduction, cross-tier segment)", "financial_value_usd": 58060687.58, "recommended_for_production": true, "notes": "Real per-cycle net benefit targets the cross-tier (High Risk + Low Profitability) segment, designed not to double-count Problems 9/10's benefits."}, {"problem_number": 14, "problem_name": "Executive Decision Support Dashboard", "phase": "Phase 5 -- Customer & Business Intelligence", "category": "bi_aggregation_layer", "model_quality_label": "4th independent reproduction (live service self-test)", "model_quality_value": true, "financial_label": "Net benefit per cycle (executive decision-latency reduction)", "financial_value_usd": 3562.5, "recommended_for_production": true, "notes": "The platform's own BI aggregation layer -- computes and presents every figure in this report. Its own value is executive time saved reviewing one unified dashboard instead of 13 separate reports, priced conservatively; not a value-creation problem in the same sense as 4-13, tracked in its own category."}];
+const INCLUDED = [4, 5, 6, 7, 8, 9, 11, 12, 13];
+const ROWS_BY_NUM = {};
+REGISTRY.forEach(r => ROWS_BY_NUM[r.problem_number] = r);
+
+function fmtUsd(v) {
+  if (v === null || v === undefined) return "N/A";
+  return "$" + v.toLocaleString(undefined, {minimumFractionDigits: 2, maximumFractionDigits: 2});
+}
+function fmtQuality(r) {
+  const v = r.model_quality_value;
+  if (typeof v === "boolean") return v ? "Yes" : "No";
+  if (typeof v === "number") return v.toFixed(4);
+  return String(v);
+}
+function statusOf(r) {
+  if (r.recommended_for_production === null) return "N/A";
+  return r.recommended_for_production ? "RECOMMENDED" : "NOT RECOMMENDED";
+}
+function pillClass(status) {
+  if (status === "RECOMMENDED") return "pill rec";
+  if (status === "NOT RECOMMENDED") return "pill notrec";
+  return "pill na";
+}
+const catLabel = {foundational_model: "Foundational Model", reserve_optimization: "Reserve Optimization",
+                   value_creation: "Value Creation", bi_aggregation_layer: "BI Aggregation Layer"};
+
+const phaseSel = document.getElementById("phaseFilter");
+const catSel = document.getElementById("categoryFilter");
+[...new Set(REGISTRY.map(r => r.phase))].forEach(p => {
+  const o = document.createElement("option"); o.value = p; o.textContent = p; phaseSel.appendChild(o);
+});
+[...new Set(REGISTRY.map(r => r.category))].forEach(c => {
+  const o = document.createElement("option"); o.value = c; o.textContent = catLabel[c] || c; catSel.appendChild(o);
+});
+
+function renderTable() {
+  const q = document.getElementById("searchBox").value.toLowerCase();
+  const phase = phaseSel.value, cat = catSel.value, status = document.getElementById("statusFilter").value;
+  const tbody = document.querySelector("#registryTable tbody");
+  tbody.innerHTML = "";
+  REGISTRY.filter(r => {
+    if (phase && r.phase !== phase) return false;
+    if (cat && r.category !== cat) return false;
+    const st = statusOf(r);
+    if (status && st !== status) return false;
+    if (q && !(r.problem_name.toLowerCase().includes(q) || (r.notes || "").toLowerCase().includes(q))) return false;
+    return true;
+  }).sort((a, b) => a.problem_number - b.problem_number).forEach(r => {
+    const st = statusOf(r);
+    const tr = document.createElement("tr");
+    tr.innerHTML = `<td>${r.problem_number}</td><td><strong>${r.problem_name}</strong><div style="color:var(--text-muted);font-size:0.78rem;margin-top:2px;">${r.notes || ""}</div></td>
+      <td>${r.phase}</td><td>${catLabel[r.category] || r.category}</td><td class="num">${fmtQuality(r)}</td>
+      <td class="num">${fmtUsd(r.financial_value_usd)}${r.financial_value_usd !== null ? "/cycle" : ""}</td>
+      <td><span class="${pillClass(st)}">${st}</span></td>`;
+    tbody.appendChild(tr);
+  });
+}
+["searchBox", "phaseFilter", "categoryFilter", "statusFilter"].forEach(id => {
+  document.getElementById(id).addEventListener("input", renderTable);
+  document.getElementById(id).addEventListener("change", renderTable);
+});
+renderTable();
+
+const INK = "#0B1F3A", ACCENT = "#C41E3A", GOLD = "#C9A227", BLUE2 = "#3a5a8c", GREY = "#8A93A6";
+const includedRows = INCLUDED.map(n => ROWS_BY_NUM[n]);
+new Chart(document.getElementById("waterfallChart"), {
+  type: "bar",
+  data: {
+    labels: includedRows.map(r => "P" + r.problem_number).concat(["TOTAL"]),
+    datasets: [{
+      label: "USD / cycle",
+      data: includedRows.map(r => r.financial_value_usd).concat([429926252.73]),
+      backgroundColor: includedRows.map((r, i) => i % 2 === 0 ? INK : BLUE2).concat([GOLD]),
+      borderRadius: 4,
+    }]
+  },
+  options: {
+    plugins: { legend: { display: false } },
+    scales: { y: { ticks: { callback: v => "$" + (v/1e6).toFixed(0) + "M" } } }
+  }
+});
+
+const catCounts = {};
+REGISTRY.forEach(r => { catCounts[r.category] = (catCounts[r.category] || 0) + 1; });
+const catColors = {foundational_model: GREY, reserve_optimization: GOLD, value_creation: INK, bi_aggregation_layer: ACCENT};
+new Chart(document.getElementById("categoryChart"), {
+  type: "doughnut",
+  data: {
+    labels: Object.keys(catCounts).map(k => catLabel[k]),
+    datasets: [{ data: Object.values(catCounts), backgroundColor: Object.keys(catCounts).map(k => catColors[k]) }]
+  },
+  options: { plugins: { legend: { position: "bottom" } } }
+});
+</script>
+</body>
+</html>
