@@ -396,7 +396,22 @@ ASSUMPTION tolerance) -- the specific, testable claim this problem's design
 depends on: that aggregating four real signals does not destroy the signal
 any one of them already carried.
 
-Next problem-roadmap item: Notebook 63 (Problem 12, Modeling -- scores every
-eligible real customer with all four real upstream signals, computes the
-real UNIFIED_RISK_SCORE, fits the real tertile cut values, and validates
-both hard-gating KPIs against the real observed default outcome).
+Notebook 63 (Modeling) shipped 2026-08-27, generated ahead of the user's own
+run of Notebook 62 -- every value it needs from Notebook 62 is read from
+that notebook's own recorded summary JSON at runtime (never a hardcoded
+literal), so the two can be generated and run independently, consistent
+with this platform's canonical-source-of-truth convention. Reuses Problem
+10's real worklist directly (already carries STATIC_PD/DYNAMIC_PD/PD_TREND/
+RISK_LEVEL/TREND/ACTION -- no need to re-score Problems 1/6's models).
+Problem 9's real per-STATEMENT propensity-to-cure model is scored once per
+collections-eligible customer's own real LATEST statement (the same
+"current status" framing already used for DYNAMIC_PD/RISK_LEVEL), via one
+real streaming pass over the raw CSV. Both hard-gating KPIs validated on
+the real HOLDOUT split; the real treatment-tier median split is refit on
+this run's own eligible population, matching Notebook 50's rule-based (not
+fixed-value) policy definition exactly.
+
+Next problem-roadmap item: Notebook 64 (Problem 12, Validation & Deployment
+-- independently reproduces Notebook 63's real pipeline from scratch,
+bootstraps a confidence interval on the composite_non_inferiority gap, and
+packages the real FastAPI unified-profile lookup service).
