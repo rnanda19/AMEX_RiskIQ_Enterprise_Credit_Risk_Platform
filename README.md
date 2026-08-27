@@ -12,6 +12,40 @@ A complete, production-grade 14-problem, 5-phase credit risk platform built end-
 
 Every number in this repository is either computed live by that notebook's own code on the real dataset, or is an explicitly labeled, editable `ASSUMPTION` where the dataset genuinely has no ground truth for it — never silently presented as fact.
 
+## Table of Contents
+
+All 14 problems, grouped by phase and listed in strict numeric order (each links to that problem's own README):
+
+**Phase 1 — Foundation**
+1. [Problem 1 — Credit Scoring / PD Prediction](Problem1_Credit_Scoring_PD_Prediction/README.md)
+2. [Problem 2 — Risk Tier Classification](Problem2_Risk_Tier_Classification/README.md)
+
+**Phase 2 — Regulatory & Loss Provisioning**
+
+3. [Problem 3 — Expected Credit Loss (IFRS9 / CECL)](Problem3_Expected_Credit_Loss_IFRS9_CECL/README.md)
+4. [Problem 4 — Delinquency Escalation & Loss Severity](Problem4_Delinquency_Escalation_Loss_Severity/README.md)
+5. [Problem 5 — Early Payment Default Detection](Problem5_Early_Payment_Default_Detection/README.md)
+
+**Phase 3 — Behavioral Intelligence**
+
+6. [Problem 6 — Dynamic / Behavioral Credit Scoring](Problem6_Dynamic_Behavioral_Credit_Scoring/README.md)
+7. [Problem 7 — Early Warning System](Problem7_Early_Warning_System/README.md)
+8. [Problem 8 — Roll-Rate Modeling](Problem8_Roll_Rate_Modeling/README.md)
+
+**Phase 4 — Operational Risk Management**
+
+9. [Problem 9 — Collections Optimization](Problem9_Collections_Optimization/README.md)
+10. [Problem 10 — Credit Line Management](Problem10_Credit_Line_Management/README.md)
+11. [Problem 11 — Real-Time Portfolio Monitoring](Problem11_Real_Time_Portfolio_Monitoring/README.md)
+
+**Phase 5 — Customer & Business Intelligence**
+
+12. [Problem 12 — 360° Customer Intelligence](Problem12_360_Customer_Intelligence/README.md)
+13. [Problem 13 — Risk-Adjusted Profitability Modeling](Problem13_Risk_Adjusted_Profitability_Modeling/README.md)
+14. [Problem 14 — Executive Decision Support Dashboard](Problem14_Executive_Decision_Support_Dashboard/README.md)
+
+**Platform-wide:** [Executive Capstone Report](Executive_Capstone_Report/) · [Roadmap / Build History](ROADMAP.md) · [Benchmarks](BENCHMARKS.md) · [Live Dashboards (below)](#live-dashboards) · [Repository Structure (below)](#repository-structure)
+
 ## Platform at a Glance (Real, Measured)
 
 | Metric | Value |
@@ -58,12 +92,18 @@ Listed in sequential problem order (1 → 14). Served via GitHub Pages — click
 
 ## Repository Structure
 
+Every `ProblemN_*` folder sits at the repo root (flat, so every GitHub Pages / dashboard link below stays permanent) but is grouped and numbered here exactly by its real Phase, 1 → 14 top to bottom:
+
 ```
 AMEX_RiskIQ_Enterprise_Credit_Risk_Platform/
+│
+├── ── Phase 1 -- Foundation ──────────────────────────────────────────────
 ├── Problem1_Credit_Scoring_PD_Prediction/       18 notebooks -- data engineering through
 │                                                 production architecture & comprehensive reporting
 ├── Problem2_Risk_Tier_Classification/           7 notebooks -- maps Problem 1's real PD score to
 │                                                 discrete, validated, deployed & monitored risk tiers
+│
+├── ── Phase 2 -- Regulatory & Loss Provisioning ─────────────────────────
 ├── Problem3_Expected_Credit_Loss_IFRS9_CECL/    4 notebooks -- dual-standard (IFRS9/CECL) ECL,
 │                                                 built on Problem 1's PD + Problem 4's severity tier
 ├── Problem4_Delinquency_Escalation_Loss_Severity/  4 notebooks -- real, validated, 3-tier
@@ -71,20 +111,36 @@ AMEX_RiskIQ_Enterprise_Credit_Risk_Platform/
 ├── Problem5_Early_Payment_Default_Detection/    4 notebooks -- scores default risk from a
 │                                                 customer's earliest statements, months before
 │                                                 full-history scoring is possible
+│
+├── ── Phase 3 -- Behavioral Intelligence ────────────────────────────────
 ├── Problem6_Dynamic_Behavioral_Credit_Scoring/  4 notebooks -- trailing-window "recency" score,
 │                                                 refreshed monthly, complementary to Problem 1
 ├── Problem7_Early_Warning_System/               4 notebooks -- rolling z-score deviation-count
 │                                                 detector, no model retraining required
 ├── Problem8_Roll_Rate_Modeling/                 4 notebooks -- real Markov transition-probability
 │                                                 matrix, cross-validated against Problem 6's PD
-├── Problem9_Collections_Optimization/           4 notebooks -- collections-strategy optimization
-│                                                 (packaging/reporting stage pending)
-├── Problem10_Credit_Line_Management/            4 notebooks -- credit-line management
-│                                                 (packaging/reporting stage pending)
+│
+├── ── Phase 4 -- Operational Risk Management ────────────────────────────
+├── Problem9_Collections_Optimization/           4 notebooks -- collections-strategy optimization,
+│                                                 platform's single largest value-creation figure
+├── Problem10_Credit_Line_Management/            4 notebooks -- credit-line management (honestly
+│                                                 excluded from the value total on its own real KPI miss)
 ├── Problem11_Real_Time_Portfolio_Monitoring/    4 notebooks -- whole-portfolio trailing-baseline
 │                                                 control chart + customer joint-deviation cohort score
+│
+├── ── Phase 5 -- Customer & Business Intelligence ───────────────────────
+├── Problem12_360_Customer_Intelligence/         4 notebooks -- composite scoring across every
+│                                                 prior problem's real signal for one unified view
+├── Problem13_Risk_Adjusted_Profitability_Modeling/  4 notebooks -- real risk-adjusted profitability
+│                                                 vs. raw revenue, Spearman(risk, profitability) = -0.98
+├── Problem14_Executive_Decision_Support_Dashboard/  4 notebooks -- platform-wide BI aggregation
+│                                                 layer across all 13 prior problems
+│
+├── Executive_Capstone_Report/                   Platform-wide capstone: Word report, live HTML
+│                                                 dashboard, Excel workbook -- rolls up all 14 problems
 ├── shared/                                      Cross-problem library (metrics, config, monitoring),
 │                                                 extracted & unit-tested -- see shared/tests/
+├── docs/                                        Platform-wide reference docs (known lint findings, etc.)
 ├── scripts/                                     CI helper scripts (notebook syntax checker)
 ├── .github/workflows/                           ci.yml (tests, notebook syntax) +
 │                                                 code-quality.yml (lint, format check, security scan)

@@ -35,7 +35,9 @@ Notebook 58 (Business Understanding & Policy) -> Notebook 59 (Modeling -- builds
 
 ## 5. Live Dashboard
 
-- [Real-Time Portfolio Monitoring Ops Dashboard](reports/financial_impact_reporting_packaging/real_time_portfolio_monitoring_ops_dashboard.html) -- interactive alert-feed + KPI dashboard (also linked from the platform root README's sequential dashboard index).
+- [Real-Time Portfolio Monitoring Ops Dashboard](https://rnanda19.github.io/AMEX_RiskIQ_Enterprise_Credit_Risk_Platform/Problem11_Real_Time_Portfolio_Monitoring/reports/financial_impact_reporting_packaging/real_time_portfolio_monitoring_ops_dashboard.html) -- interactive alert-feed + KPI dashboard (also linked from the platform root README's sequential dashboard index).
+
+(Served via GitHub Pages — click the link above to view it rendered in your browser. Opening the `.html` file directly in GitHub's own file browser shows raw source code instead.)
 
 ## 6. How to Run
 

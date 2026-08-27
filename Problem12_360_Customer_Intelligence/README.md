@@ -8,6 +8,10 @@ Phase 5, Problem 12 of the platform: a 4-notebook build (Notebooks 62-65) that c
 
 **Real, synced results (2026-08-27):** all hard gates passed; recommended for production. Real eligible population: 447,695 customers (149,012 Low Risk / 149,286 Medium Risk / 149,397 High Risk); real collections-eligible population: 303,660. Real composite ROC-AUC: 0.9590 vs. real best single-signal AUC 0.9626 (gap -0.0032 to -0.0040 at 95% CI, inside the -0.005 ASSUMPTION tolerance -- `composite_non_inferiority` passes, honestly reported even though the composite is very slightly below the best single signal). Real net benefit: **$1,275,022 per cycle** (Year-1 ROI 33,900.6%, payback 0.04 months) from collapsing four case lookups into one.
 
+📊 [Ops Dashboard](https://rnanda19.github.io/AMEX_RiskIQ_Enterprise_Credit_Risk_Platform/Problem12_360_Customer_Intelligence/reports/financial_impact_reporting_packaging/Problem12_360_Ops_Dashboard.html)
+
+(Served via GitHub Pages — click the link above to view it rendered in your browser. Opening the `.html` file directly in GitHub's own file browser shows raw source code instead.)
+
 Notebook 62 (Business Understanding & Policy) is shipped: it loads Problem 1's real champion model, Problem 6's real dynamic-PD deployment, Problem 9's real propensity-to-cure deployment, and Problem 10's real scored worklist, then defines `UNIFIED_RISK_SCORE = 0.35*STATIC_PD + 0.65*DYNAMIC_PD` (+ a real 0.10 collections adjustment where a real propensity-to-cure score exists), tertile-graded into Low/Medium/High Risk. Two new hard-gating KPIs: `profile_completeness` and `composite_non_inferiority` (the composite's real ROC-AUC must not fall below its best single real input signal's AUC).
 
 Notebook 63 (Modeling) is shipped: builds the real per-customer unified profile by joining Problem 10's already-scored worklist with a freshly-scored real per-customer propensity-to-cure signal (Problem 9's model, run once per collections-eligible customer's own real latest statement), computes `UNIFIED_RISK_SCORE`/`UNIFIED_RISK_GRADE`, and validates both hard-gating KPIs on the real holdout split.
