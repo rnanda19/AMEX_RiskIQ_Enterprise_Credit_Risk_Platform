@@ -8,6 +8,8 @@
 
 **[📄 Full Capstone Report (Word)](Executive_Capstone_Report/AMEX_RiskIQ_Platform_Executive_Capstone_Report.docx)** &nbsp;·&nbsp; **[📈 Interactive Capstone Dashboard (HTML, live)](https://rnanda19.github.io/AMEX_RiskIQ_Enterprise_Credit_Risk_Platform/Executive_Capstone_Report/AMEX_RiskIQ_Platform_Executive_Capstone_Dashboard.html)** &nbsp;·&nbsp; **[📊 Capstone Workbook (Excel)](Executive_Capstone_Report/AMEX_RiskIQ_Platform_Executive_Capstone_Workbook.xlsx)**
 
+*(The Interactive Dashboard renders live via GitHub Pages. The Word Report and Excel Workbook open as downloads — normal browser behavior for Office files, not a broken link — view them in Word/Excel or Google Docs/Sheets. Every other problem's own README follows this same pattern for its Word/Excel deliverables.)*
+
 A complete, production-grade 14-problem, 5-phase credit risk platform built end-to-end on the real Kaggle **American Express Default Prediction** dataset — 73 notebooks, real measured results for every problem, zero fabrication. See the capstone report above for the full narrative, or `ROADMAP.md` for the phase-by-phase build history.
 
 Every number in this repository is either computed live by that notebook's own code on the real dataset, or is an explicitly labeled, editable `ASSUMPTION` where the dataset genuinely has no ground truth for it — never silently presented as fact.

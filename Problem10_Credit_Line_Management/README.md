@@ -10,7 +10,7 @@ Phase 4, Problem 10 of the platform: a 4-notebook build (Notebooks 54-57) coveri
 
 📊 [Financial Impact Dashboard](https://rnanda19.github.io/AMEX_RiskIQ_Enterprise_Credit_Risk_Platform/Problem10_Credit_Line_Management/reports/financial_impact_reporting_packaging/credit_line_management_financial_impact_dashboard.html) · 📄 [Financial Impact Report (Word)](reports/financial_impact_reporting_packaging/Credit_Line_Management_Financial_Impact_Report.docx) · 📊 [Financial Impact Workbook (Excel)](reports/financial_impact_reporting_packaging/AMEX_Problem10_Financial_Impact_Workbook.xlsx)
 
-(Served via GitHub Pages — click the link above to view it rendered in your browser. Opening the `.html` file directly in GitHub's own file browser shows raw source code instead.)
+(Served via GitHub Pages — click the link above to view it rendered in your browser. Opening the `.html` file directly in GitHub's own file browser shows raw source code instead. The Word and Excel links open as downloads — that's normal browser behavior for Office files, not a broken link — view them in Word/Excel or Google Docs/Sheets.)
 
 This problem also received the platform's Global Standard hardening delta (2026-08-27): a real, auth-protected FastAPI recommendation service (`src/credit_line_scoring_service.py`), Docker packaging, real unit tests, and `MODEL_CARD.md`/`CHANGELOG.md`/`requirements.txt` -- deployed here for completeness and honest transparency, matching this platform's standard of shipping every real result, including the ones that didn't clear their KPI bar. See `CHANGELOG.md` for the full detail.
 

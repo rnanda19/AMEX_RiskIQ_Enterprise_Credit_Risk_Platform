@@ -10,7 +10,7 @@ Phase 4, Problem 9 of the platform: a 4-notebook build (Notebooks 50-53) coverin
 
 📊 [Financial Impact Dashboard](https://rnanda19.github.io/AMEX_RiskIQ_Enterprise_Credit_Risk_Platform/Problem9_Collections_Optimization/reports/financial_impact_reporting_packaging/collections_optimization_financial_impact_dashboard.html) · 📄 [Financial Impact Report (Word)](reports/financial_impact_reporting_packaging/Collections_Optimization_Financial_Impact_Report.docx) · 📊 [Financial Impact Workbook (Excel)](reports/financial_impact_reporting_packaging/AMEX_Problem9_Financial_Impact_Workbook.xlsx)
 
-(Served via GitHub Pages — click the link above to view it rendered in your browser. Opening the `.html` file directly in GitHub's own file browser shows raw source code instead.)
+(Served via GitHub Pages — click the link above to view it rendered in your browser. Opening the `.html` file directly in GitHub's own file browser shows raw source code instead. The Word and Excel links open as downloads — that's normal browser behavior for Office files, not a broken link — view them in Word/Excel or Google Docs/Sheets.)
 
 This problem also received the platform's Global Standard hardening delta (2026-08-27): a real, auth-protected FastAPI scoring service (`src/collections_scoring_service.py`), Docker packaging, real unit tests, and `MODEL_CARD.md`/`CHANGELOG.md`/`requirements.txt` -- see `CHANGELOG.md` for the full detail, including a real hardcoded-path bug found and fixed.
 
