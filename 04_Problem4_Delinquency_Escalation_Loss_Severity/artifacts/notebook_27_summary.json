@@ -1,0 +1,27 @@
+{
+  "notebook": "27_lgd_modeling",
+  "generated_at_utc": "2026-08-24T11:18:27.661677+00:00",
+  "problem_number": 4,
+  "problem_name": "Delinquency Escalation / Loss Severity",
+  "phase": "Phase 2 -- Regulatory & Loss Provisioning",
+  "n_holdout_customers": 91783,
+  "n_features_used": 243,
+  "tier_order": [
+    "Low Severity",
+    "Moderate Severity",
+    "Severe"
+  ],
+  "lgd_by_tier": {
+    "Low Severity": 0.3015,
+    "Moderate Severity": 0.45,
+    "Severe": 0.648
+  },
+  "monotonic_validated": true,
+  "severe_to_low_default_rate_ratio": 48.65931445603577,
+  "output_files": {
+    "severity_feature_weights.csv": "C:\\Users\\rnand\\Downloads\\amex-default-prediction\\AMEX_Enterprise_Credit_Risk_Platform\\Phase2_Regulatory_Loss_Provisioning\\04_Problem4_Delinquency_Escalation_Loss_Severity\\02_LGD_Modeling\\severity_feature_weights.csv",
+    "severity_scores_holdout.csv": "C:\\Users\\rnand\\Downloads\\amex-default-prediction\\AMEX_Enterprise_Credit_Risk_Platform\\Phase2_Regulatory_Loss_Provisioning\\04_Problem4_Delinquency_Escalation_Loss_Severity\\02_LGD_Modeling\\severity_scores_holdout.csv",
+    "tier_validation_summary.json": "C:\\Users\\rnand\\Downloads\\amex-default-prediction\\AMEX_Enterprise_Credit_Risk_Platform\\Phase2_Regulatory_Loss_Provisioning\\04_Problem4_Delinquency_Escalation_Loss_Severity\\02_LGD_Modeling\\tier_validation_summary.json",
+    "severity_tier_default_rate_chart.png": "C:\\Users\\rnand\\Downloads\\amex-default-prediction\\AMEX_Enterprise_Credit_Risk_Platform\\Phase2_Regulatory_Loss_Provisioning\\04_Problem4_Delinquency_Escalation_Loss_Severity\\02_LGD_Modeling\\severity_tier_default_rate_chart.png"
+  }
+}

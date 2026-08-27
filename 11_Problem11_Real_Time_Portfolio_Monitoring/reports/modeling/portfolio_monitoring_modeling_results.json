@@ -1,0 +1,260 @@
+{
+  "generated_at_utc": "2026-08-27T04:31:43.388312+00:00",
+  "problem": "Problem 11 -- Real-Time Portfolio Monitoring (Streaming Aggregation + Threshold Alerting)",
+  "control_limit_k_sigma": 2.5,
+  "min_trailing_months_for_baseline": 6,
+  "monitored_base_columns": [
+    "P_2",
+    "B_1",
+    "B_11",
+    "D_39",
+    "B_4",
+    "S_3",
+    "R_1",
+    "B_5"
+  ],
+  "n_calendar_months_covered": 32,
+  "n_labeled_calendar_months": 13,
+  "n_baseline_eligible_months": 26,
+  "n_holdout_eval_customers": 91783,
+  "base_default_rate_holdout": 0.2589368401555844,
+  "monthly_breach_count_distribution": {
+    "min": 0,
+    "median": 0.0,
+    "mean": 0.8846153846153846,
+    "max": 4
+  },
+  "secondary_threshold_free_metrics": {
+    "roc_auc": 0.6629561138656829,
+    "pr_auc": 0.4594386055908303,
+    "log_loss": 3.085417147640082,
+    "auc_retention_pct_of_full_history": 68.95177797680661,
+    "full_history_reference_auc": 0.9614779100963606
+  },
+  "candidate_results": {
+    "1": {
+      "candidate_consecutive_breach_months": 1,
+      "n_alerted": 12971,
+      "pct_alerted": 14.13224671235414,
+      "default_rate_alerted": 0.691696862231131,
+      "base_default_rate_holdout": 0.2589368401555844,
+      "default_rate_lift": 2.6712956789598543,
+      "meets_kpi_target": true,
+      "accuracy": 0.7952453068651057,
+      "precision": 0.691696862231131,
+      "recall": 0.3775140957670622,
+      "f1": 0.48844489207066444,
+      "specificity": 0.9412058750018377,
+      "mcc": 0.4007865657558358,
+      "confusion_matrix": {
+        "tn": 64018,
+        "fp": 3999,
+        "fn": 14794,
+        "tp": 8972
+      }
+    },
+    "2": {
+      "candidate_consecutive_breach_months": 2,
+      "n_alerted": 8962,
+      "pct_alerted": 9.76433544338276,
+      "default_rate_alerted": 0.75027895559027,
+      "base_default_rate_holdout": 0.2589368401555844,
+      "default_rate_lift": 2.8975365387924663,
+      "meets_kpi_target": true,
+      "accuracy": 0.7899393133804735,
+      "precision": 0.75027895559027,
+      "recall": 0.2829251872422789,
+      "f1": 0.410901979956001,
+      "specificity": 0.967096461178823,
+      "mcc": 0.3689705403132225,
+      "confusion_matrix": {
+        "tn": 65779,
+        "fp": 2238,
+        "fn": 17042,
+        "tp": 6724
+      }
+    },
+    "3": {
+      "candidate_consecutive_breach_months": 3,
+      "n_alerted": 3087,
+      "pct_alerted": 3.363367943954763,
+      "default_rate_alerted": 0.9397473275024295,
+      "base_default_rate_holdout": 0.2589368401555844,
+      "default_rate_lift": 3.629253090976836,
+      "meets_kpi_target": true,
+      "accuracy": 0.7706438011396446,
+      "precision": 0.9397473275024295,
+      "recall": 0.1220651350669023,
+      "f1": 0.21606524410680372,
+      "specificity": 0.9972653895349692,
+      "mcc": 0.2899465867814195,
+      "confusion_matrix": {
+        "tn": 67831,
+        "fp": 186,
+        "fn": 20865,
+        "tp": 2901
+      }
+    },
+    "4": {
+      "candidate_consecutive_breach_months": 4,
+      "n_alerted": 0,
+      "pct_alerted": 0.0,
+      "default_rate_alerted": null,
+      "base_default_rate_holdout": 0.2589368401555844,
+      "default_rate_lift": null,
+      "meets_kpi_target": false,
+      "accuracy": 0.7410631598444156,
+      "precision": 0.0,
+      "recall": 0.0,
+      "f1": 0.0,
+      "specificity": 1.0,
+      "mcc": 0.0,
+      "confusion_matrix": {
+        "tn": 68017,
+        "fp": 0,
+        "fn": 23766,
+        "tp": 0
+      }
+    },
+    "5": {
+      "candidate_consecutive_breach_months": 5,
+      "n_alerted": 0,
+      "pct_alerted": 0.0,
+      "default_rate_alerted": null,
+      "base_default_rate_holdout": 0.2589368401555844,
+      "default_rate_lift": null,
+      "meets_kpi_target": false,
+      "accuracy": 0.7410631598444156,
+      "precision": 0.0,
+      "recall": 0.0,
+      "f1": 0.0,
+      "specificity": 1.0,
+      "mcc": 0.0,
+      "confusion_matrix": {
+        "tn": 68017,
+        "fp": 0,
+        "fn": 23766,
+        "tp": 0
+      }
+    },
+    "6": {
+      "candidate_consecutive_breach_months": 6,
+      "n_alerted": 0,
+      "pct_alerted": 0.0,
+      "default_rate_alerted": null,
+      "base_default_rate_holdout": 0.2589368401555844,
+      "default_rate_lift": null,
+      "meets_kpi_target": false,
+      "accuracy": 0.7410631598444156,
+      "precision": 0.0,
+      "recall": 0.0,
+      "f1": 0.0,
+      "specificity": 1.0,
+      "mcc": 0.0,
+      "confusion_matrix": {
+        "tn": 68017,
+        "fp": 0,
+        "fn": 23766,
+        "tp": 0
+      }
+    },
+    "8": {
+      "candidate_consecutive_breach_months": 8,
+      "n_alerted": 0,
+      "pct_alerted": 0.0,
+      "default_rate_alerted": null,
+      "base_default_rate_holdout": 0.2589368401555844,
+      "default_rate_lift": null,
+      "meets_kpi_target": false,
+      "accuracy": 0.7410631598444156,
+      "precision": 0.0,
+      "recall": 0.0,
+      "f1": 0.0,
+      "specificity": 1.0,
+      "mcc": 0.0,
+      "confusion_matrix": {
+        "tn": 68017,
+        "fp": 0,
+        "fn": 23766,
+        "tp": 0
+      }
+    },
+    "10": {
+      "candidate_consecutive_breach_months": 10,
+      "n_alerted": 0,
+      "pct_alerted": 0.0,
+      "default_rate_alerted": null,
+      "base_default_rate_holdout": 0.2589368401555844,
+      "default_rate_lift": null,
+      "meets_kpi_target": false,
+      "accuracy": 0.7410631598444156,
+      "precision": 0.0,
+      "recall": 0.0,
+      "f1": 0.0,
+      "specificity": 1.0,
+      "mcc": 0.0,
+      "confusion_matrix": {
+        "tn": 68017,
+        "fp": 0,
+        "fn": 23766,
+        "tp": 0
+      }
+    }
+  },
+  "candidates_meeting_kpi": [
+    1,
+    2,
+    3
+  ],
+  "alert_months_by_candidate": {
+    "1": [
+      "2017-09-01",
+      "2017-10-01",
+      "2018-01-01",
+      "2018-02-01",
+      "2018-03-01",
+      "2018-04-01",
+      "2019-01-01",
+      "2019-02-01",
+      "2019-03-01",
+      "2019-04-01",
+      "2019-05-01",
+      "2019-10-01"
+    ],
+    "2": [
+      "2017-10-01",
+      "2018-02-01",
+      "2018-03-01",
+      "2018-04-01",
+      "2019-02-01",
+      "2019-03-01",
+      "2019-04-01",
+      "2019-05-01"
+    ],
+    "3": [
+      "2018-03-01",
+      "2018-04-01",
+      "2019-03-01",
+      "2019-04-01",
+      "2019-05-01"
+    ],
+    "4": [
+      "2018-04-01",
+      "2019-04-01",
+      "2019-05-01"
+    ],
+    "5": [
+      "2019-05-01"
+    ],
+    "6": [],
+    "8": [],
+    "10": []
+  },
+  "chart_paths": {
+    "monthly_kpi_trend": "C:\\Users\\rnand\\Downloads\\amex-default-prediction\\AMEX_Enterprise_Credit_Risk_Platform\\Phase4_Operational_Risk_Management\\11_Problem11_Real_Time_Portfolio_Monitoring\\reports\\charts\\notebook_59_monthly_kpi_trend.png",
+    "roc_curve": "C:\\Users\\rnand\\Downloads\\amex-default-prediction\\AMEX_Enterprise_Credit_Risk_Platform\\Phase4_Operational_Risk_Management\\11_Problem11_Real_Time_Portfolio_Monitoring\\reports\\charts\\notebook_59_roc_curve.png",
+    "pr_curve": "C:\\Users\\rnand\\Downloads\\amex-default-prediction\\AMEX_Enterprise_Credit_Risk_Platform\\Phase4_Operational_Risk_Management\\11_Problem11_Real_Time_Portfolio_Monitoring\\reports\\charts\\notebook_59_pr_curve.png",
+    "lift_by_candidate": "C:\\Users\\rnand\\Downloads\\amex-default-prediction\\AMEX_Enterprise_Credit_Risk_Platform\\Phase4_Operational_Risk_Management\\11_Problem11_Real_Time_Portfolio_Monitoring\\reports\\charts\\notebook_59_lift_by_candidate.png"
+  },
+  "random_seed": 42
+}

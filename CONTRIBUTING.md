@@ -32,7 +32,7 @@ demonstrable. This document is that discipline, written down.
   are already real Python modules, not notebook cells, so they're testable
   as-is.
 - `ProblemN_.../tests/` — pytest tests for that problem's `src/`. See
-  `Problem1_Credit_Scoring_PD_Prediction/tests/conftest.py` for the pattern
+  `01_Problem1_Credit_Scoring_PD_Prediction/tests/conftest.py` for the pattern
   used to test a service that needs config/model artifacts without
   requiring the real (multi-GB) trained files in CI.
 

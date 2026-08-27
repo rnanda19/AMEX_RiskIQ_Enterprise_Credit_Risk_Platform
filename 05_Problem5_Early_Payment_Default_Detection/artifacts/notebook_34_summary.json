@@ -1,0 +1,23 @@
+{
+  "notebook": "34_early_payment_default_business_understanding.ipynb",
+  "generated_at_utc": "2026-08-24T19:06:28.348880+00:00",
+  "early_window_candidates": [
+    3,
+    6,
+    9,
+    12
+  ],
+  "early_window_coverage_by_k": {
+    "3": 97.55552795410023,
+    "6": 94.26035000098058,
+    "9": 90.59451355703587,
+    "12": 86.43402997953861
+  },
+  "policy_path": "C:\\Users\\rnand\\Downloads\\amex-default-prediction\\AMEX_Enterprise_Credit_Risk_Platform\\Phase2_Regulatory_Loss_Provisioning\\05_Problem5_Early_Payment_Default_Detection\\policy\\early_default_policy.json",
+  "kpi_targets": {
+    "min_auc_retention_vs_full_history": 0.8,
+    "description": "ASSUMPTION -- the early-window model (Notebook 35) should retain at least 80% of Notebook 05's full-history champion holdout AUC (i.e. early_auc / full_history_auc >= 0.80) to be considered operationally useful for early risk flagging. Below that threshold, the honest conclusion is 'not enough signal yet at this window length' -- Notebook 35 must report that outcome plainly if it happens, not obscure it.",
+    "full_history_reference_auc": 0.9620396555226549
+  },
+  "random_seed": 42
+}

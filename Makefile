@@ -1,19 +1,19 @@
 .PHONY: install test test-all lint format-check syntax-check clean help
 
-PROBLEMS := Problem1_Credit_Scoring_PD_Prediction \
-            Problem2_Risk_Tier_Classification \
-            Problem3_Expected_Credit_Loss_IFRS9_CECL \
-            Problem4_Delinquency_Escalation_Loss_Severity \
-            Problem5_Early_Payment_Default_Detection \
-            Problem6_Dynamic_Behavioral_Credit_Scoring \
-            Problem7_Early_Warning_System \
-            Problem8_Roll_Rate_Modeling \
-            Problem9_Collections_Optimization \
-            Problem10_Credit_Line_Management \
-            Problem11_Real_Time_Portfolio_Monitoring \
-            Problem12_360_Customer_Intelligence \
-            Problem13_Risk_Adjusted_Profitability_Modeling \
-            Problem14_Executive_Decision_Support_Dashboard
+PROBLEMS := 01_Problem1_Credit_Scoring_PD_Prediction \
+            02_Problem2_Risk_Tier_Classification \
+            03_Problem3_Expected_Credit_Loss_IFRS9_CECL \
+            04_Problem4_Delinquency_Escalation_Loss_Severity \
+            05_Problem5_Early_Payment_Default_Detection \
+            06_Problem6_Dynamic_Behavioral_Credit_Scoring \
+            07_Problem7_Early_Warning_System \
+            08_Problem8_Roll_Rate_Modeling \
+            09_Problem9_Collections_Optimization \
+            10_Problem10_Credit_Line_Management \
+            11_Problem11_Real_Time_Portfolio_Monitoring \
+            12_Problem12_360_Customer_Intelligence \
+            13_Problem13_Risk_Adjusted_Profitability_Modeling \
+            14_Problem14_Executive_Decision_Support_Dashboard
 
 help:
 	@echo "Targets:"

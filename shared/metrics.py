@@ -1,5 +1,5 @@
 """Official AMEX competition metric -- extracted verbatim (same algorithm,
-same code) from Problem1_Credit_Scoring_PD_Prediction/notebooks/
+same code) from 01_Problem1_Credit_Scoring_PD_Prediction/notebooks/
 05_model_development.ipynb, Section 3.
 
 This is the single source of truth for the metric going forward. The

@@ -14,9 +14,9 @@ narrative version of both.
 | `shared/` unit tests | Done, 2026-08-24 (27 tests) | `shared/tests/` |
 | Root CI workflow (notebook syntax check, unit tests) | Done, 2026-08-25 (split from lint — see below) | `.github/workflows/ci.yml` |
 | Code-quality workflow (lint, format check, security scan) | Done, 2026-08-25 (new — pyflakes + `black --check`, both advisory; `bandit`, blocking, 0 findings) | `.github/workflows/code-quality.yml` |
-| Problem 1 tests (FastAPI service, monitoring job) | Done, 2026-08-24 (9 tests) | `Problem1_Credit_Scoring_PD_Prediction/tests/` |
+| Problem 1 tests (FastAPI service, monitoring job) | Done, 2026-08-24 (9 tests) | `01_Problem1_Credit_Scoring_PD_Prediction/tests/` |
 | Problem 1 `CONTRIBUTING.md` / `MODEL_CARD.md` / `CHANGELOG.md` | Done, 2026-08-24 | repo root, `Problem1_.../` |
-| Problem 2 tests (risk-tier FastAPI service) | Done, 2026-08-24 (5 tests) | `Problem2_Risk_Tier_Classification/tests/` |
+| Problem 2 tests (risk-tier FastAPI service) | Done, 2026-08-24 (5 tests) | `02_Problem2_Risk_Tier_Classification/tests/` |
 | Problem 2 `MODEL_CARD.md` / `CHANGELOG.md` | Done, 2026-08-24 | `Problem2_.../` |
 | Problem 3 tests (`ecl_calculator.py` + new deployable API, driven by the real scoring bundle) | Done, 2026-08-25 (14 tests, up from 7) | `Problem3_.../tests/` |
 | Problem 3 deployable API (`ecl_scoring_service.py`) + Docker | Done, 2026-08-25 (new) | `Problem3_.../src/` |

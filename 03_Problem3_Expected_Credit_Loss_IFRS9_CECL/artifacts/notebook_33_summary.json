@@ -1,0 +1,25 @@
+{
+  "notebook": "33_financial_impact_reporting_packaging",
+  "generated_at_utc": "2026-08-24T12:32:53.579027+00:00",
+  "problem_number": 3,
+  "problem_name": "Expected Credit Loss (IFRS9/CECL)",
+  "phase": "Phase 2 -- Regulatory & Loss Provisioning",
+  "problem_3_complete": true,
+  "loss_flat_lgd_usd": 67830905.87,
+  "loss_ifrs9_usd": 72448498.95,
+  "loss_cecl_usd": 73051922.57,
+  "reserve_change_ifrs9_vs_flat_usd": 4617593.08,
+  "cecl_vs_ifrs9_delta_usd": 603423.62,
+  "macro_stress_buffer_usd": 3715619.76,
+  "roi_year_1_pct": 42.9,
+  "payback_period_months": 8.4,
+  "output_files": {
+    "p3_financial_assumptions.json": "C:\\Users\\rnand\\Downloads\\amex-default-prediction\\AMEX_Enterprise_Credit_Risk_Platform\\Phase2_Regulatory_Loss_Provisioning\\03_Problem3_Expected_Credit_Loss_IFRS9_CECL\\artifacts\\p3_financial_assumptions.json",
+    "p3_smart_suggestions.csv": "C:\\Users\\rnand\\Downloads\\amex-default-prediction\\AMEX_Enterprise_Credit_Risk_Platform\\Phase2_Regulatory_Loss_Provisioning\\03_Problem3_Expected_Credit_Loss_IFRS9_CECL\\04_Financial_Impact_Reporting_Packaging\\p3_smart_suggestions.csv",
+    "ecl_standard_comparison_final_chart.png": "C:\\Users\\rnand\\Downloads\\amex-default-prediction\\AMEX_Enterprise_Credit_Risk_Platform\\Phase2_Regulatory_Loss_Provisioning\\03_Problem3_Expected_Credit_Loss_IFRS9_CECL\\04_Financial_Impact_Reporting_Packaging\\ecl_standard_comparison_final_chart.png",
+    "macro_stress_buffer_final_chart.png": "C:\\Users\\rnand\\Downloads\\amex-default-prediction\\AMEX_Enterprise_Credit_Risk_Platform\\Phase2_Regulatory_Loss_Provisioning\\03_Problem3_Expected_Credit_Loss_IFRS9_CECL\\04_Financial_Impact_Reporting_Packaging\\macro_stress_buffer_final_chart.png",
+    "ECL_Financial_Impact_Report.docx": "C:\\Users\\rnand\\Downloads\\amex-default-prediction\\AMEX_Enterprise_Credit_Risk_Platform\\Phase2_Regulatory_Loss_Provisioning\\03_Problem3_Expected_Credit_Loss_IFRS9_CECL\\04_Financial_Impact_Reporting_Packaging\\ECL_Financial_Impact_Report.docx",
+    "AMEX_Problem3_Financial_Impact_Workbook.xlsx": "C:\\Users\\rnand\\Downloads\\amex-default-prediction\\AMEX_Enterprise_Credit_Risk_Platform\\Phase2_Regulatory_Loss_Provisioning\\03_Problem3_Expected_Credit_Loss_IFRS9_CECL\\04_Financial_Impact_Reporting_Packaging\\AMEX_Problem3_Financial_Impact_Workbook.xlsx",
+    "ecl_financial_impact_dashboard.html": "C:\\Users\\rnand\\Downloads\\amex-default-prediction\\AMEX_Enterprise_Credit_Risk_Platform\\Phase2_Regulatory_Loss_Provisioning\\03_Problem3_Expected_Credit_Loss_IFRS9_CECL\\04_Financial_Impact_Reporting_Packaging\\ecl_financial_impact_dashboard.html"
+  }
+}

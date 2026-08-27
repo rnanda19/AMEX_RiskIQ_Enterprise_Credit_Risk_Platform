@@ -1,0 +1,20 @@
+{
+  "notebook": "30_ecl_policy",
+  "generated_at_utc": "2026-08-24T12:21:32.909095+00:00",
+  "problem_number": 3,
+  "problem_name": "Expected Credit Loss (IFRS9/CECL)",
+  "phase": "Phase 2 -- Regulatory & Loss Provisioning",
+  "champion_pd_model": "xgboost",
+  "lgd_by_tier": {
+    "Low Severity": 0.3015,
+    "Moderate Severity": 0.45,
+    "Severe": 0.648
+  },
+  "ead_per_account_usd": 5000,
+  "flat_lgd_comparison_baseline_usd": 67830905.87421922,
+  "output_files": {
+    "ecl_policy.json": "C:\\Users\\rnand\\Downloads\\amex-default-prediction\\AMEX_Enterprise_Credit_Risk_Platform\\Phase2_Regulatory_Loss_Provisioning\\03_Problem3_Expected_Credit_Loss_IFRS9_CECL\\01_ECL_Policy\\ecl_policy.json",
+    "p3_stakeholder_analysis.csv": "C:\\Users\\rnand\\Downloads\\amex-default-prediction\\AMEX_Enterprise_Credit_Risk_Platform\\Phase2_Regulatory_Loss_Provisioning\\03_Problem3_Expected_Credit_Loss_IFRS9_CECL\\01_ECL_Policy\\p3_stakeholder_analysis.csv",
+    "ECL_Policy_Charter.docx": "C:\\Users\\rnand\\Downloads\\amex-default-prediction\\AMEX_Enterprise_Credit_Risk_Platform\\Phase2_Regulatory_Loss_Provisioning\\03_Problem3_Expected_Credit_Loss_IFRS9_CECL\\01_ECL_Policy\\ECL_Policy_Charter.docx"
+  }
+}

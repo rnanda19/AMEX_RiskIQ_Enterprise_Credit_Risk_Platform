@@ -1,0 +1,231 @@
+{
+  "generated_at_utc": "2026-08-26T12:13:02.573917+00:00",
+  "problem": "Problem 7 -- Early Warning System (Rolling Z-Score Trend-Deviation Detection)",
+  "z_threshold": 2.0,
+  "min_statements_for_baseline": 4,
+  "monitored_feature_count": 89,
+  "n_holdout_customers_scored": 88389,
+  "base_default_rate_holdout": 0.256151783592981,
+  "early_warning_score_distribution": {
+    "min": 0,
+    "median": 7.0,
+    "mean": 7.394268517575717,
+    "max": 32
+  },
+  "z_computable_feature_count_distribution": {
+    "min": 22,
+    "median": 68.0,
+    "mean": 67.05559515324305,
+    "max": 82
+  },
+  "secondary_threshold_free_metrics": {
+    "roc_auc": 0.6606956921230794,
+    "pr_auc": 0.40136844214544143,
+    "log_loss": 0.6792533978818713,
+    "auc_retention_pct_of_full_history": 68.71667931059005,
+    "full_history_reference_auc": 0.9614779100963606
+  },
+  "candidate_results": {
+    "1": {
+      "candidate_min_deviation_count": 1,
+      "n_alerted": 88192,
+      "pct_alerted": 99.77712158752786,
+      "default_rate_alerted": 0.2564404934687954,
+      "base_default_rate_holdout": 0.256151783592981,
+      "default_rate_lift": 1.0011271046867787,
+      "meets_kpi_target": false,
+      "accuracy": 0.2578148864677731,
+      "precision": 0.2564404934687954,
+      "recall": 0.9988958084890244,
+      "f1": 0.4081094980736784,
+      "specificity": 0.0026160491573888178,
+      "mcc": 0.01399433504986657,
+      "confusion_matrix": {
+        "tn": 172,
+        "fp": 65576,
+        "fn": 25,
+        "tp": 22616
+      }
+    },
+    "2": {
+      "candidate_min_deviation_count": 2,
+      "n_alerted": 87045,
+      "pct_alerted": 98.47944880019007,
+      "default_rate_alerted": 0.25824573496467346,
+      "base_default_rate_holdout": 0.256151783592981,
+      "default_rate_lift": 1.0081746507571452,
+      "meets_kpi_target": false,
+      "accuracy": 0.2676916810915385,
+      "precision": 0.25824573496467346,
+      "recall": 0.9928448390088777,
+      "f1": 0.4098791094579071,
+      "specificity": 0.017977733162985947,
+      "mcc": 0.038605396482705244,
+      "confusion_matrix": {
+        "tn": 1182,
+        "fp": 64566,
+        "fn": 162,
+        "tp": 22479
+      }
+    },
+    "3": {
+      "candidate_min_deviation_count": 3,
+      "n_alerted": 84127,
+      "pct_alerted": 95.17813302560273,
+      "default_rate_alerted": 0.26306655413838603,
+      "base_default_rate_holdout": 0.256151783592981,
+      "default_rate_lift": 1.0269948170901375,
+      "meets_kpi_target": false,
+      "accuracy": 0.2928305558383962,
+      "precision": 0.26306655413838603,
+      "recall": 0.9774744931760965,
+      "f1": 0.4145624157050802,
+      "specificity": 0.05706637464257468,
+      "mcc": 0.07037977865164217,
+      "confusion_matrix": {
+        "tn": 3752,
+        "fp": 61996,
+        "fn": 510,
+        "tp": 22131
+      }
+    },
+    "5": {
+      "candidate_min_deviation_count": 5,
+      "n_alerted": 69466,
+      "pct_alerted": 78.59122741517609,
+      "default_rate_alerted": 0.28743557999596925,
+      "base_default_rate_holdout": 0.256151783592981,
+      "default_rate_lift": 1.1221299183014763,
+      "meets_kpi_target": false,
+      "accuracy": 0.40973424294878324,
+      "precision": 0.28743557999596925,
+      "recall": 0.881895675986043,
+      "f1": 0.4335609671360483,
+      "specificity": 0.2471405974326215,
+      "mcc": 0.13731555830077358,
+      "confusion_matrix": {
+        "tn": 16249,
+        "fp": 49499,
+        "fn": 2674,
+        "tp": 19967
+      }
+    },
+    "8": {
+      "candidate_min_deviation_count": 8,
+      "n_alerted": 37675,
+      "pct_alerted": 42.62408218217199,
+      "default_rate_alerted": 0.36055739880557397,
+      "base_default_rate_holdout": 0.256151783592981,
+      "default_rate_lift": 1.4075927707709852,
+      "meets_kpi_target": false,
+      "accuracy": 0.624975958546878,
+      "precision": 0.36055739880557397,
+      "recall": 0.5999734994037366,
+      "f1": 0.45042774719809003,
+      "specificity": 0.6335858124961976,
+      "mcc": 0.20615586705483538,
+      "confusion_matrix": {
+        "tn": 41657,
+        "fp": 24091,
+        "fn": 9057,
+        "tp": 13584
+      }
+    },
+    "10": {
+      "candidate_min_deviation_count": 10,
+      "n_alerted": 21428,
+      "pct_alerted": 24.242835646969645,
+      "default_rate_alerted": 0.42799141310434946,
+      "base_default_rate_holdout": 0.256151783592981,
+      "default_rate_lift": 1.6708508022119317,
+      "meets_kpi_target": true,
+      "accuracy": 0.7089343696613832,
+      "precision": 0.42799141310434946,
+      "recall": 0.40506161388631245,
+      "f1": 0.41621094193197034,
+      "specificity": 0.8135760783597981,
+      "mcc": 0.22269595362894387,
+      "confusion_matrix": {
+        "tn": 53491,
+        "fp": 12257,
+        "fn": 13470,
+        "tp": 9171
+      }
+    },
+    "12": {
+      "candidate_min_deviation_count": 12,
+      "n_alerted": 11183,
+      "pct_alerted": 12.652026835918496,
+      "default_rate_alerted": 0.49959760350532056,
+      "base_default_rate_holdout": 0.256151783592981,
+      "default_rate_lift": 1.9503967393768729,
+      "meets_kpi_target": true,
+      "accuracy": 0.7437463937820317,
+      "precision": 0.49959760350532056,
+      "recall": 0.2467647188728413,
+      "f1": 0.33035714285714285,
+      "specificity": 0.9148871448561173,
+      "mcc": 0.2122585059508088,
+      "confusion_matrix": {
+        "tn": 60152,
+        "fp": 5596,
+        "fn": 17054,
+        "tp": 5587
+      }
+    },
+    "15": {
+      "candidate_min_deviation_count": 15,
+      "n_alerted": 3783,
+      "pct_alerted": 4.2799443369650065,
+      "default_rate_alerted": 0.577583928099392,
+      "base_default_rate_holdout": 0.256151783592981,
+      "default_rate_lift": 2.2548503078829185,
+      "meets_kpi_target": true,
+      "accuracy": 0.7504893142811888,
+      "precision": 0.577583928099392,
+      "recall": 0.096506338059273,
+      "f1": 0.16537995761429003,
+      "specificity": 0.975695078177283,
+      "mcc": 0.15570983332940855,
+      "confusion_matrix": {
+        "tn": 64150,
+        "fp": 1598,
+        "fn": 20456,
+        "tp": 2185
+      }
+    },
+    "20": {
+      "candidate_min_deviation_count": 20,
+      "n_alerted": 462,
+      "pct_alerted": 0.5226894749346638,
+      "default_rate_alerted": 0.670995670995671,
+      "base_default_rate_holdout": 0.256151783592981,
+      "default_rate_lift": 2.619523712010793,
+      "meets_kpi_target": true,
+      "accuracy": 0.7456357691567955,
+      "precision": 0.670995670995671,
+      "recall": 0.013691974736098228,
+      "f1": 0.026836341600657922,
+      "specificity": 0.9976881426050983,
+      "mcc": 0.06888960587762505,
+      "confusion_matrix": {
+        "tn": 65596,
+        "fp": 152,
+        "fn": 22331,
+        "tp": 310
+      }
+    }
+  },
+  "candidates_meeting_kpi": [
+    10,
+    12,
+    15,
+    20
+  ],
+  "chart_paths": {
+    "roc_curve": "C:\\Users\\rnand\\Downloads\\amex-default-prediction\\AMEX_Enterprise_Credit_Risk_Platform\\Phase3_Behavioral_Intelligence\\07_Problem7_Early_Warning_System\\reports\\charts\\notebook_43_roc_curve.png",
+    "pr_curve": "C:\\Users\\rnand\\Downloads\\amex-default-prediction\\AMEX_Enterprise_Credit_Risk_Platform\\Phase3_Behavioral_Intelligence\\07_Problem7_Early_Warning_System\\reports\\charts\\notebook_43_pr_curve.png",
+    "lift_by_candidate": "C:\\Users\\rnand\\Downloads\\amex-default-prediction\\AMEX_Enterprise_Credit_Risk_Platform\\Phase3_Behavioral_Intelligence\\07_Problem7_Early_Warning_System\\reports\\charts\\notebook_43_lift_by_candidate.png"
+  },
+  "random_seed": 42
+}

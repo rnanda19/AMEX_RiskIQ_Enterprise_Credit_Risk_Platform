@@ -6,7 +6,7 @@ labels: bug
 ---
 
 **Which problem / notebook / service is affected?**
-e.g. `Problem5_Early_Payment_Default_Detection/src/early_default_service.py`, or `Notebook 36`.
+e.g. `05_Problem5_Early_Payment_Default_Detection/src/early_default_service.py`, or `Notebook 36`.
 
 **What happened**
 A clear description of the actual behavior, including the full error/traceback if there is one.

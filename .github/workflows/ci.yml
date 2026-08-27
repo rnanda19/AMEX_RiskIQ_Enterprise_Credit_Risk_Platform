@@ -35,44 +35,44 @@ jobs:
       - run: pip install -r requirements-dev.txt
       - run: python -m pytest shared/tests -v
       - name: Problem 1 tests
-        run: python -m pytest Problem1_Credit_Scoring_PD_Prediction/tests -v
-        if: hashFiles('Problem1_Credit_Scoring_PD_Prediction/tests/**') != ''
+        run: python -m pytest 01_Problem1_Credit_Scoring_PD_Prediction/tests -v
+        if: hashFiles('01_Problem1_Credit_Scoring_PD_Prediction/tests/**') != ''
       - name: Problem 2 tests
-        run: python -m pytest Problem2_Risk_Tier_Classification/tests -v
-        if: hashFiles('Problem2_Risk_Tier_Classification/tests/**') != ''
+        run: python -m pytest 02_Problem2_Risk_Tier_Classification/tests -v
+        if: hashFiles('02_Problem2_Risk_Tier_Classification/tests/**') != ''
       - name: Problem 3 tests
-        run: python -m pytest Problem3_Expected_Credit_Loss_IFRS9_CECL/tests -v
-        if: hashFiles('Problem3_Expected_Credit_Loss_IFRS9_CECL/tests/**') != ''
+        run: python -m pytest 03_Problem3_Expected_Credit_Loss_IFRS9_CECL/tests -v
+        if: hashFiles('03_Problem3_Expected_Credit_Loss_IFRS9_CECL/tests/**') != ''
       - name: Problem 4 tests
-        run: python -m pytest Problem4_Delinquency_Escalation_Loss_Severity/tests -v
-        if: hashFiles('Problem4_Delinquency_Escalation_Loss_Severity/tests/**') != ''
+        run: python -m pytest 04_Problem4_Delinquency_Escalation_Loss_Severity/tests -v
+        if: hashFiles('04_Problem4_Delinquency_Escalation_Loss_Severity/tests/**') != ''
       - name: Problem 5 tests
-        run: python -m pytest Problem5_Early_Payment_Default_Detection/tests -v
-        if: hashFiles('Problem5_Early_Payment_Default_Detection/tests/**') != ''
+        run: python -m pytest 05_Problem5_Early_Payment_Default_Detection/tests -v
+        if: hashFiles('05_Problem5_Early_Payment_Default_Detection/tests/**') != ''
       - name: Problem 6 tests
-        run: python -m pytest Problem6_Dynamic_Behavioral_Credit_Scoring/tests -v
-        if: hashFiles('Problem6_Dynamic_Behavioral_Credit_Scoring/tests/**') != ''
+        run: python -m pytest 06_Problem6_Dynamic_Behavioral_Credit_Scoring/tests -v
+        if: hashFiles('06_Problem6_Dynamic_Behavioral_Credit_Scoring/tests/**') != ''
       - name: Problem 7 tests
-        run: python -m pytest Problem7_Early_Warning_System/tests -v
-        if: hashFiles('Problem7_Early_Warning_System/tests/**') != ''
+        run: python -m pytest 07_Problem7_Early_Warning_System/tests -v
+        if: hashFiles('07_Problem7_Early_Warning_System/tests/**') != ''
       - name: Problem 8 tests
-        run: python -m pytest Problem8_Roll_Rate_Modeling/tests -v
-        if: hashFiles('Problem8_Roll_Rate_Modeling/tests/**') != ''
+        run: python -m pytest 08_Problem8_Roll_Rate_Modeling/tests -v
+        if: hashFiles('08_Problem8_Roll_Rate_Modeling/tests/**') != ''
       - name: Problem 9 tests
-        run: python -m pytest Problem9_Collections_Optimization/tests -v
-        if: hashFiles('Problem9_Collections_Optimization/tests/**') != ''
+        run: python -m pytest 09_Problem9_Collections_Optimization/tests -v
+        if: hashFiles('09_Problem9_Collections_Optimization/tests/**') != ''
       - name: Problem 10 tests
-        run: python -m pytest Problem10_Credit_Line_Management/tests -v
-        if: hashFiles('Problem10_Credit_Line_Management/tests/**') != ''
+        run: python -m pytest 10_Problem10_Credit_Line_Management/tests -v
+        if: hashFiles('10_Problem10_Credit_Line_Management/tests/**') != ''
       - name: Problem 11 tests
-        run: python -m pytest Problem11_Real_Time_Portfolio_Monitoring/tests -v
-        if: hashFiles('Problem11_Real_Time_Portfolio_Monitoring/tests/**') != ''
+        run: python -m pytest 11_Problem11_Real_Time_Portfolio_Monitoring/tests -v
+        if: hashFiles('11_Problem11_Real_Time_Portfolio_Monitoring/tests/**') != ''
       - name: Problem 12 tests
-        run: python -m pytest Problem12_360_Customer_Intelligence/tests -v
-        if: hashFiles('Problem12_360_Customer_Intelligence/tests/**') != ''
+        run: python -m pytest 12_Problem12_360_Customer_Intelligence/tests -v
+        if: hashFiles('12_Problem12_360_Customer_Intelligence/tests/**') != ''
       - name: Problem 13 tests
-        run: python -m pytest Problem13_Risk_Adjusted_Profitability_Modeling/tests -v
-        if: hashFiles('Problem13_Risk_Adjusted_Profitability_Modeling/tests/**') != ''
+        run: python -m pytest 13_Problem13_Risk_Adjusted_Profitability_Modeling/tests -v
+        if: hashFiles('13_Problem13_Risk_Adjusted_Profitability_Modeling/tests/**') != ''
       - name: Problem 14 tests
-        run: python -m pytest Problem14_Executive_Decision_Support_Dashboard/tests -v
-        if: hashFiles('Problem14_Executive_Decision_Support_Dashboard/tests/**') != ''
+        run: python -m pytest 14_Problem14_Executive_Decision_Support_Dashboard/tests -v
+        if: hashFiles('14_Problem14_Executive_Decision_Support_Dashboard/tests/**') != ''

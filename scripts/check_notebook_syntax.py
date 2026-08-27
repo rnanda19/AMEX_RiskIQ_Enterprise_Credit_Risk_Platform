@@ -3,9 +3,9 @@
 
 This is what docs/code_quality_report.csv (from 18_repository_packaging.ipynb)
 already does per-problem at packaging time; this script generalizes it into
-a reusable, root-level CI step that runs across every ProblemN_.../notebooks/
-folder in the repo, so new phases pick it up automatically without adding a
-new CI step per problem.
+a reusable, root-level CI step that runs across every */notebooks/ folder in
+the repo, so new phases pick it up automatically without adding a new CI
+step per problem.
 
 Usage:
     python scripts/check_notebook_syntax.py [path-to-repo-root]
@@ -41,9 +41,9 @@ def check_notebook(path: Path) -> list:
 
 def main() -> int:
     repo_root = Path(sys.argv[1]) if len(sys.argv) > 1 else Path.cwd()
-    notebooks = sorted(repo_root.glob("Problem*_*/notebooks/*.ipynb"))
+    notebooks = sorted(repo_root.glob("*/notebooks/*.ipynb"))
     if not notebooks:
-        print(f"No notebooks found under {repo_root}/Problem*_*/notebooks/ -- nothing to check.")
+        print(f"No notebooks found under {repo_root}/*/notebooks/ -- nothing to check.")
         return 0
 
     total_failures = 0

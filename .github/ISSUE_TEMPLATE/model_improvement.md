@@ -6,7 +6,7 @@ labels: model-improvement
 ---
 
 **Which model / MODEL_CARD.md is this about?**
-e.g. `Problem4_Delinquency_Escalation_Loss_Severity/MODEL_CARD.md`.
+e.g. `04_Problem4_Delinquency_Escalation_Loss_Severity/MODEL_CARD.md`.
 
 **What's the proposed change?**
 Architecture, feature set, validation method, or hyperparameters.

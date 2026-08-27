@@ -1,0 +1,25 @@
+{
+  "notebook": "31_ecl_modeling",
+  "generated_at_utc": "2026-08-24T12:22:40.571642+00:00",
+  "problem_number": 3,
+  "problem_name": "Expected Credit Loss (IFRS9/CECL)",
+  "phase": "Phase 2 -- Regulatory & Loss Provisioning",
+  "n_holdout_customers": 91783,
+  "champion_pd_model": "xgboost",
+  "monotonic_validated": true,
+  "total_ecl_ifrs9_usd": 72448498.94548872,
+  "total_ecl_cecl_usd": 73051922.56796154,
+  "total_ecl_notebook_08_flat_usd": 67830905.87421922,
+  "stage_counts": {
+    "1": 30281,
+    "2": 40277,
+    "3": 21225
+  },
+  "output_files": {
+    "ecl_by_customer.csv": "C:\\Users\\rnand\\Downloads\\amex-default-prediction\\AMEX_Enterprise_Credit_Risk_Platform\\Phase2_Regulatory_Loss_Provisioning\\03_Problem3_Expected_Credit_Loss_IFRS9_CECL\\02_ECL_Modeling\\ecl_by_customer.csv",
+    "ecl_stage_summary.csv": "C:\\Users\\rnand\\Downloads\\amex-default-prediction\\AMEX_Enterprise_Credit_Risk_Platform\\Phase2_Regulatory_Loss_Provisioning\\03_Problem3_Expected_Credit_Loss_IFRS9_CECL\\02_ECL_Modeling\\ecl_stage_summary.csv",
+    "ecl_standard_comparison.csv": "C:\\Users\\rnand\\Downloads\\amex-default-prediction\\AMEX_Enterprise_Credit_Risk_Platform\\Phase2_Regulatory_Loss_Provisioning\\03_Problem3_Expected_Credit_Loss_IFRS9_CECL\\02_ECL_Modeling\\ecl_standard_comparison.csv",
+    "ecl_by_stage_chart.png": "C:\\Users\\rnand\\Downloads\\amex-default-prediction\\AMEX_Enterprise_Credit_Risk_Platform\\Phase2_Regulatory_Loss_Provisioning\\03_Problem3_Expected_Credit_Loss_IFRS9_CECL\\02_ECL_Modeling\\ecl_by_stage_chart.png",
+    "ecl_standard_comparison_chart.png": "C:\\Users\\rnand\\Downloads\\amex-default-prediction\\AMEX_Enterprise_Credit_Risk_Platform\\Phase2_Regulatory_Loss_Provisioning\\03_Problem3_Expected_Credit_Loss_IFRS9_CECL\\02_ECL_Modeling\\ecl_standard_comparison_chart.png"
+  }
+}

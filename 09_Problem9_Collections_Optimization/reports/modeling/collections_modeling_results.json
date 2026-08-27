@@ -1,0 +1,38 @@
+{
+  "generated_at_utc": "2026-08-25T21:40:32.620209+00:00",
+  "n_train_eligible_statements": 2699966,
+  "n_holdout_eligible_statements": 677582,
+  "train_cure_rate": 0.05321252193546141,
+  "holdout_cure_rate": 0.0528393611400539,
+  "classification_metrics": {
+    "roc_auc": 0.8236424083608698,
+    "pr_auc": 0.26548660131219165,
+    "log_loss": 0.16587470471858978,
+    "f1_optimal_threshold": 0.15535672008991241,
+    "accuracy": 0.9184511985265252,
+    "precision": 0.2933302169432463,
+    "recall": 0.3855822137809681,
+    "f1": 0.33318852122704123,
+    "specificity": 0.9481784227903998,
+    "matthews_corrcoef": 0.29369644019614816,
+    "confusion_matrix": {
+      "tn": 608521,
+      "fp": 33258,
+      "fn": 21998,
+      "tp": 13805
+    }
+  },
+  "min_propensity_model_roc_auc_target": 0.6,
+  "meets_kpi_target": true,
+  "treatment_tier_counts": {
+    "Priority Outreach": 261281,
+    "Automated Nudge": 338791,
+    "Monitor": 77510
+  },
+  "median_propensity_holdout": 0.03366449102759361,
+  "median_severity_score_holdout": 1.6147152185440063,
+  "model_path": "C:\\Users\\rnand\\Downloads\\amex-default-prediction\\AMEX_Enterprise_Credit_Risk_Platform\\Phase4_Operational_Risk_Management\\09_Problem9_Collections_Optimization\\models\\collections_propensity_xgboost.joblib",
+  "train_seconds": 84.71937394142151,
+  "warp_thread_count": 15,
+  "random_seed": 42
+}

@@ -1,0 +1,372 @@
+{
+  "problem_number": 14,
+  "problem_name": "Executive Decision Support Dashboard",
+  "phase": "Phase 5 -- Customer & Business Intelligence",
+  "generated_at_utc": "2026-08-27T10:15:37.476333+00:00",
+  "prior_problems_registry": {
+    "1": {
+      "problem_name": "Credit Scoring (Static PD)",
+      "phase": "Phase 1 -- Foundation",
+      "category": "foundational_model",
+      "summary_jsons": {
+        "model": "notebook_05_summary.json",
+        "capital": "notebook_08_summary.json"
+      },
+      "model_quality_path": [
+        "model",
+        "champion_metrics",
+        "holdout_auc"
+      ],
+      "model_quality_label": "Champion model holdout ROC-AUC",
+      "financial_field": null,
+      "financial_label": null,
+      "exposure_fields": {
+        "total_ecl_usd": [
+          "capital",
+          "total_ecl_usd"
+        ],
+        "total_rwa_usd": [
+          "capital",
+          "total_rwa_usd"
+        ],
+        "total_required_capital_usd": [
+          "capital",
+          "total_required_capital_usd"
+        ]
+      },
+      "status_field": null,
+      "notes": "Foundational static-PD model underlying Problems 6, 10, 12, 13. No standalone 'net benefit of deploying this model' figure exists -- its value is realized entirely through the downstream problems that consume it. Real portfolio-level Basel/IFRS9 capital and ECL exposure figures (Notebook 8) are reported as risk-exposure context, never summed into the platform's net-benefit total (different kind of number)."
+    },
+    "2": {
+      "problem_name": "Risk Tier Classification",
+      "phase": "Phase 1 -- Foundation",
+      "category": "foundational_model",
+      "summary_jsons": {
+        "validation": "notebook_21_summary.json"
+      },
+      "model_quality_path": [
+        "validation",
+        "spearman_tier_vs_actual_default"
+      ],
+      "model_quality_label": "Spearman(tier, actual default) on holdout",
+      "financial_field": null,
+      "financial_label": null,
+      "exposure_fields": {},
+      "status_field": null,
+      "notes": "Predates this platform's financial-impact-reporting convention entirely -- Notebook 21 is a technical validation notebook (rank-ordering, PSI, fair-lending gates), and Notebook 25 is packaging-only. No dollar figure exists for this problem; reported as N/A, not fabricated."
+    },
+    "3": {
+      "problem_name": "Expected Credit Loss (IFRS9/CECL)",
+      "phase": "Phase 2 -- Regulatory & Loss Provisioning",
+      "category": "reserve_optimization",
+      "summary_jsons": {
+        "validation": "notebook_32_summary.json",
+        "financial": "notebook_33_summary.json"
+      },
+      "model_quality_path": [
+        "validation",
+        "psi"
+      ],
+      "model_quality_label": "Population Stability Index (holdout)",
+      "financial_field": [
+        "financial",
+        "reserve_change_ifrs9_vs_flat_usd"
+      ],
+      "financial_label": "Reserve accuracy gain vs. flat-LGD (IFRS9 vs. flat)",
+      "exposure_fields": {
+        "loss_cecl_usd": [
+          "financial",
+          "loss_cecl_usd"
+        ],
+        "macro_stress_buffer_usd": [
+          "financial",
+          "macro_stress_buffer_usd"
+        ]
+      },
+      "status_field": [
+        "validation",
+        "self_test_passed"
+      ],
+      "notes": "Reserve-provisioning accuracy gain, not a P&L cash benefit like Problems 4-13 -- kept in its own 'reserve_optimization' category, reported alongside but never summed into the platform's value-creation total."
+    },
+    "4": {
+      "problem_name": "Delinquency Escalation / Loss Severity",
+      "phase": "Phase 2 -- Regulatory & Loss Provisioning",
+      "category": "value_creation",
+      "summary_jsons": {
+        "validation": "notebook_28_summary.json",
+        "financial": "notebook_29_summary.json"
+      },
+      "model_quality_path": [
+        "validation",
+        "psi"
+      ],
+      "model_quality_label": "Population Stability Index (holdout)",
+      "financial_field": [
+        "financial",
+        "loss_prevented_per_cycle_usd"
+      ],
+      "financial_label": "Loss prevented per cycle (tiered vs. flat LGD)",
+      "exposure_fields": {},
+      "status_field": [
+        "validation",
+        "self_test_passed"
+      ],
+      "notes": "Real per-cycle loss-prevention value from severity-tiered LGD vs. a flat-LGD baseline."
+    },
+    "5": {
+      "problem_name": "Early Payment Default Detection",
+      "phase": "Phase 3 -- Behavioral Intelligence",
+      "category": "value_creation",
+      "summary_jsons": {
+        "financial": "notebook_37_summary.json"
+      },
+      "model_quality_path": [
+        "financial",
+        "meets_kpi_target"
+      ],
+      "model_quality_label": "Meets early-detection KPI target",
+      "financial_field": [
+        "financial",
+        "loss_prevented_per_cycle_usd"
+      ],
+      "financial_label": "Loss prevented per cycle (early detection)",
+      "exposure_fields": {},
+      "status_field": [
+        "financial",
+        "recommended_for_production"
+      ],
+      "notes": "Real per-cycle loss-prevention value from flagging defaulters K months earlier than a full-history baseline."
+    },
+    "6": {
+      "problem_name": "Dynamic / Behavioral Credit Scoring",
+      "phase": "Phase 3 -- Behavioral Intelligence",
+      "category": "value_creation",
+      "summary_jsons": {
+        "financial": "notebook_41_summary.json"
+      },
+      "model_quality_path": [
+        "financial",
+        "real_defaulter_capture_rate"
+      ],
+      "model_quality_label": "Real defaulter capture rate (holdout)",
+      "financial_field": [
+        "financial",
+        "net_benefit_per_cycle_usd"
+      ],
+      "financial_label": "Net benefit per cycle (dynamic vs. static PD)",
+      "exposure_fields": {},
+      "status_field": [
+        "financial",
+        "recommended_for_production"
+      ],
+      "notes": "Real per-cycle net benefit from monthly-refreshed dynamic PD vs. static PD alone."
+    },
+    "7": {
+      "problem_name": "Early Warning System",
+      "phase": "Phase 3 -- Behavioral Intelligence",
+      "category": "value_creation",
+      "summary_jsons": {
+        "financial": "notebook_45_summary.json"
+      },
+      "model_quality_path": [
+        "financial",
+        "real_alert_capture_rate"
+      ],
+      "model_quality_label": "Real alert capture rate (holdout)",
+      "financial_field": [
+        "financial",
+        "net_benefit_per_cycle_usd"
+      ],
+      "financial_label": "Net benefit per cycle (rolling z-score alerts)",
+      "exposure_fields": {},
+      "status_field": [
+        "financial",
+        "recommended_for_production"
+      ],
+      "notes": "Real result: NOT recommended for production (real default-rate lift fell below this problem's own KPI target). Reported honestly and EXCLUDED from the platform's value-creation total -- summing a not-recommended system's 'benefit' into an executive total would be the exact category error this platform's aggregation must not make."
+    },
+    "8": {
+      "problem_name": "Roll-Rate Modeling",
+      "phase": "Phase 3 -- Behavioral Intelligence",
+      "category": "value_creation",
+      "summary_jsons": {
+        "financial": "notebook_49_summary.json"
+      },
+      "model_quality_path": [
+        "financial",
+        "real_escalation_capture_rate"
+      ],
+      "model_quality_label": "Real escalation capture rate (holdout)",
+      "financial_field": [
+        "financial",
+        "net_benefit_per_cycle_usd"
+      ],
+      "financial_label": "Net benefit per cycle (Markov roll-rate escalation)",
+      "exposure_fields": {},
+      "status_field": [
+        "financial",
+        "recommended_for_production"
+      ],
+      "notes": "Real per-cycle net benefit from Markov transition-matrix escalation detection."
+    },
+    "9": {
+      "problem_name": "Collections Optimization",
+      "phase": "Phase 4 -- Operational Risk Management",
+      "category": "value_creation",
+      "summary_jsons": {
+        "financial": "notebook_53_summary.json"
+      },
+      "model_quality_path": [
+        "financial",
+        "meets_kpi_target"
+      ],
+      "model_quality_label": "Meets propensity-to-cure KPI target",
+      "financial_field": [
+        "financial",
+        "net_benefit_per_cycle_usd"
+      ],
+      "financial_label": "Net benefit per cycle (treatment targeting)",
+      "exposure_fields": {},
+      "status_field": [
+        "financial",
+        "recommended_for_production"
+      ],
+      "notes": "Real per-cycle net benefit from propensity-to-cure treatment targeting."
+    },
+    "10": {
+      "problem_name": "Credit Line Management",
+      "phase": "Phase 4 -- Operational Risk Management",
+      "category": "value_creation",
+      "summary_jsons": {
+        "financial": "notebook_57_summary.json"
+      },
+      "model_quality_path": [
+        "financial",
+        "meets_kpi_with_ci"
+      ],
+      "model_quality_label": "Meets limit-optimization KPI target (with CI)",
+      "financial_field": [
+        "financial",
+        "net_benefit_per_cycle_usd"
+      ],
+      "financial_label": "Net benefit per cycle (limit optimization)",
+      "exposure_fields": {},
+      "status_field": [
+        "financial",
+        "recommended_for_production"
+      ],
+      "notes": "Real per-cycle net benefit, net of amplified-loss cost and freeze-review cost, from utilization-trend + PD-based limit actions."
+    },
+    "11": {
+      "problem_name": "Real-Time Portfolio Monitoring",
+      "phase": "Phase 4 -- Operational Risk Management",
+      "category": "value_creation",
+      "summary_jsons": {
+        "financial": "notebook_61_summary.json"
+      },
+      "model_quality_path": [
+        "financial",
+        "real_cohort_capture_rate"
+      ],
+      "model_quality_label": "Real cohort capture rate (holdout)",
+      "financial_field": [
+        "financial",
+        "net_benefit_per_cycle_usd"
+      ],
+      "financial_label": "Net benefit per cycle (streaming breach alerts)",
+      "exposure_fields": {},
+      "status_field": [
+        "financial",
+        "recommended_for_production"
+      ],
+      "notes": "Real per-cycle net benefit from streaming aggregation + consecutive-breach alerting."
+    },
+    "12": {
+      "problem_name": "360 Degree Customer Intelligence",
+      "phase": "Phase 5 -- Customer & Business Intelligence",
+      "category": "value_creation",
+      "summary_jsons": {
+        "financial": "notebook_65_summary.json"
+      },
+      "model_quality_path": [
+        "financial",
+        "reproduced_unified_roc_auc"
+      ],
+      "model_quality_label": "Reproduced composite ROC-AUC (holdout)",
+      "financial_field": [
+        "financial",
+        "net_benefit_per_cycle_usd"
+      ],
+      "financial_label": "Net benefit per cycle (unified-profile operational efficiency)",
+      "exposure_fields": {},
+      "status_field": [
+        "financial",
+        "recommended_for_production"
+      ],
+      "notes": "Real per-cycle net benefit is OPERATIONAL EFFICIENCY (collapsing 4 case lookups into 1), explicitly designed by Problem 12 itself to not double-count Problems 9/10's benefits -- safe to sum alongside them."
+    },
+    "13": {
+      "problem_name": "Risk-Adjusted Profitability Modeling",
+      "phase": "Phase 5 -- Customer & Business Intelligence",
+      "category": "value_creation",
+      "summary_jsons": {
+        "financial": "notebook_69_summary.json"
+      },
+      "model_quality_path": [
+        "financial",
+        "reproduced_spearman_correlation"
+      ],
+      "model_quality_label": "Reproduced Spearman(risk, profitability) (holdout)",
+      "financial_field": [
+        "financial",
+        "net_benefit_per_cycle_usd"
+      ],
+      "financial_label": "Net benefit per cycle (proactive exposure reduction, cross-tier segment)",
+      "exposure_fields": {},
+      "status_field": [
+        "financial",
+        "recommended_for_production"
+      ],
+      "notes": "Real per-cycle net benefit targets the cross-tier (High Risk + Low Profitability) segment, explicitly designed by Problem 13 itself to not double-count Problems 9/10's benefits -- safe to sum alongside them."
+    }
+  },
+  "problem_artifacts_fallback_dirs": {
+    "1": "C:\\Users\\rnand\\Downloads\\amex-default-prediction\\AMEX_Enterprise_Credit_Risk_Platform\\Phase1_Foundation\\01_Problem1_Credit_Scoring_PD_Prediction\\artifacts",
+    "2": "C:\\Users\\rnand\\Downloads\\amex-default-prediction\\AMEX_Enterprise_Credit_Risk_Platform\\Phase1_Foundation\\02_Problem2_Risk_Tier_Classification\\artifacts",
+    "3": "C:\\Users\\rnand\\Downloads\\amex-default-prediction\\AMEX_Enterprise_Credit_Risk_Platform\\Phase2_Regulatory_Loss_Provisioning\\03_Problem3_Expected_Credit_Loss_IFRS9_CECL\\artifacts",
+    "4": "C:\\Users\\rnand\\Downloads\\amex-default-prediction\\AMEX_Enterprise_Credit_Risk_Platform\\Phase2_Regulatory_Loss_Provisioning\\04_Problem4_Delinquency_Escalation_Loss_Severity\\artifacts"
+  },
+  "kpi_targets": {
+    "aggregation_completeness": {
+      "definition": "Every one of the 13 prior problems' real summary JSON(s) is present, parses as valid JSON, and its problem_number field (where present) matches this registry's own expectation. 100% required -- Problem 14 cannot honestly report on a problem it could not actually read.",
+      "target": "100% (13 / 13 problems loaded and sanity-checked)",
+      "rationale": "ASSUMPTION-free: this is a structural completeness check on real files, not a statistical estimate."
+    },
+    "aggregation_scope_correctness": {
+      "definition": "The platform's TOTAL_PLATFORM_NET_VALUE_USD headline figure sums the financial_field of every problem tagged category=='value_creation' AND whose real recommended_for_production flag is True -- and ONLY those. This KPI passes when the real, programmatically-derived inclusion set exactly equals the expected set computed independently from each problem's own real category/status fields (i.e. the filter logic itself is verified against the data it filters, not just trusted to have been written correctly).",
+      "target": "Computed inclusion set == independently-derived expected set (exact set equality)",
+      "rationale": "The single most important integrity check an executive rollup can make: proving foundational models (Problems 1, 2), the reserve-optimization problem (3), and the one not-recommended-for-production system (Problem 7) are correctly EXCLUDED from the value-creation total, while every recommended, benefit-bearing problem is correctly INCLUDED exactly once."
+    }
+  },
+  "expected_foundational_problems": [
+    1,
+    2
+  ],
+  "expected_reserve_optimization_problems": [
+    3
+  ],
+  "expected_value_creation_candidate_problems": [
+    4,
+    5,
+    6,
+    7,
+    8,
+    9,
+    10,
+    11,
+    12,
+    13
+  ],
+  "random_seed": 42
+}
