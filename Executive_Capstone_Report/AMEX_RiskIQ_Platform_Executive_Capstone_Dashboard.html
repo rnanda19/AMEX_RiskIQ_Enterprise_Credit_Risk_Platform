@@ -131,6 +131,24 @@
   .chart-card { background: var(--card); border: 1px solid var(--border); border-radius: 10px; padding: 20px; }
   .chart-card h3 { margin: 0 0 12px; font-size: 1.05rem; }
 
+  .methodology {
+    background: var(--card);
+    border: 1px solid var(--border);
+    border-left: 3px solid var(--gold);
+    border-radius: 10px;
+    padding: 22px 26px;
+  }
+  .methodology > p { color: var(--text-muted); font-size: 0.92rem; line-height: 1.6; margin: 0 0 14px; }
+  .methodology ul { margin: 0 0 14px; padding-left: 20px; display: grid; gap: 10px; }
+  .methodology li { font-size: 0.9rem; color: var(--text-muted); line-height: 1.55; }
+  .methodology li b { color: var(--text); }
+  .methodology .takeaway {
+    font-size: 0.9rem; color: var(--text); line-height: 1.6;
+    background: var(--bg); border: 1px solid var(--border); border-radius: 8px;
+    padding: 12px 16px; margin: 0;
+  }
+  .methodology .takeaway b { color: var(--ink); }
+
   .controls { display: flex; gap: 10px; flex-wrap: wrap; margin-bottom: 16px; }
   .controls select, .controls input {
     font: inherit; padding: 9px 12px; border-radius: 7px; border: 1px solid var(--border);
@@ -212,6 +230,21 @@
     <div class="chart-grid">
       <div class="chart-card"><h3>Real Net Value Build-Up (Included Problems)</h3><canvas id="waterfallChart" height="260"></canvas></div>
       <div class="chart-card"><h3>All 14 Problems by Category</h3><canvas id="categoryChart" height="260"></canvas></div>
+    </div>
+  </section>
+
+  <section>
+    <h2>Financial Methodology -- What Is Measured vs. What Is Assumed</h2>
+    <div class="methodology">
+      <p>The Kaggle American Express Default Prediction dataset this entire platform is built on is deliberately anonymized: it contains no revenue, credit-limit, exposure, or loss-recovery columns, by the competition's own design. Every dollar figure above is therefore built from two clearly separated ingredients, and this platform never blends the two without saying which is which.</p>
+      <ul>
+        <li><b>Measured, from the real data:</b> every predicted default probability, population count, and true/false-positive and true/false-negative outcome count in this report is computed live by that problem's own trained model against real, held-out customers -- fully reproducible by re-running the platform's own notebooks against the same dataset.</li>
+        <li><b>Assumed, where the dataset has no ground truth:</b> exposure-at-default, loss-given-default, revenue-per-account, and every treatment cost used in a net-benefit calculation are explicitly labeled ASSUMPTION values, sourced from commonly-cited unsecured-retail credit industry benchmarks -- never invented silently and never presented as if the dataset itself provided them.</li>
+        <li><b>Every net-benefit figure is the product of the two:</b> real population counts and real model outcomes, multiplied by assumption-labeled dollar values per outcome. No dollar total anywhere in this report is read directly from a data column, because no such column exists in the raw dataset.</li>
+        <li><b>Full traceability, not a hidden constant:</b> all 10 of this platform's <code>financial_assumptions.json</code> files -- one per value-creation problem -- log the exact value, its source, and a documented rationale for every assumption used, each explicitly marked "edit to your institution's actual figures."</li>
+        <li><b>The revenue proxy, specifically (Problem 13):</b> built from the dataset's own real "S_" (Spend) feature columns -- real and genuinely present, though anonymized -- converted into a real per-customer spend percentile rank, then scaled by an assumption-labeled average revenue figure. Reported explicitly as a revenue proxy, never as audited revenue.</li>
+      </ul>
+      <p class="takeaway">What this means for the <b>$429,926,252.73</b> total: it is a transparent, fully-documented methodology applied to real model outputs and stated financial assumptions -- not a number American Express, or any institution, has realized. Every assumption is designed to be replaced with an institution's own real unit economics to produce that institution's own real total.</p>
     </div>
   </section>
 
