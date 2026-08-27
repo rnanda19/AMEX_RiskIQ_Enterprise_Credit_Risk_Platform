@@ -396,6 +396,18 @@ ASSUMPTION tolerance) -- the specific, testable claim this problem's design
 depends on: that aggregating four real signals does not destroy the signal
 any one of them already carried.
 
+**Real bug found and fixed 2026-08-27, on the user's own first run of
+Notebook 62:** Section 1 read `NB52_SUMMARY["model_path"]` directly, but
+`notebook_52_summary.json` (Problem 9's Validation & Deployment summary) has
+no top-level `model_path` key -- only `deployment_policy_path`. The real
+model path lives one level down, inside that policy JSON itself
+(`COLLECTIONS_DEPLOYMENT_POLICY["model_path"]`, written by Notebook 52
+Section 7), the same nesting pattern this platform already uses for every
+other cross-problem model-path lookup. Fixed by loading
+`P9_DEPLOYMENT_POLICY` from `NB52_SUMMARY["deployment_policy_path"]` first,
+then reading `model_path` from that policy dict -- Notebook 62 repackaged,
+re-verified with `check_notebook_syntax.py` (64/64 clean), and redelivered.
+
 Notebook 63 (Modeling) shipped 2026-08-27, generated ahead of the user's own
 run of Notebook 62 -- every value it needs from Notebook 62 is read from
 that notebook's own recorded summary JSON at runtime (never a hardcoded
