@@ -232,7 +232,7 @@ work, not as progress toward an unverified number.
 | Phase 2 — Regulatory & Loss Provisioning | Problem 3 (ECL/IFRS9/CECL), Problem 4 (Delinquency/Loss Severity), Problem 5 (Early Payment Default) | **Complete, pushed to GitHub 2026-08-25** (12 notebooks + Global Standard hardening pass) |
 | Phase 3 — Behavioral Intelligence | Problems 6, 7, 8 | **Complete, pushed to GitHub 2026-08-25** (12 notebooks + real notebook-output artifacts + Global Standard hardening pass, all pushed 2026-08-25) — Problem 6 complete (Notebooks 38-41), RECOMMENDED FOR PRODUCTION (W=3 trailing window, 99.2% AUC retention); Problem 7 complete (Notebooks 42-45), concluded NOT RECOMMENDED FOR PRODUCTION (honest result -- real default-rate lift below KPI target; a v2 enhancement attempt, Notebooks 46-47, was built, showed genuine but insufficient improvement, and was deliberately abandoned per user decision, freeing 46-49 for Problem 8); Problem 8 complete -- Notebooks 46 (Business Understanding & Policy), 47 (Modeling), 48 (Validation & Deployment), and 49 (Financial-Impact Reporting & Packaging) all shipped, RECOMMENDED FOR PRODUCTION on this run (both hard-gate KPIs -- monotonicity and coherence -- met; Severe/Low default ratio 107.2x). All 12 Phase 3 notebooks (38-49) verified: syntax-clean, idempotent, pyflakes-clean. Hardening pass: 21 new tests (94 total platform-wide), Docker for all 3 services, MODEL_CARD/CHANGELOG/requirements.txt, BENCHMARKS.md entries, CI wiring -- see "Two more real bugs found" above. |
 | Phase 4 — Operational Risk Management | Problems 9, 10, 11 | **Complete, pushed to GitHub 2026-08-27** (Problem 11 pushed with real RECOMMENDED FOR PRODUCTION results; Problems 9 and 10 are code-complete, 12 notebooks total, but their real run results are not yet synced into this repository -- see each problem's own README for honest current status). |
-| Phase 5 — Customer & Business Intelligence | Problems 12, 13, 14 | **Started 2026-08-27.** Problem 12 (360° Customer Intelligence): code-complete, all 4 notebooks shipped (62-65) -- unified profile composes Problems 1/6/9/10's real outputs, both hard-gating KPIs (profile_completeness, composite_non_inferiority) designed with a 200-resample bootstrap CI, real lookup-by-customer_ID FastAPI service, 3x independent reproduction. Not yet run end-to-end by the user, not yet pushed to GitHub. Problems 13, 14 not started. |
+| Phase 5 — Customer & Business Intelligence | Problems 12, 13, 14 | **Started 2026-08-27.** Problem 12 (360° Customer Intelligence): code-complete, all 4 notebooks shipped (62-65) -- unified profile composes Problems 1/6/9/10's real outputs, both hard-gating KPIs (profile_completeness, composite_non_inferiority) designed with a 200-resample bootstrap CI, real lookup-by-customer_ID FastAPI service, 3x independent reproduction. Problem 13 (Risk-Adjusted Profitability Modeling): code-complete, all 4 notebooks shipped (66-69) -- real Spend-column revenue proxy discovered programmatically from the raw CSV, both hard-gating KPIs (profitability_tier_monotonicity, risk_adjustment_materiality) with a 200-resample bootstrap CI, real cross-tier (High Risk + Low Profitability) segment priced as this problem's own additive financial claim. Not yet run end-to-end by the user, not yet pushed to GitHub. Problem 14 not started. |
 
 ## Phase 3 build plan — scoped 2026-08-25
 
@@ -490,5 +490,88 @@ Intelligence) end to end: all 4 notebooks (62-65) written, syntax-checked,
 and committed locally (not yet run by the user for Notebook 65 specifically,
 not yet pushed to GitHub, per this platform's standing practice).
 
-Next problem-roadmap item: Problem 13 (Risk-Adjusted Profitability Modeling),
-Notebooks 66-69.
+Notebook 66 (Business Understanding & Policy) shipped 2026-08-27, opening
+Problem 13 (Risk-Adjusted Profitability Modeling). Real Spend columns
+("S_" prefix, per the AMEX Kaggle competition's own documented column
+groups D_/S_/P_/B_/R_, excluding the real statement-date exception S_2)
+are discovered programmatically from the raw CSV's own header via
+`pl.scan_csv(..., n_rows=0).collect_schema().names()` -- not hardcoded --
+and verified non-degenerate on a real 2,000-row sample before being trusted
+as this problem's revenue proxy basis; the notebook would raise a
+`RuntimeError` rather than proceed if no such columns existed. Defines
+`REVENUE_ASSUMPTIONS` (average monthly revenue per account, bounded
+revenue-multiplier floor/ceiling) as explicit, sourced ASSUMPTIONs (the
+same treatment as Notebook 08's `EAD_PER_ACCOUNT_USD` precedent) and the
+tertile `PROFITABILITY_TIER_NAMES`. Two new hard-gating KPIs:
+`profitability_tier_monotonicity` (real per-tier default rate must be
+non-increasing Low to High Profitability -- the inverse-direction cousin
+of the tertile-monotonicity convention reused from Problems 4/8/10/12) and
+`risk_adjustment_materiality` (genuinely new: the real Spearman rank
+correlation between `UNIFIED_RISK_SCORE` and `PROFITABILITY_SCORE` on real
+holdout must be <= an ASSUMPTION -0.15 threshold, proving PD-adjustment
+measurably re-ranks customers rather than revenue dominating the score).
+
+Notebook 67 (Modeling) shipped 2026-08-27: computes each real customer's
+`SPEND_PERCENTILE_RANK` via one real streaming pass over the raw CSV
+(latest real statement per customer, real rank-based percentile over the
+real mean of the discovered Spend columns), with an honest 0.5 fallback
+for customers with no real recorded spend -- never fabricated. Derives
+`REVENUE_MULTIPLIER`, `REVENUE_PER_ACCOUNT_USD`, `PD_ADJUSTED_REVENUE_USD`
+(net of `UNIFIED_RISK_SCORE`), `EXPECTED_LOSS_USD`, and
+`PROFITABILITY_SCORE` via chained polars expressions; fits real tertile
+cuts on the real TRAIN split; validates both hard-gating KPIs on real
+HOLDOUT. Persists `profitability_scored_profile.parquet` and
+`profitability_modeling_results.json`; generates a twin-axis tier P&L
+chart and a risk-vs-profitability hexbin chart from real data.
+
+Notebook 68 (Validation & Deployment) shipped 2026-08-27: independently
+reproduces Notebook 67's entire pipeline from a fresh kernel (including a
+fresh real streaming CSV pass and refitted tertile cuts), comparing every
+reproduced value to Notebook 67's reported values within tolerance;
+cross-checks the persisted profile against a real 500-customer sample;
+bootstraps a 200-resample 95% CI on the `risk_adjustment_materiality`
+Spearman correlation. Reuses Notebook 64's precomputed-lookup FastAPI
+architecture for `profitability_scoring_lookup_service.py`
+(`GET /profitability/{customer_id}`, `X-API-Key` auth on every endpoint
+but `/health`) since Problem 13's deliverable is a precomputed artifact,
+not a model to re-run live per request -- explicitly avoiding
+re-implementing Notebook 67's pipeline a second time, the same
+duplication anti-pattern flagged in Notebooks 46/50/56/64. Self-tested
+live via `TestClient` against one real customer per tier plus
+auth-rejection and unknown-customer-404 checks. All 68 notebooks pass
+`check_notebook_syntax.py`; full local test suite (27 tests) green.
+
+Notebook 69 (Financial Impact, Reporting & Packaging) shipped 2026-08-27,
+completing Problem 13, following the standard 15-section elevated-
+reporting template established across Notebooks 29/33/37/41/45/49/53/57/
+61/65. This problem's own genuinely new, additive financial claim: the
+real cross-tier segment of customers who are simultaneously High Risk
+(Problem 12's `UNIFIED_RISK_GRADE`) *and* Low Profitability (this
+problem's own `PROFITABILITY_TIER`) -- a segment invisible to either
+single-axis lens alone, read directly off the real persisted
+`unified_customer_profile.parquet` joined with this problem's own real
+`profitability_scored_profile.parquet`. Prices a targeted PROACTIVE
+EXPOSURE REDUCTION action against that real segment's own real total
+expected loss (an explicit `exposure_reduction_rate` ASSUMPTION), net of
+a real per-account `segment_review_cost_usd_per_account` ASSUMPTION --
+explicitly, in code comments, NOT double-counting Problems 9/10's own
+already-priced collections/alerting benefits (Notebooks 53, 57), since
+this is a distinct, newly-identified segment those problems' single-axis
+scores do not themselves surface. Section 8 performs a third independent
+reproduction: live-drives the exact deployed
+`profitability_scoring_lookup_service.py` against a real tier-stratified
+sample (100/tier) plus a dedicated real sample from the cross-tier segment
+itself, cross-checking every response against the persisted profile.
+Packages a multi-tab interactive HTML dashboard (Overview, Tier P&L
+Summary, Live Sample, Financial Calculator, SMART Suggestions, Policy &
+Validation), a Word financial-impact report, and a 6-sheet Excel
+workbook. All 69 notebooks pass `check_notebook_syntax.py`; full local
+test suite (27 tests) green.
+
+This completes Phase 5's second problem (Problem 13, Risk-Adjusted
+Profitability Modeling) end to end: all 4 notebooks (66-69) written,
+syntax-checked, and committed locally (not yet run by the user, not yet
+pushed to GitHub, per this platform's standing practice).
+
+Next problem-roadmap item: Problem 14 (Executive Decision Support
+Dashboard), Notebooks 70-73 -- depends on all 13 prior problems.
