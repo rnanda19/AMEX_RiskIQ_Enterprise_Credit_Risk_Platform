@@ -2,15 +2,15 @@
 
 [![CI](https://github.com/rnanda19/AMEX_RiskIQ_Enterprise_Credit_Risk_Platform/actions/workflows/ci.yml/badge.svg)](https://github.com/rnanda19/AMEX_RiskIQ_Enterprise_Credit_Risk_Platform/actions/workflows/ci.yml) [![Code Quality](https://github.com/rnanda19/AMEX_RiskIQ_Enterprise_Credit_Risk_Platform/actions/workflows/code-quality.yml/badge.svg)](https://github.com/rnanda19/AMEX_RiskIQ_Enterprise_Credit_Risk_Platform/actions/workflows/code-quality.yml) [![Python 3.11](https://img.shields.io/badge/python-3.11-blue.svg)]() [![CRISP-DM](https://img.shields.io/badge/methodology-CRISP--DM-informational.svg)]() [![License: All Rights Reserved](https://img.shields.io/badge/license-All%20Rights%20Reserved-lightgrey.svg)](LICENSE)
 
-## 📊 Executive Capstone -- Real Results, All 14 Problems
+## 📊 Executive Rollup -- Real Results, All 14 Problems
 
-### 💰 [$429,926,252.73 / cycle -- Real Platform Net Value](Executive_Capstone_Report/AMEX_RiskIQ_Platform_Executive_Capstone_Report.docx)
+### 💰 [$429,926,252.73 / cycle -- Real Platform Net Value](Executive_Rollup_Report/AMEX_RiskIQ_Platform_Executive_Rollup_Report.docx)
 
-**[📄 Full Capstone Report (Word)](Executive_Capstone_Report/AMEX_RiskIQ_Platform_Executive_Capstone_Report.docx)** &nbsp;·&nbsp; **[📈 Interactive Capstone Dashboard (HTML, live)](https://rnanda19.github.io/AMEX_RiskIQ_Enterprise_Credit_Risk_Platform/Executive_Capstone_Report/AMEX_RiskIQ_Platform_Executive_Capstone_Dashboard.html)** &nbsp;·&nbsp; **[📊 Capstone Workbook (Excel)](Executive_Capstone_Report/AMEX_RiskIQ_Platform_Executive_Capstone_Workbook.xlsx)**
+**[📄 Full Rollup Report (Word)](Executive_Rollup_Report/AMEX_RiskIQ_Platform_Executive_Rollup_Report.docx)** &nbsp;·&nbsp; **[📈 Interactive Rollup Dashboard (HTML, live)](https://rnanda19.github.io/AMEX_RiskIQ_Enterprise_Credit_Risk_Platform/Executive_Rollup_Report/AMEX_RiskIQ_Platform_Executive_Rollup_Dashboard.html)** &nbsp;·&nbsp; **[📊 Rollup Workbook (Excel)](Executive_Rollup_Report/AMEX_RiskIQ_Platform_Executive_Rollup_Workbook.xlsx)**
 
 *(The Interactive Dashboard renders live via GitHub Pages. The Word Report and Excel Workbook open as downloads — normal browser behavior for Office files, not a broken link — view them in Word/Excel or Google Docs/Sheets. Every other problem's own README follows this same pattern for its Word/Excel deliverables.)*
 
-A complete, production-grade 14-problem, 5-phase credit risk platform built end-to-end on the real Kaggle **American Express Default Prediction** dataset — 73 notebooks, real measured results for every problem, zero fabrication. See the capstone report above for the full narrative, or `ROADMAP.md` for the phase-by-phase build history.
+A complete, production-grade 14-problem, 5-phase credit risk platform built end-to-end on the real Kaggle **American Express Default Prediction** dataset — 73 notebooks, real measured results for every problem, zero fabrication. See the rollup report above for the full narrative, or `ROADMAP.md` for the phase-by-phase build history.
 
 Every number in this repository is either computed live by that notebook's own code on the real dataset, or is an explicitly labeled, editable `ASSUMPTION` where the dataset genuinely has no ground truth for it — never silently presented as fact.
 
@@ -46,7 +46,7 @@ All 14 problems, grouped by phase and listed in strict numeric order (each links
 13. [Problem 13 — Risk-Adjusted Profitability Modeling](Problem13_Risk_Adjusted_Profitability_Modeling/README.md)
 14. [Problem 14 — Executive Decision Support Dashboard](Problem14_Executive_Decision_Support_Dashboard/README.md)
 
-**Platform-wide:** [Executive Capstone Report](Executive_Capstone_Report/) · [Roadmap / Build History](ROADMAP.md) · [Benchmarks](BENCHMARKS.md) · [Live Dashboards (below)](#live-dashboards) · [Repository Structure (below)](#repository-structure)
+**Platform-wide:** [Executive Rollup Report](Executive_Rollup_Report/) · [Roadmap / Build History](ROADMAP.md) · [Benchmarks](BENCHMARKS.md) · [Live Dashboards (below)](#live-dashboards) · [Repository Structure (below)](#repository-structure)
 
 ## Platform at a Glance (Real, Measured)
 
@@ -69,7 +69,7 @@ All 14 problems, grouped by phase and listed in strict numeric order (each links
 | Credit-line limit optimization (Problem 10, measured) | Net benefit $4,108,042.50/cycle, KPI target NOT met (with CI) -- the one system in this platform honestly excluded on its own real backtest |
 | 360° unified customer intelligence (Problem 12, measured) | Composite AUC 0.9590 vs. best-single 0.9626, net benefit $1,275,022/cycle, RECOMMENDED FOR PRODUCTION |
 | Risk-adjusted profitability modeling (Problem 13, measured) | Spearman(risk, profitability) = -0.9784, net benefit $58,060,687.58/cycle, RECOMMENDED FOR PRODUCTION |
-| **Total platform net value across all 9 recommended value-creation problems** | **$429,926,252.73 / cycle** -- see the [Executive Capstone Report](Executive_Capstone_Report/AMEX_RiskIQ_Platform_Executive_Capstone_Report.docx) |
+| **Total platform net value across all 9 recommended value-creation problems** | **$429,926,252.73 / cycle** -- see the [Executive Rollup Report](Executive_Rollup_Report/AMEX_RiskIQ_Platform_Executive_Rollup_Report.docx) |
 | Live FastAPI self-tests, all deployable services (measured) | Pass |
 
 ## Live Dashboards
@@ -83,14 +83,14 @@ Listed in sequential problem order (1 → 14). Served via GitHub Pages — click
 4. 📊 [Problem 4 — Loss Severity Financial Impact Dashboard](https://rnanda19.github.io/AMEX_RiskIQ_Enterprise_Credit_Risk_Platform/Problem4_Delinquency_Escalation_Loss_Severity/reports/financial_impact_reporting_packaging/financial_impact_dashboard.html) — tiered-LGD vs flat-LGD loss-severity dashboard
 5. 📊 [Problem 5 — Early Payment Default Financial Impact Dashboard](https://rnanda19.github.io/AMEX_RiskIQ_Enterprise_Credit_Risk_Platform/Problem5_Early_Payment_Default_Detection/reports/financial_impact_reporting_packaging/financial_impact_dashboard.html) — early-warning value and loss-prevention ROI dashboard
 6. 📊 [Problem 6 — Behavioral Scoring Financial Impact Dashboard](https://rnanda19.github.io/AMEX_RiskIQ_Enterprise_Credit_Risk_Platform/Problem6_Dynamic_Behavioral_Credit_Scoring/reports/financial_impact_reporting_packaging/financial_impact_dashboard.html) — trailing-window recency-model value and loss-prevention ROI dashboard
-7. 📊 [Problem 7 — Early Warning Financial Impact Dashboard](https://rnanda19.github.io/AMEX_RiskIQ_Enterprise_Credit_Risk_Platform/Problem7_Early_Warning_System/reports/financial_impact_reporting_packaging/early_warning_financial_impact_dashboard.html) — candidate sweep and financial-impact dashboard (reflects this problem's earlier v1 run, honestly reported as a KPI miss at the time; the current, re-verified result is RECOMMENDED FOR PRODUCTION — see Platform at a Glance above and the Executive Capstone Report)
+7. 📊 [Problem 7 — Early Warning Financial Impact Dashboard](https://rnanda19.github.io/AMEX_RiskIQ_Enterprise_Credit_Risk_Platform/Problem7_Early_Warning_System/reports/financial_impact_reporting_packaging/early_warning_financial_impact_dashboard.html) — candidate sweep and financial-impact dashboard (reflects this problem's earlier v1 run, honestly reported as a KPI miss at the time; the current, re-verified result is RECOMMENDED FOR PRODUCTION — see Platform at a Glance above and the Executive Rollup Report)
 8. 📊 [Problem 8 — Roll-Rate Financial Impact Dashboard](https://rnanda19.github.io/AMEX_RiskIQ_Enterprise_Credit_Risk_Platform/Problem8_Roll_Rate_Modeling/reports/financial_impact_reporting_packaging/roll_rate_financial_impact_dashboard.html) — transition-matrix and financial-impact dashboard
 9. 📊 [Problem 9 — Collections Optimization Financial Impact Dashboard](https://rnanda19.github.io/AMEX_RiskIQ_Enterprise_Credit_Risk_Platform/Problem9_Collections_Optimization/reports/financial_impact_reporting_packaging/collections_optimization_financial_impact_dashboard.html) — real net benefit $341,908,210/cycle, RECOMMENDED FOR PRODUCTION (the platform's single largest value-creation figure)
 10. 📊 [Problem 10 — Credit Line Management Financial Impact Dashboard](https://rnanda19.github.io/AMEX_RiskIQ_Enterprise_Credit_Risk_Platform/Problem10_Credit_Line_Management/reports/financial_impact_reporting_packaging/credit_line_management_financial_impact_dashboard.html) — real net benefit $4,108,042.50/cycle, KPI target NOT met (with CI) — honestly excluded from the platform total
 11. 📊 [Problem 11 — Real-Time Portfolio Monitoring Ops Dashboard](https://rnanda19.github.io/AMEX_RiskIQ_Enterprise_Credit_Risk_Platform/Problem11_Real_Time_Portfolio_Monitoring/reports/financial_impact_reporting_packaging/real_time_portfolio_monitoring_ops_dashboard.html) — interactive alert-feed + KPI ops dashboard, joint-deviation cohort scoring (2.67x lift, RECOMMENDED FOR PRODUCTION)
 12. 📊 [Problem 12 — 360° Customer Intelligence Ops Dashboard](https://rnanda19.github.io/AMEX_RiskIQ_Enterprise_Credit_Risk_Platform/Problem12_360_Customer_Intelligence/reports/financial_impact_reporting_packaging/Problem12_360_Ops_Dashboard.html) — real composite AUC 0.9590, net benefit $1,275,022/cycle, RECOMMENDED FOR PRODUCTION
 13. 📊 [Problem 13 — Risk-Adjusted Profitability Dashboard](https://rnanda19.github.io/AMEX_RiskIQ_Enterprise_Credit_Risk_Platform/Problem13_Risk_Adjusted_Profitability_Modeling/reports/financial_impact_reporting_packaging/Problem13_Profitability_Dashboard.html) — real Spearman(risk, profitability) = -0.9784, net benefit $58,060,687.58/cycle, RECOMMENDED FOR PRODUCTION
-14. 📊 [Problem 14 — Executive Decision Support Dashboard](https://rnanda19.github.io/AMEX_RiskIQ_Enterprise_Credit_Risk_Platform/Problem14_Executive_Decision_Support_Dashboard/reports/financial_impact_reporting_packaging/Problem14_Executive_Dashboard.html) — the platform's own real BI aggregation layer across all 13 prior problems: **$429,926,252.73/cycle total platform net value**, 4x independently reproduced, RECOMMENDED FOR PRODUCTION. See also the platform-wide **[Executive Capstone Dashboard](https://rnanda19.github.io/AMEX_RiskIQ_Enterprise_Credit_Risk_Platform/Executive_Capstone_Report/AMEX_RiskIQ_Platform_Executive_Capstone_Dashboard.html)** at the top of this README.
+14. 📊 [Problem 14 — Executive Decision Support Dashboard](https://rnanda19.github.io/AMEX_RiskIQ_Enterprise_Credit_Risk_Platform/Problem14_Executive_Decision_Support_Dashboard/reports/financial_impact_reporting_packaging/Problem14_Executive_Dashboard.html) — the platform's own real BI aggregation layer across all 13 prior problems: **$429,926,252.73/cycle total platform net value**, 4x independently reproduced, RECOMMENDED FOR PRODUCTION. See also the platform-wide **[Executive Rollup Dashboard](https://rnanda19.github.io/AMEX_RiskIQ_Enterprise_Credit_Risk_Platform/Executive_Rollup_Report/AMEX_RiskIQ_Platform_Executive_Rollup_Dashboard.html)** at the top of this README.
 
 ## Repository Structure
 
@@ -138,7 +138,7 @@ AMEX_RiskIQ_Enterprise_Credit_Risk_Platform/
 ├── Problem14_Executive_Decision_Support_Dashboard/  4 notebooks -- platform-wide BI aggregation
 │                                                 layer across all 13 prior problems
 │
-├── Executive_Capstone_Report/                   Platform-wide capstone: Word report, live HTML
+├── Executive_Rollup_Report/                   Platform-wide rollup: Word report, live HTML
 │                                                 dashboard, Excel workbook -- rolls up all 14 problems
 ├── shared/                                      Cross-problem library (metrics, config, monitoring),
 │                                                 extracted & unit-tested -- see shared/tests/
@@ -237,7 +237,7 @@ Polars (WARP-tuned thread pools), NumPy/Pandas, scikit-learn, XGBoost/LightGBM/C
 - **Phase 2 — Regulatory & Loss Provisioning**: Problem 3 (Expected Credit Loss, IFRS9/CECL), Problem 4 (Delinquency Escalation / Loss Severity), Problem 5 (Early Payment Default Detection) — **complete**.
 - **Phase 3 — Behavioral Intelligence**: Problem 6 (Dynamic/Behavioral Credit Scoring), Problem 7 (Early Warning System), Problem 8 (Roll-Rate Modeling) — **complete**, including the Global Standard hardening pass (tests, Docker, MODEL_CARD/CHANGELOG).
 - **Phase 4 — Operational Risk Management**: Problem 9 (Collections Optimization), Problem 10 (Credit Line Management), Problem 11 (Real-Time Portfolio Monitoring) — **complete**, real results for all three, including the hardening delta below.
-- **Phase 5 — Customer & Business Intelligence**: Problem 12 (360° Customer Intelligence), Problem 13 (Risk-Adjusted Profitability Modeling), Problem 14 (Executive Decision Support Dashboard) — **complete**, real results for all three, including the platform-wide BI aggregation, the Executive Capstone Report linked at the top of this README, and the hardening delta below.
+- **Phase 5 — Customer & Business Intelligence**: Problem 12 (360° Customer Intelligence), Problem 13 (Risk-Adjusted Profitability Modeling), Problem 14 (Executive Decision Support Dashboard) — **complete**, real results for all three, including the platform-wide BI aggregation, the Executive Rollup Report linked at the top of this README, and the hardening delta below.
 
 **The full 14-problem, 5-phase platform is complete end to end (Notebooks 1-73), with real, verified results throughout.** See `ROADMAP.md` for the full build history, including three real production bugs found and fixed on the user's own runs.
 

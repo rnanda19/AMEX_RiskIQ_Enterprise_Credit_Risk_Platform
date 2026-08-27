@@ -6,7 +6,7 @@ Phase 4, Problem 9 of the platform: a 4-notebook build (Notebooks 50-53) coverin
 
 ## Status: Complete -- Real Results Synced, Hardened (2026-08-27)
 
-**Real, synced results:** a real, trained XGBoost propensity-to-cure classifier -- real holdout ROC-AUC **0.8236** (reproduced, bit-identical), meeting the KPI target (>= 0.60). **Recommended for production.** Real net benefit: **$341,908,210 per cycle** -- the platform's single largest value-creation figure (see the [Executive Capstone Report](../Executive_Capstone_Report/) and root `README.md`'s Platform-at-a-Glance table).
+**Real, synced results:** a real, trained XGBoost propensity-to-cure classifier -- real holdout ROC-AUC **0.8236** (reproduced, bit-identical), meeting the KPI target (>= 0.60). **Recommended for production.** Real net benefit: **$341,908,210 per cycle** -- the platform's single largest value-creation figure (see the [Executive Rollup Report](../Executive_Rollup_Report/) and root `README.md`'s Platform-at-a-Glance table).
 
 📊 [Financial Impact Dashboard](https://rnanda19.github.io/AMEX_RiskIQ_Enterprise_Credit_Risk_Platform/Problem9_Collections_Optimization/reports/financial_impact_reporting_packaging/collections_optimization_financial_impact_dashboard.html) · 📄 [Financial Impact Report (Word)](reports/financial_impact_reporting_packaging/Collections_Optimization_Financial_Impact_Report.docx) · 📊 [Financial Impact Workbook (Excel)](reports/financial_impact_reporting_packaging/AMEX_Problem9_Financial_Impact_Workbook.xlsx)
 

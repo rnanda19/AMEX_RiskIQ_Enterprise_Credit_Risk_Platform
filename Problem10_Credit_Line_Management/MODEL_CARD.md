@@ -44,7 +44,7 @@ consistent deployment artifact -- the figures immediately below are from the pri
 - **Deployment status: NOT RECOMMENDED FOR PRODUCTION** -- real hard-gate KPIs failed on both the
   original run and the redesigned run (see addendum above). Reported honestly rather than rounded up;
   this is the one system in the platform's 9-problem value-creation total that is deliberately excluded
-  for exactly this reason (see `Executive_Capstone_Report/` and the root `README.md`'s
+  for exactly this reason (see `Executive_Rollup_Report/` and the root `README.md`'s
   Platform-at-a-Glance table).
 
 ## Limitations
