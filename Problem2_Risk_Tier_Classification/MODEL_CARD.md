@@ -36,7 +36,7 @@ model's own card.
 Translate a continuous PD score into an actionable underwriting/pricing
 grade, since credit policy is written in discrete risk grades, not raw
 probabilities. Served in real time via
-`src/fastapi_service/risk_tier_service.py` (`/risk-tier` endpoint).
+`src/risk_tier_service.py` (`/risk-tier` endpoint).
 
 ## Evaluation (measured, Notebook 21)
 

@@ -2,7 +2,7 @@
 
 [![CI](https://github.com/rnanda19/AMEX_RiskIQ_Enterprise_Credit_Risk_Platform/actions/workflows/ci.yml/badge.svg)](https://github.com/rnanda19/AMEX_RiskIQ_Enterprise_Credit_Risk_Platform/actions/workflows/ci.yml) [![Code Quality](https://github.com/rnanda19/AMEX_RiskIQ_Enterprise_Credit_Risk_Platform/actions/workflows/code-quality.yml/badge.svg)](https://github.com/rnanda19/AMEX_RiskIQ_Enterprise_Credit_Risk_Platform/actions/workflows/code-quality.yml) [![Python 3.11](https://img.shields.io/badge/python-3.11-blue.svg)]() [![CRISP-DM](https://img.shields.io/badge/methodology-CRISP--DM-informational.svg)]() [![License: All Rights Reserved](https://img.shields.io/badge/license-All%20Rights%20Reserved-lightgrey.svg)](LICENSE)
 
-An enterprise-grade credit risk platform built end-to-end on the real Kaggle **American Express Default Prediction** dataset. This repository holds **Phase 1: Foundation**, **Phase 2: Regulatory & Loss Provisioning**, and **Phase 3: Behavioral Intelligence** of a larger 14-problem, 5-phase roadmap — eight problems, 49 notebooks combined. Later phases (Operational Risk Management, Customer & Business Intelligence) are planned.
+An enterprise-grade credit risk platform built end-to-end on the real Kaggle **American Express Default Prediction** dataset. This repository holds **Phase 1: Foundation**, **Phase 2: Regulatory & Loss Provisioning**, **Phase 3: Behavioral Intelligence**, and **Phase 4: Operational Risk Management** (Problems 9-11) of a larger 14-problem, 5-phase roadmap — eleven problems, 61 notebooks combined so far. Problem 11 is fully packaged; Problems 9 and 10's packaging/reporting stage is still pending (see the Live Dashboards section below). **Phase 5: Customer & Business Intelligence** is planned.
 
 Every number in this repository is either computed live by that notebook's own code on the real dataset, or is an explicitly labeled, editable `ASSUMPTION` where the dataset genuinely has no ground truth for it — never silently presented as fact.
 
@@ -22,20 +22,25 @@ Every number in this repository is either computed live by that notebook's own c
 | Trailing-window behavioral score (Problem 6, measured) | W=3, 99.2% AUC retention, RECOMMENDED FOR PRODUCTION |
 | Z-score deviation early-warning signal (Problem 7, measured) | 1.41x default-rate lift, KPI not met, NOT RECOMMENDED FOR PRODUCTION |
 | Roll-rate Markov transition model (Problem 8, measured) | Severe/Low default ratio 107.2x, both hard-gate KPIs met, RECOMMENDED FOR PRODUCTION |
+| Portfolio-monitoring control chart + joint-deviation cohort score (Problem 11, measured) | 2.67x cohort default-rate lift, MCC 0.401, RECOMMENDED FOR PRODUCTION |
 | Live FastAPI self-tests, all deployable services (measured) | Pass |
 
 ## Live Dashboards
 
-- 📊 [Financial Impact Dashboard](https://rnanda19.github.io/AMEX_RiskIQ_Enterprise_Credit_Risk_Platform/Problem1_Credit_Scoring_PD_Prediction/reports/executive_reports/Financial_Impact_Dashboard.html) — interactive ROI, revenue-impact, and loss-reduction dashboard for Problem 1
-- 📈 [Power BI Dashboard Preview](https://rnanda19.github.io/AMEX_RiskIQ_Enterprise_Credit_Risk_Platform/Problem1_Credit_Scoring_PD_Prediction/reports/powerbi_dashboard/PowerBI_Dashboard_Preview.html) — star-schema data model and dashboard preview
-- 📊 [ECL Financial Impact Dashboard](https://rnanda19.github.io/AMEX_RiskIQ_Enterprise_Credit_Risk_Platform/Problem3_Expected_Credit_Loss_IFRS9_CECL/reports/financial_impact_reporting_packaging/ecl_financial_impact_dashboard.html) — IFRS9/CECL reserve-change and stress-buffer dashboard for Problem 3
-- 📊 [Loss Severity Financial Impact Dashboard](https://rnanda19.github.io/AMEX_RiskIQ_Enterprise_Credit_Risk_Platform/Problem4_Delinquency_Escalation_Loss_Severity/reports/financial_impact_reporting_packaging/financial_impact_dashboard.html) — tiered-LGD vs flat-LGD loss-severity dashboard for Problem 4
-- 📊 [Early Payment Default Financial Impact Dashboard](https://rnanda19.github.io/AMEX_RiskIQ_Enterprise_Credit_Risk_Platform/Problem5_Early_Payment_Default_Detection/reports/financial_impact_reporting_packaging/financial_impact_dashboard.html) — early-warning value and loss-prevention ROI dashboard for Problem 5
-- 📊 [Behavioral Scoring Financial Impact Dashboard](https://rnanda19.github.io/AMEX_RiskIQ_Enterprise_Credit_Risk_Platform/Problem6_Dynamic_Behavioral_Credit_Scoring/reports/financial_impact_reporting_packaging/financial_impact_dashboard.html) — trailing-window recency-model value and loss-prevention ROI dashboard for Problem 6
-- 📊 [Early Warning Financial Impact Dashboard](https://rnanda19.github.io/AMEX_RiskIQ_Enterprise_Credit_Risk_Platform/Problem7_Early_Warning_System/reports/financial_impact_reporting_packaging/early_warning_financial_impact_dashboard.html) — candidate sweep and financial-impact dashboard for Problem 7 (honest KPI-miss result)
-- 📊 [Roll-Rate Financial Impact Dashboard](https://rnanda19.github.io/AMEX_RiskIQ_Enterprise_Credit_Risk_Platform/Problem8_Roll_Rate_Modeling/reports/financial_impact_reporting_packaging/roll_rate_financial_impact_dashboard.html) — transition-matrix and financial-impact dashboard for Problem 8
+Listed in sequential problem order (1 → 11). Served via GitHub Pages — click through to view them rendered directly in your browser. **Note:** clicking an `.html` file directly in GitHub's file browser shows raw source code, not the rendered page — always use these `github.io` links, or any problem's own README, to view a dashboard rendered.
 
-(Served via GitHub Pages — click through to view them rendered directly in your browser. **Note:** clicking an `.html` file directly in GitHub's file browser shows raw source code, not the rendered page — always use these `github.io` links, or any problem's own README, to view a dashboard rendered.)
+1. 📊 [Problem 1 — Financial Impact Dashboard](https://rnanda19.github.io/AMEX_RiskIQ_Enterprise_Credit_Risk_Platform/Problem1_Credit_Scoring_PD_Prediction/reports/executive_reports/Financial_Impact_Dashboard.html) — interactive ROI, revenue-impact, and loss-reduction dashboard
+   📈 [Problem 1 — Power BI Dashboard Preview](https://rnanda19.github.io/AMEX_RiskIQ_Enterprise_Credit_Risk_Platform/Problem1_Credit_Scoring_PD_Prediction/reports/powerbi_dashboard/PowerBI_Dashboard_Preview.html) — star-schema data model and dashboard preview
+2. Problem 2 — Risk Tier Classification: no HTML dashboard produced by this problem's packaging notebook; see [Problem 2's README](Problem2_Risk_Tier_Classification/README.md) and its real `reports/` Word deliverables instead.
+3. 📊 [Problem 3 — ECL Financial Impact Dashboard](https://rnanda19.github.io/AMEX_RiskIQ_Enterprise_Credit_Risk_Platform/Problem3_Expected_Credit_Loss_IFRS9_CECL/reports/financial_impact_reporting_packaging/ecl_financial_impact_dashboard.html) — IFRS9/CECL reserve-change and stress-buffer dashboard
+4. 📊 [Problem 4 — Loss Severity Financial Impact Dashboard](https://rnanda19.github.io/AMEX_RiskIQ_Enterprise_Credit_Risk_Platform/Problem4_Delinquency_Escalation_Loss_Severity/reports/financial_impact_reporting_packaging/financial_impact_dashboard.html) — tiered-LGD vs flat-LGD loss-severity dashboard
+5. 📊 [Problem 5 — Early Payment Default Financial Impact Dashboard](https://rnanda19.github.io/AMEX_RiskIQ_Enterprise_Credit_Risk_Platform/Problem5_Early_Payment_Default_Detection/reports/financial_impact_reporting_packaging/financial_impact_dashboard.html) — early-warning value and loss-prevention ROI dashboard
+6. 📊 [Problem 6 — Behavioral Scoring Financial Impact Dashboard](https://rnanda19.github.io/AMEX_RiskIQ_Enterprise_Credit_Risk_Platform/Problem6_Dynamic_Behavioral_Credit_Scoring/reports/financial_impact_reporting_packaging/financial_impact_dashboard.html) — trailing-window recency-model value and loss-prevention ROI dashboard
+7. 📊 [Problem 7 — Early Warning Financial Impact Dashboard](https://rnanda19.github.io/AMEX_RiskIQ_Enterprise_Credit_Risk_Platform/Problem7_Early_Warning_System/reports/financial_impact_reporting_packaging/early_warning_financial_impact_dashboard.html) — candidate sweep and financial-impact dashboard (honest KPI-miss result)
+8. 📊 [Problem 8 — Roll-Rate Financial Impact Dashboard](https://rnanda19.github.io/AMEX_RiskIQ_Enterprise_Credit_Risk_Platform/Problem8_Roll_Rate_Modeling/reports/financial_impact_reporting_packaging/roll_rate_financial_impact_dashboard.html) — transition-matrix and financial-impact dashboard
+9. Problem 9 — Collections Optimization: packaging notebook not yet run in this repository; see [Problem 9's README](Problem9_Collections_Optimization/README.md).
+10. Problem 10 — Credit Line Management: packaging notebook not yet run in this repository; see [Problem 10's README](Problem10_Credit_Line_Management/README.md).
+11. 📊 [Problem 11 — Real-Time Portfolio Monitoring Ops Dashboard](https://rnanda19.github.io/AMEX_RiskIQ_Enterprise_Credit_Risk_Platform/Problem11_Real_Time_Portfolio_Monitoring/reports/financial_impact_reporting_packaging/real_time_portfolio_monitoring_ops_dashboard.html) — interactive alert-feed + KPI ops dashboard, joint-deviation cohort scoring (2.67x lift, RECOMMENDED FOR PRODUCTION)
 
 ## Repository Structure
 
@@ -58,6 +63,12 @@ AMEX_RiskIQ_Enterprise_Credit_Risk_Platform/
 │                                                 detector, no model retraining required
 ├── Problem8_Roll_Rate_Modeling/                 4 notebooks -- real Markov transition-probability
 │                                                 matrix, cross-validated against Problem 6's PD
+├── Problem9_Collections_Optimization/           4 notebooks -- collections-strategy optimization
+│                                                 (packaging/reporting stage pending)
+├── Problem10_Credit_Line_Management/            4 notebooks -- credit-line management
+│                                                 (packaging/reporting stage pending)
+├── Problem11_Real_Time_Portfolio_Monitoring/    4 notebooks -- whole-portfolio trailing-baseline
+│                                                 control chart + customer joint-deviation cohort score
 ├── shared/                                      Cross-problem library (metrics, config, monitoring),
 │                                                 extracted & unit-tested -- see shared/tests/
 ├── scripts/                                     CI helper scripts (notebook syntax checker)

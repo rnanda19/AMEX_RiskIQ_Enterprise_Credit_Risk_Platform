@@ -80,9 +80,7 @@ def risk_tier_app(tmp_path, monkeypatch):
     monkeypatch.setenv("AMEX_PROJECT_ROOT", str(project_root))
     monkeypatch.setenv("API_KEY", TEST_API_KEY)
 
-    service_path = (
-        Path(__file__).resolve().parents[1] / "src" / "fastapi_service" / "risk_tier_service.py"
-    )
+    service_path = Path(__file__).resolve().parents[1] / "src" / "risk_tier_service.py"
     spec = importlib.util.spec_from_file_location("amex_risk_tier_service_under_test", service_path)
     module = importlib.util.module_from_spec(spec)
     sys.modules[spec.name] = module
