@@ -206,8 +206,9 @@ immediately, not discovered after the fact.
 10. A model inventory document, live/alerting monitoring, `pytest-cov`
     coverage measurement, and Dependabot — named as lower-priority items
     by the model-risk benchmark pass, not blockers.
-11. Phase 4 (Problems 9, 10, 11) and Phase 5 (Problems 12, 13, 14) — not
-    started.
+11. ~~Phase 4 (Problems 9, 10, 11)~~ — done, see status table below. Phase 5
+    (Problems 12, 13, 14) — started 2026-08-27, Notebook 62 shipped, see
+    "Phase 5 build plan" below.
 12. Kaggle notebook(s) and LinkedIn write-ups showcasing the platform
     (tracked outside this repo — see the project's own working notes).
 
@@ -230,8 +231,8 @@ work, not as progress toward an unverified number.
 | Phase 1 — Foundation | Problem 1 (PD Prediction), Problem 2 (Risk Tier Classification) | Complete, pushed to GitHub (25 notebooks) |
 | Phase 2 — Regulatory & Loss Provisioning | Problem 3 (ECL/IFRS9/CECL), Problem 4 (Delinquency/Loss Severity), Problem 5 (Early Payment Default) | **Complete, pushed to GitHub 2026-08-25** (12 notebooks + Global Standard hardening pass) |
 | Phase 3 — Behavioral Intelligence | Problems 6, 7, 8 | **Complete, pushed to GitHub 2026-08-25** (12 notebooks + real notebook-output artifacts + Global Standard hardening pass, all pushed 2026-08-25) — Problem 6 complete (Notebooks 38-41), RECOMMENDED FOR PRODUCTION (W=3 trailing window, 99.2% AUC retention); Problem 7 complete (Notebooks 42-45), concluded NOT RECOMMENDED FOR PRODUCTION (honest result -- real default-rate lift below KPI target; a v2 enhancement attempt, Notebooks 46-47, was built, showed genuine but insufficient improvement, and was deliberately abandoned per user decision, freeing 46-49 for Problem 8); Problem 8 complete -- Notebooks 46 (Business Understanding & Policy), 47 (Modeling), 48 (Validation & Deployment), and 49 (Financial-Impact Reporting & Packaging) all shipped, RECOMMENDED FOR PRODUCTION on this run (both hard-gate KPIs -- monotonicity and coherence -- met; Severe/Low default ratio 107.2x). All 12 Phase 3 notebooks (38-49) verified: syntax-clean, idempotent, pyflakes-clean. Hardening pass: 21 new tests (94 total platform-wide), Docker for all 3 services, MODEL_CARD/CHANGELOG/requirements.txt, BENCHMARKS.md entries, CI wiring -- see "Two more real bugs found" above. |
-| Phase 4 — Operational Risk Management | Problems 9, 10, 11 | **In progress, not pushed to GitHub yet.** Problem 9 (Collections Optimization) complete locally -- Notebooks 50-53 all shipped 2026-08-26 (propensity-to-cure scoring + business-rule treatment tiers; two-value-stream financial model distinct from Problem 8's pattern). Problem 10 (Credit Line Management) started 2026-08-26 -- Notebook 54 (Business Understanding & Policy) shipped; Notebooks 55-57 not yet built. Problem 11 (Real-Time Portfolio Monitoring) not started. |
-| Phase 5 — Customer & Business Intelligence | Problems 12, 13, 14 | Not started |
+| Phase 4 — Operational Risk Management | Problems 9, 10, 11 | **Complete, pushed to GitHub 2026-08-27** (Problem 11 pushed with real RECOMMENDED FOR PRODUCTION results; Problems 9 and 10 are code-complete, 12 notebooks total, but their real run results are not yet synced into this repository -- see each problem's own README for honest current status). |
+| Phase 5 — Customer & Business Intelligence | Problems 12, 13, 14 | **Started 2026-08-27.** Problem 12 (360° Customer Intelligence): Notebook 62 (Business Understanding & Policy) shipped. Problems 13, 14 not started. |
 
 ## Phase 3 build plan — scoped 2026-08-25
 
@@ -344,7 +345,58 @@ actions) is defined as an honest business-rule layer, explicitly not a
 fitted treatment-response model, matching Problem 9's precedent for the
 same reason (no real limit-change/outcome data exists in this dataset).
 
-Next problem-roadmap item: Notebook 55 (Problem 10, Modeling -- scores the
-real eligible population with both real models, fits the real tertile cut
-values, and validates both hard-gating KPIs against the real observed
-default outcome).
+Notebook 55 (Modeling), 56 (Validation & Deployment), and 57 (Financial
+Impact, Reporting & Packaging) all shipped -- Problem 10 (Notebooks 54-57)
+is code-complete. Real, measured results for Problem 10 are pending the
+user's own run + sync of these notebooks (same "packaging pending" status
+as Problem 9 -- see each problem's own README for the honest current state).
+
+## Phase 5 build plan — scoped 2026-08-27
+
+Per `AMEX_Master_Execution_Plan.docx`'s Phase 5 table, Phase 5 turns thirteen
+models of risk infrastructure into strategy a business can act on:
+
+| # | Problem | Depends on | Core technique (per master plan) | Deliverable |
+|---|---|---|---|---|
+| 12 | 360° Customer Intelligence | #1, #6, #9, #10 | Multi-signal customer profile aggregation | Unified customer risk profile |
+| 13 | Risk-Adjusted Profitability Modeling | #1, #12 | PD-adjusted revenue (spend proxy) minus expected loss | Profitability scoring model |
+| 14 | Executive Decision Support Dashboard | All above | BI aggregation layer | Executive dashboard |
+
+Same 4-notebook-per-problem pattern as Phases 2/3/4, continuing the
+numbering sequence: Notebooks 62-65 (Problem 12), 66-69 (Problem 13), 70-73
+(Problem 14) -- 12 notebooks total. Same standing rules apply unchanged:
+zero-fabrication, Claude generates code only (user runs every notebook
+locally), WARP optimization standard (Phase 4's 92%/92% cap carried
+forward -- no new incident to warrant changing it), `random_state=42`, one
+notebook = one idempotent code cell, no local/absolute paths in any
+publicly-shared file, two-tier RAM pre-flight guard (Notebooks 51/52
+precedent), canonical-source-of-truth path resolution via each producing
+notebook's own recorded summary JSON path (never guessed or re-derived --
+the Notebook 46/47/50 lesson).
+
+Repository-packaging skeleton for all 3 problems (`notebooks/`, `src/`,
+`tests/`, `reports/`, `docs/`, `artifacts/`, `models/`, `data/`, `LICENSE`)
+created and committed locally 2026-08-27 -- content is empty by design
+except Notebook 62; **not pushed to GitHub** until each problem has real,
+run content, same practice as every prior phase.
+
+Notebook 62 (Business Understanding & Policy) shipped 2026-08-27: composes
+Problem 1's real static PD, Problem 6's real dynamic PD, Problem 9's real
+propensity-to-cure score (collections-eligible customers only), and Problem
+10's real risk-level/trend/action worklist into a documented composite --
+`UNIFIED_RISK_SCORE = 0.35*STATIC_PD + 0.65*DYNAMIC_PD` (+ a real 0.10
+collections adjustment where a real propensity score exists), tertile-graded
+into `UNIFIED_RISK_GRADE_NAMES`. Two new hard-gating KPIs with no prior
+platform precedent: `profile_completeness` (every dynamic-PD-eligible
+customer must get a real, non-null value for the seven always-applicable
+fields; the three collections-only fields are honestly nullable, never
+imputed) and `composite_non_inferiority` (the real composite's holdout
+ROC-AUC must be >= the best single real input signal's AUC, minus a 0.005
+ASSUMPTION tolerance) -- the specific, testable claim this problem's design
+depends on: that aggregating four real signals does not destroy the signal
+any one of them already carried.
+
+Next problem-roadmap item: Notebook 63 (Problem 12, Modeling -- scores every
+eligible real customer with all four real upstream signals, computes the
+real UNIFIED_RISK_SCORE, fits the real tertile cut values, and validates
+both hard-gating KPIs against the real observed default outcome).
