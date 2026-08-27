@@ -411,7 +411,39 @@ the real HOLDOUT split; the real treatment-tier median split is refit on
 this run's own eligible population, matching Notebook 50's rule-based (not
 fixed-value) policy definition exactly.
 
-Next problem-roadmap item: Notebook 64 (Problem 12, Validation & Deployment
--- independently reproduces Notebook 63's real pipeline from scratch,
-bootstraps a confidence interval on the composite_non_inferiority gap, and
-packages the real FastAPI unified-profile lookup service).
+Notebook 64 (Validation & Deployment) shipped 2026-08-27, completing Problem
+12 -- independently reproduces Notebook 63's entire real pipeline from
+scratch in a fresh kernel (reloads Problem 10's worklist, re-derives each
+customer's real latest-statement severity/state via one real streaming CSV
+pass, re-scores collections-eligible customers with Problem 9's real
+persisted model, re-computes UNIFIED_RISK_SCORE, re-fits the tertile cuts),
+matching Notebook 63's reported ROC-AUC and cut values within the platform's
+standard 1e-4 tolerance, plus a 200-sample cross-check of the persisted
+`unified_customer_profile.parquet` against the fresh reproduction. Bootstraps
+a 200-resample 95% CI on the `composite_non_inferiority` AUC gap only --
+`profile_completeness` is a deterministic population-wide null-count check,
+not a sampling-variable statistic, so (unlike Notebooks 48/52/56, which
+bootstrapped two ratio/rate KPIs each) this notebook honestly bootstraps
+just the one KPI that actually has a bootstrap distribution. Architecture
+decision: because Problem 12's deliverable is a precomputed lookup artifact
+rather than a live-compute-from-inputs model, the generated
+`customer_intelligence_lookup_service.py` is a `GET /profile/{customer_id}`
+lookup service (loads the real persisted parquet once at startup into an
+in-memory index) rather than Notebook 56's live-compute `/recommend`
+pattern -- recomputing the full four-signal composite per request would mean
+re-implementing Problems 1/6/9/10's pipelines a fifth time, the exact
+duplication anti-pattern already flagged in Notebooks 46/50/56. Explainability
+via deterministic weighted-term narration (UNIFIED_RISK_SCORE is an explicit
+weighted sum, not a trained classifier). `X-API-Key` auth on every endpoint
+but `/health`; self-tested live via `TestClient` against real sampled
+holdout customers (with and without a real collections propensity score) plus
+auth-rejection, and unknown-customer-404 checks. All 64 notebooks pass
+`check_notebook_syntax.py`; full local test suite (27 tests) green.
+
+This completes Phase 5's first problem (Problem 12, 360 Degree Customer
+Intelligence) end to end: Notebooks 62-64 all written, syntax-checked, and
+committed locally (not yet run by the user, not yet pushed to GitHub, per
+this platform's standing practice).
+
+Next problem-roadmap item: Problem 13 (Risk-Adjusted Profitability Modeling),
+Notebooks 66-69.
