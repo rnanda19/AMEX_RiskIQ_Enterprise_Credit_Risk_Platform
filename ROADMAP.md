@@ -188,11 +188,11 @@ immediately, not discovered after the fact.
    benchmark pass: real API-key authentication and real per-request
    explainability on all 8 deployed services~~ — done, 2026-08-25, see
    above.
-5. Real `docker build`/compose smoke test for all 7 Dockerfiles (Problems
-   1, 3, 4, 5, 6, 7, 8) once run somewhere with real Docker Hub registry
-   access — this pass, like the Phase 2 one before it, could only
-   statically verify build-context correctness, not actually pull a base
-   image and build (this sandbox's Docker CLI has no daemon access).
+5. Real `docker build`/compose smoke test for all 13 Dockerfiles (Problems
+   1, 3-14) once run somewhere with real Docker Hub registry access — this
+   pass, like the Phase 2 one before it, could only statically verify
+   build-context correctness, not actually pull a base image and build
+   (this sandbox's Docker CLI has no daemon access).
 6. Fix Problem 1's `src/docker/Dockerfile` build-context bug (see above) —
    flagged, not fixed, in this pass.
 7. Pre-commit hook: run `check_notebook_syntax.py` + `pyflakes` on
@@ -201,16 +201,18 @@ immediately, not discovered after the fact.
 8. Repo-wide `black` reformatting pass, once deliberately scheduled (not
    as a side effect of another change) — then flip `format-check` from
    advisory to blocking.
-9. Wire all eight problems' notebooks to `shared/` (see above) — now that
-   every problem has its own test safety net.
+9. Wire all fourteen problems' notebooks to `shared/` (see above) — now
+   that every problem has its own test safety net.
 10. A model inventory document, live/alerting monitoring, `pytest-cov`
     coverage measurement, and Dependabot — named as lower-priority items
     by the model-risk benchmark pass, not blockers.
-11. ~~Phase 4 (Problems 9, 10, 11)~~ — done, see status table below. Phase 5
-    (Problems 12, 13, 14) — started 2026-08-27, Notebook 62 shipped, see
-    "Phase 5 build plan" below.
+11. ~~Phase 4 (Problems 9, 10, 11) and Phase 5 (Problems 12, 13, 14)~~ —
+    done, see status table below.
 12. Kaggle notebook(s) and LinkedIn write-ups showcasing the platform
     (tracked outside this repo — see the project's own working notes).
+13. ~~Global Standard hardening delta: extend Problems 1-8's tests, Docker,
+    MODEL_CARD/CHANGELOG/requirements.txt, and CI/lint/security wiring to
+    Problems 9-14~~ — done, 2026-08-27 (see below).
 
 ### On the "Global Standard" repository score
 
@@ -224,6 +226,19 @@ scan with 0 real findings plus a doubled test count (Automated Testing & CI/CD),
 consolidated real-comparisons file (Benchmarking & Comparison) — tracked here as real engineering
 work, not as progress toward an unverified number.
 
+**2026-08-27 update:** the same hardening delta was extended from Problems 1-8 to Problems 9-14,
+requested by the user as "hardening delta works... to score 95/100 with CI badge." Two things
+worth being explicit about: (1) the 95/100 figure was not this project's own prior target (which
+was 85-90/100 against its own invented, non-external rubric — see above), so this repository does
+not claim a specific numeric score; (2) what IS real and now true is that Problems 9-14 (previously
+almost entirely unhardened — 0 tests, no MODEL_CARD/CHANGELOG/requirements.txt for 5 of the 6, no
+Dockerfiles at all) now carry the same real engineering substance as Problems 1-8: deployable
+FastAPI services (with a real, previously-undiscovered personal-path-leak bug fixed across all 6,
+the same bug class already found and fixed once for Problems 5-8), Docker packaging, 46 new real
+unit tests (172 passing platform-wide), MODEL_CARD/CHANGELOG/requirements.txt, and CI/lint/security
+wiring covering all 14 problems, not 8. See each of Problem 9-14's own `CHANGELOG.md` for the
+per-problem detail, and the root `README.md`'s "Repository Hardening" section for the summary.
+
 ## Problem roadmap — status (verified against real build history)
 
 | Phase | Problems | Status |
@@ -231,7 +246,7 @@ work, not as progress toward an unverified number.
 | Phase 1 — Foundation | Problem 1 (PD Prediction), Problem 2 (Risk Tier Classification) | Complete, pushed to GitHub (25 notebooks) |
 | Phase 2 — Regulatory & Loss Provisioning | Problem 3 (ECL/IFRS9/CECL), Problem 4 (Delinquency/Loss Severity), Problem 5 (Early Payment Default) | **Complete, pushed to GitHub 2026-08-25** (12 notebooks + Global Standard hardening pass) |
 | Phase 3 — Behavioral Intelligence | Problems 6, 7, 8 | **Complete, pushed to GitHub 2026-08-25** (12 notebooks + real notebook-output artifacts + Global Standard hardening pass, all pushed 2026-08-25) — Problem 6 complete (Notebooks 38-41), RECOMMENDED FOR PRODUCTION (W=3 trailing window, 99.2% AUC retention); Problem 7 complete (Notebooks 42-45), concluded NOT RECOMMENDED FOR PRODUCTION (honest result -- real default-rate lift below KPI target; a v2 enhancement attempt, Notebooks 46-47, was built, showed genuine but insufficient improvement, and was deliberately abandoned per user decision, freeing 46-49 for Problem 8); Problem 8 complete -- Notebooks 46 (Business Understanding & Policy), 47 (Modeling), 48 (Validation & Deployment), and 49 (Financial-Impact Reporting & Packaging) all shipped, RECOMMENDED FOR PRODUCTION on this run (both hard-gate KPIs -- monotonicity and coherence -- met; Severe/Low default ratio 107.2x). All 12 Phase 3 notebooks (38-49) verified: syntax-clean, idempotent, pyflakes-clean. Hardening pass: 21 new tests (94 total platform-wide), Docker for all 3 services, MODEL_CARD/CHANGELOG/requirements.txt, BENCHMARKS.md entries, CI wiring -- see "Two more real bugs found" above. |
-| Phase 4 — Operational Risk Management | Problems 9, 10, 11 | **Complete, pushed to GitHub 2026-08-27** (Problem 11 pushed with real RECOMMENDED FOR PRODUCTION results; Problems 9 and 10 are code-complete, 12 notebooks total, but their real run results are not yet synced into this repository -- see each problem's own README for honest current status). |
+| Phase 4 — Operational Risk Management | Problems 9, 10, 11 | **Complete, all real results synced 2026-08-27** (12 notebooks total). Problem 9 (Collections Optimization): real holdout ROC-AUC 0.8236, net benefit $341,908,210/cycle -- RECOMMENDED FOR PRODUCTION, the platform's single largest value-creation figure. Problem 10 (Credit Line Management): real risk-level monotonicity passed (461.02x ratio) but trend coherence and minimum-tier-population both failed -- honestly NOT RECOMMENDED FOR PRODUCTION, the one system excluded from the platform total. Problem 11 (Real-Time Portfolio Monitoring): real cohort default-rate lift 2.67x, RECOMMENDED FOR PRODUCTION. All three received the Global Standard hardening delta (2026-08-27) -- see below. |
 | Phase 5 — Customer & Business Intelligence | Problems 12, 13, 14 | **Complete 2026-08-27, real results for all 3 problems.** Problem 12 (360° Customer Intelligence): run end-to-end with real results (62-65) -- real composite AUC 0.9590 vs. best-single 0.9626; real net benefit $1,275,022/cycle (33,900.6% Year-1 ROI); recommended for production. Problem 13 (Risk-Adjusted Profitability Modeling): run end-to-end with real results (66-69) -- real Spearman(risk, profitability) = -0.978 on holdout; real net benefit $58,060,687.58/cycle (1,741,720.6% Year-1 ROI) from the real 148,855-customer cross-tier segment; recommended for production. Problem 14 (Executive Decision Support Dashboard): run end-to-end with real results (70-73) -- real BI aggregation layer across all 13 prior problems, **TOTAL_PLATFORM_NET_VALUE_USD = $429,926,252.73/cycle** (9 production-recommended value-creation problems: 4,5,6,7,8,9,11,12,13; 2 foundational models and 1 reserve-optimization problem correctly excluded from the sum; 1 problem, #10, honestly excluded on its own real, data-driven KPI miss), plus $4,617,593.08 in Problem 3's separately-tracked reserve-optimization value; partition-completeness proof and 4th independent reproduction (live-driving its own deployed FastAPI service) both passed; Problem 14's own executive-dashboard deliverable carries a real net benefit of $3,562.50/cycle (42.5% Year-1 ROI, 8.42-month payback) from executive decision-latency reduction; 7-tab interactive executive dashboard, real Word report, real 7-sheet Excel workbook. Three real production bugs were found and fixed on the user's own run and are documented in Notebooks 70/71/72/73's commit history: (1) Problems 3/4's summary JSONs live in their own per-problem `artifacts/` subfolders (an earlier project-history convention), fixed with a multi-candidate `_resolve_summary_json_path()` resolver; (2) Notebook 73's Word/Excel saves hit Windows' 260-character MAX_PATH limit (this platform's deep folder structure pushes some real output paths just over it), fixed by prefixing writes and reads with the `\\?\` extended-length-path marker; (3) Section 13's verification checks needed the same long-path fix applied to `.exists()`, not just to writes. All 12 Phase 5 notebooks pushed to GitHub with real synced results. **This completes the entire 14-problem, 5-phase platform (Notebooks 1-73), with real, verified results end to end.** |
 
 ## Phase 3 build plan — scoped 2026-08-25

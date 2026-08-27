@@ -2,9 +2,10 @@ name: CI
 
 # Runs on every push/PR touching main. Two checks (notebook syntax + tests), both fast
 # (seconds, not minutes) because neither touches the real Kaggle dataset or the real multi-GB
-# trained model artifacts -- see shared/tests/ and each Problem's tests/ for how
-# synthetic-but-structurally-real (or, for Problems 3-8, the real small deployable artifacts --
-# trained models or frozen policy JSON -- shipped in-repo) fixtures make that possible.
+# per-customer parquet files -- see shared/tests/ and each Problem's tests/ for how
+# synthetic-but-structurally-real fixtures (Problems 12-13's per-customer lookup tables) or the
+# real small deployable artifacts shipped in-repo (trained models/frozen policy JSON, Problems
+# 3-9, 11, 14) make that possible.
 # Lint/format/security checks live in a separate workflow -- see code-quality.yml.
 on:
   push:
@@ -57,3 +58,21 @@ jobs:
       - name: Problem 8 tests
         run: python -m pytest Problem8_Roll_Rate_Modeling/tests -v
         if: hashFiles('Problem8_Roll_Rate_Modeling/tests/**') != ''
+      - name: Problem 9 tests
+        run: python -m pytest Problem9_Collections_Optimization/tests -v
+        if: hashFiles('Problem9_Collections_Optimization/tests/**') != ''
+      - name: Problem 10 tests
+        run: python -m pytest Problem10_Credit_Line_Management/tests -v
+        if: hashFiles('Problem10_Credit_Line_Management/tests/**') != ''
+      - name: Problem 11 tests
+        run: python -m pytest Problem11_Real_Time_Portfolio_Monitoring/tests -v
+        if: hashFiles('Problem11_Real_Time_Portfolio_Monitoring/tests/**') != ''
+      - name: Problem 12 tests
+        run: python -m pytest Problem12_360_Customer_Intelligence/tests -v
+        if: hashFiles('Problem12_360_Customer_Intelligence/tests/**') != ''
+      - name: Problem 13 tests
+        run: python -m pytest Problem13_Risk_Adjusted_Profitability_Modeling/tests -v
+        if: hashFiles('Problem13_Risk_Adjusted_Profitability_Modeling/tests/**') != ''
+      - name: Problem 14 tests
+        run: python -m pytest Problem14_Executive_Decision_Support_Dashboard/tests -v
+        if: hashFiles('Problem14_Executive_Decision_Support_Dashboard/tests/**') != ''

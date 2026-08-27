@@ -1,14 +1,14 @@
 test,value,target,pass
-Cohort default-rate lift @ candidate=1 (reproduced),1.0,>=1.3x,False
-Lift 95% CI lower bound,1.0,>1.0x,False
-"ROC-AUC (reproduced, secondary)",0.5,>0.5 (reported),False
-ROC-AUC 95% CI lower bound,0.5,>0.5 (reported),False
-Accuracy @ candidate=1,0.2589,reported,True
-Precision @ candidate=1,0.2589,reported,True
-Recall @ candidate=1,1.0,reported,True
-F1 @ candidate=1,0.4114,reported,True
-Specificity @ candidate=1,0.0,reported,True
-MCC @ candidate=1,0.0,reported,True
+Cohort default-rate lift @ candidate=1 (reproduced),2.671,>=1.3x,True
+Lift 95% CI lower bound,2.64,>1.0x,True
+"ROC-AUC (reproduced, secondary)",0.663,>0.5 (reported),True
+ROC-AUC 95% CI lower bound,0.6598,>0.5 (reported),True
+Accuracy @ candidate=1,0.7952,reported,True
+Precision @ candidate=1,0.6917,reported,True
+Recall @ candidate=1,0.3775,reported,True
+F1 @ candidate=1,0.4884,reported,True
+Specificity @ candidate=1,0.9412,reported,True
+MCC @ candidate=1,0.4008,reported,True
 Score-rank calibration monotonicity,True,True,True
 Split-half score PSI,0.0,<0.1,True
-Cohort default-rate lift KPI (Notebook 58 target),1.0,>=1.3x,False
+Cohort default-rate lift KPI (Notebook 58 target),2.671,>=1.3x,True

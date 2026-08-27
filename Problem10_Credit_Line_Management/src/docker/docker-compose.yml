@@ -1,0 +1,12 @@
+services:
+  amex-p10-api:
+    build:
+      context: ..
+      dockerfile: docker/Dockerfile
+    image: amex-p10-api:latest
+    container_name: amex-p10-api
+    ports:
+      - "8010:8010"
+    environment:
+      - API_KEY=${API_KEY:?Set API_KEY before running -- see src/.env.example}
+    restart: unless-stopped

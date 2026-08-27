@@ -7,7 +7,13 @@ PROBLEMS := Problem1_Credit_Scoring_PD_Prediction \
             Problem5_Early_Payment_Default_Detection \
             Problem6_Dynamic_Behavioral_Credit_Scoring \
             Problem7_Early_Warning_System \
-            Problem8_Roll_Rate_Modeling
+            Problem8_Roll_Rate_Modeling \
+            Problem9_Collections_Optimization \
+            Problem10_Credit_Line_Management \
+            Problem11_Real_Time_Portfolio_Monitoring \
+            Problem12_360_Customer_Intelligence \
+            Problem13_Risk_Adjusted_Profitability_Modeling \
+            Problem14_Executive_Decision_Support_Dashboard
 
 help:
 	@echo "Targets:"

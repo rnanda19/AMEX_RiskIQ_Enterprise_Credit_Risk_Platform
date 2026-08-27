@@ -1,0 +1,24 @@
+# Python
+__pycache__/
+*.py[cod]
+*.egg-info/
+.Python
+build/
+dist/
+
+# Environments
+.env
+.venv
+venv/
+env/
+
+# Jupyter
+.ipynb_checkpoints/
+
+# OS
+.DS_Store
+Thumbs.db
+
+# This problem deliberately commits its small, curated real report CSVs/models/policy
+# JSON (all individually reviewed and under the 20MB size-safety cap) -- so no blanket
+# *.csv/*.joblib exclusion here.

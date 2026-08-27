@@ -1,0 +1,38 @@
+{
+  "ead_per_account_usd": {
+    "value": 5000,
+    "source": "Notebook 08 (inherited, real value read programmatically)"
+  },
+  "lgd_assumption": {
+    "value": 0.45,
+    "source": "Notebook 08 (inherited, real value read programmatically)"
+  },
+  "limit_increase_usd_large": {
+    "value": 2500,
+    "source": "ASSUMPTION -- illustrative meaningful limit increase for a Low Risk, Trending Better customer, sized to move real spend/utilization without a large single-step exposure jump; edit to your institution's real limit-increase sizing policy."
+  },
+  "limit_increase_usd_small": {
+    "value": 750,
+    "source": "ASSUMPTION -- illustrative modest limit increase (30% of the Large tier), proportionate to a less confident increase decision (Medium Risk improving, or Low Risk with no trend signal); edit to your institution's real sizing policy."
+  },
+  "limit_decrease_usd_small": {
+    "value": 750,
+    "source": "ASSUMPTION -- mirrors the Small increase magnitude for symmetry: a proportionate first-step exposure reduction, not a severe cut; edit to your institution's real sizing policy."
+  },
+  "annual_revenue_yield_on_incremental_limit_pct": {
+    "value": 0.15,
+    "source": "ASSUMPTION -- illustrative blended net interest margin plus fee yield realized over a year on the portion of an incremental limit dollar that actually gets utilized; a single simplified figure covering assumed utilization rate x realized margin together, not a raw APR; card-industry revolving-balance yields are commonly cited in the low-to-high teens, positioned in that range; edit to your institution's real risk-adjusted portfolio yield."
+  },
+  "freeze_review_manual_cost_usd": {
+    "value": 30,
+    "source": "ASSUMPTION -- illustrative credit-officer review cost per Freeze/Review case; set above Problem 8's $20 (a quick triage review of transition history) because this is a judgment call on an ACTIVE line with authority to freeze it, not a glance at history, and below Problem 6's $35 (a full account re-underwrite) since a freeze review considers the current score and trend rather than rebuilding the file from scratch; edit to your institution's actual review cost. Freeze/Review is deliberately NOT assigned an automated avoided-loss dollar value below -- Notebook 54 Section 8's own rationale frames it as 'review first, before any automated action', so pricing a guaranteed avoided loss for a case that has not actually been frozen yet would be fabricated precision; only the real review cost is priced, the same honesty standard Problem 9 applied to its own unpriced false-positive cell."
+  },
+  "implementation_cost_usd": {
+    "value": 52000,
+    "source": "ASSUMPTION -- illustrative one-time build/validate/deploy cost for the real-time credit-line recommendation service and its limit-change execution workflow; set above Problem 9's $45,000 (a scoring+routing service) because actually EXECUTING a limit change requires integration with the core banking/lending system of record, not just producing a recommendation, and below Problem 6's $60,000 (a full model training/retraining pipeline) since Problem 10 composes two already-trained models rather than training a new one; edit to your institution's actual project cost."
+  },
+  "annual_application_cycles": {
+    "value": 12,
+    "source": "ASSUMPTION -- monthly re-scoring cadence, matching this platform's other statement-driven, ongoing existing-book monitoring cadences; edit to your institution's actual cadence."
+  }
+}

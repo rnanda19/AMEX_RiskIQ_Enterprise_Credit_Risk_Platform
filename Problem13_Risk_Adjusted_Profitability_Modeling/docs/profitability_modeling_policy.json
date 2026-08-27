@@ -1,0 +1,97 @@
+{
+  "generated_at_utc": "2026-08-27T09:29:39.975747+00:00",
+  "problem": "Problem 13 -- Risk-Adjusted Profitability Modeling (PD-Adjusted Revenue Minus Expected Loss)",
+  "real_spend_columns": [
+    "S_11",
+    "S_12",
+    "S_13",
+    "S_15",
+    "S_16",
+    "S_17",
+    "S_18",
+    "S_19",
+    "S_20",
+    "S_22",
+    "S_23",
+    "S_24",
+    "S_25",
+    "S_26",
+    "S_27",
+    "S_3",
+    "S_5",
+    "S_6",
+    "S_7",
+    "S_8",
+    "S_9"
+  ],
+  "n_real_spend_columns": 21,
+  "revenue_assumptions": {
+    "avg_monthly_revenue_per_account_usd": {
+      "value": 65.0,
+      "source": "ASSUMPTION -- illustrative average monthly revenue-per-active-account (interchange, fees, and finance charges combined) for a mid-market unsecured consumer credit product; edit to your institution's actual revenue data."
+    },
+    "revenue_multiplier_floor": {
+      "value": 0.4,
+      "source": "ASSUMPTION -- a customer at the real 0th percentile of relative Spend (SPEND_INDEX) is modeled as earning 40% of the average assumed revenue, not zero -- even low-real-spend accounts carry some baseline real revenue (fees, minimum finance charges)."
+    },
+    "revenue_multiplier_ceiling": {
+      "value": 1.8,
+      "source": "ASSUMPTION -- a customer at the real 100th percentile of relative Spend is modeled as earning 180% of the average assumed revenue; edit both bounds to your institution's own real revenue-by-spend-decile analysis when available."
+    }
+  },
+  "profitability_tier_names": [
+    "Low Profitability",
+    "Medium Profitability",
+    "High Profitability"
+  ],
+  "profitability_tier_cut_percentiles": [
+    33.333,
+    66.667
+  ],
+  "reused_from_problem_1": {
+    "champion_model": "catboost",
+    "champion_holdout_auc": 0.9614779100963606
+  },
+  "reused_from_problem_8": {
+    "ead_per_account_usd": 5000,
+    "lgd_assumption": 0.45
+  },
+  "reused_from_problem_12": {
+    "profile_path": "C:\\Users\\rnand\\Downloads\\amex-default-prediction\\AMEX_Enterprise_Credit_Risk_Platform\\Phase5_Customer_Business_Intelligence\\Problem12_360_Customer_Intelligence\\modeling\\unified_customer_profile.parquet",
+    "deployment_policy_path": "C:\\Users\\rnand\\Downloads\\amex-default-prediction\\AMEX_Enterprise_Credit_Risk_Platform\\Phase5_Customer_Business_Intelligence\\Problem12_360_Customer_Intelligence\\docs\\customer_intelligence_deployment_policy.json",
+    "unified_risk_grade_names": [
+      "Low Risk",
+      "Medium Risk",
+      "High Risk"
+    ],
+    "recommended_for_production": true
+  },
+  "kpi_targets": {
+    "profitability_tier_monotonicity": {
+      "description": "PRIMARY, hard-gating KPI (reused convention from Problems 4/8/10, inverted direction): the real observed default rate must be MONOTONICALLY DECREASING from the Low Profitability tier to the High Profitability tier on the real holdout split -- since PROFITABILITY_SCORE is explicitly PD-adjusted, a customer scored as more profitable should, on average, also be a real lower-default-rate customer. A violation means the revenue side of the formula (Section 6) is overwhelming the real risk signal for at least one tier pair, and needs revisiting.",
+      "hard_gate": true
+    },
+    "risk_adjustment_materiality": {
+      "description": "NEW hard-gating KPI for this problem (no Problem 4/6/8/9/10/12 analog -- this is the platform's first problem that risk-adjusts a revenue estimate, so there is no prior claim to reuse): the real Spearman rank correlation between UNIFIED_RISK_SCORE and PROFITABILITY_SCORE on the real holdout split must be <= an ASSUMPTION -0.15 threshold (a materially negative correlation). This is the specific, testable claim this whole problem depends on: that the PD adjustment measurably re-ranks customers relative to raw revenue alone, rather than the revenue term simply dominating and producing a profitability ranking indistinguishable from a pure spend ranking. If this gate fails, the honest conclusion is that Section 6's revenue-to-risk balance needs revisiting, not that either underlying signal is bad.",
+      "spearman_threshold": -0.15,
+      "hard_gate": true
+    },
+    "min_tier_population_pct": 10.0,
+    "min_tier_population_pct_description": "ASSUMPTION -- each of the 3 real PROFITABILITY_TIER tiers must hold >= 10% of the eligible validation population, reusing this platform's Problem 4/8/12 single-axis threshold convention.",
+    "metrics_suite_requirement": "STANDING RULE (carried from Problems 6-12): Notebook 67/68 must compute and DISPLAY -- inline in the notebook AND in this problem's Word/Excel/HTML reports -- the real per-tier default rate table and the real Spearman correlation, so the risk-adjustment-materiality claim is auditable.",
+    "elevated_reporting_requirement": "STANDING RULE (carried from Problems 7-12): Problem 13's Word report must synthesize MAXIMUM DETAIL from every one of this problem's notebooks (66-69), with a narrative 'story' paragraph below every chart. Problem 13's HTML report must be an advanced, 'global standard' interactive dashboard with slicers, filters, full legends, and interactive KPI cards -- built in Notebook 69, and must double as the real profitability-scoring dashboard the master plan names as this problem's deliverable.",
+    "static_pd_reference_auc": 0.9614779100963606,
+    "problem_12_reference": {
+      "recommended_for_production": true,
+      "meets_kpi_with_ci": true
+    }
+  },
+  "random_seed": 42,
+  "warp_resource_cap": {
+    "cpu_fraction_cap": 0.92,
+    "ram_fraction_cap": 0.92,
+    "warp_thread_count": 15,
+    "max_ram_bytes": 30238967808,
+    "note": "Phase 4/5 cap (92%/92%) carried forward -- no new incident to warrant a change."
+  }
+}

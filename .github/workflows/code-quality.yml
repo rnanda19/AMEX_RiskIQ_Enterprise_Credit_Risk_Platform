@@ -27,8 +27,14 @@ jobs:
           Problem6_Dynamic_Behavioral_Credit_Scoring/src Problem6_Dynamic_Behavioral_Credit_Scoring/tests
           Problem7_Early_Warning_System/src Problem7_Early_Warning_System/tests
           Problem8_Roll_Rate_Modeling/src Problem8_Roll_Rate_Modeling/tests
+          Problem9_Collections_Optimization/src Problem9_Collections_Optimization/tests
+          Problem10_Credit_Line_Management/src Problem10_Credit_Line_Management/tests
+          Problem11_Real_Time_Portfolio_Monitoring/src Problem11_Real_Time_Portfolio_Monitoring/tests
+          Problem12_360_Customer_Intelligence/src Problem12_360_Customer_Intelligence/tests
+          Problem13_Risk_Adjusted_Profitability_Modeling/src Problem13_Risk_Adjusted_Profitability_Modeling/tests
+          Problem14_Executive_Decision_Support_Dashboard/src Problem14_Executive_Decision_Support_Dashboard/tests
         continue-on-error: true  # advisory for now -- see ROADMAP.md "make lint blocking";
-          # one known pre-existing finding logged in docs/known_lint_findings.md
+          # known pre-existing findings logged in docs/known_lint_findings.md
 
   format-check:
     name: Format check (black --check, advisory)
@@ -44,6 +50,9 @@ jobs:
           Problem3_Expected_Credit_Loss_IFRS9_CECL/src Problem4_Delinquency_Escalation_Loss_Severity/src
           Problem5_Early_Payment_Default_Detection/src Problem6_Dynamic_Behavioral_Credit_Scoring/src
           Problem7_Early_Warning_System/src Problem8_Roll_Rate_Modeling/src
+          Problem9_Collections_Optimization/src Problem10_Credit_Line_Management/src
+          Problem11_Real_Time_Portfolio_Monitoring/src Problem12_360_Customer_Intelligence/src
+          Problem13_Risk_Adjusted_Profitability_Modeling/src Problem14_Executive_Decision_Support_Dashboard/src
         continue-on-error: true  # advisory: repo-wide reformatting is a deliberate future pass
           # (see ROADMAP.md), not something to apply as a side effect of adding this check
 
@@ -63,4 +72,7 @@ jobs:
           Problem1_Credit_Scoring_PD_Prediction/src Problem2_Risk_Tier_Classification/src
           Problem3_Expected_Credit_Loss_IFRS9_CECL/src Problem4_Delinquency_Escalation_Loss_Severity/src
           Problem5_Early_Payment_Default_Detection/src Problem6_Dynamic_Behavioral_Credit_Scoring/src
-          Problem7_Early_Warning_System/src Problem8_Roll_Rate_Modeling/src -q
+          Problem7_Early_Warning_System/src Problem8_Roll_Rate_Modeling/src
+          Problem9_Collections_Optimization/src Problem10_Credit_Line_Management/src
+          Problem11_Real_Time_Portfolio_Monitoring/src Problem12_360_Customer_Intelligence/src
+          Problem13_Risk_Adjusted_Profitability_Modeling/src Problem14_Executive_Decision_Support_Dashboard/src -q

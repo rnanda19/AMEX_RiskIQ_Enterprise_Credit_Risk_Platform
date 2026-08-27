@@ -40,7 +40,7 @@ def require_api_key(presented: str = Security(_api_key_header)) -> str:
     return presented
 
 
-POLICY_PATH = Path(os.environ.get("AMEX_P11_POLICY_PATH", r"C:\Users\rnand\Downloads\amex-default-prediction\AMEX_Enterprise_Credit_Risk_Platform\Phase4_Operational_Risk_Management\Problem11_Real_Time_Portfolio_Monitoring\models\portfolio_monitoring_deployment_policy.json"))
+POLICY_PATH = Path(os.environ.get("AMEX_P11_POLICY_PATH", str(Path(__file__).parent / "portfolio_monitoring_deployment_policy.json")))
 with open(POLICY_PATH, "r", encoding="utf-8") as _f:
     _POLICY = json.load(_f)
 

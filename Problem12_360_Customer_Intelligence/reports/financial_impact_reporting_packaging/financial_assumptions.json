@@ -1,0 +1,26 @@
+{
+  "case_lookup_volume_accounts_per_cycle": {
+    "value": 303660,
+    "source": "Notebook 63 (real, measured collections-eligible population -- the real subset of the unified profile actively worked by ops/collections agents each cycle; not fabricated)."
+  },
+  "minutes_saved_per_case_lookup": {
+    "value": 6.0,
+    "source": "ASSUMPTION -- illustrative time an ops/collections/credit analyst saves per case by querying ONE unified 360 profile endpoint instead of separately consulting Problem 1's static-PD output, Problem 6's dynamic-PD service, Problem 9's propensity-to-cure score, and Problem 10's worklist -- four separate lookups collapsed into one; edit to your institution's own time-and-motion study."
+  },
+  "fully_loaded_hourly_labor_cost_usd": {
+    "value": 42.0,
+    "source": "ASSUMPTION -- illustrative fully-loaded hourly cost (wages + benefits + overhead) of a frontline collections/credit operations analyst; edit to your institution's actual compensation data."
+  },
+  "ongoing_hosting_cost_usd_per_cycle": {
+    "value": 350.0,
+    "source": "ASSUMPTION -- illustrative recurring cloud-hosting plus on-call maintenance cost for the unified lookup API each monthly cycle -- this technique's own genuinely new recurring cost stream, with no Problem 5-11 analog, since it is the platform's first purely read-through aggregation service rather than a scored classifier."
+  },
+  "implementation_cost_usd": {
+    "value": 45000,
+    "source": "ASSUMPTION -- illustrative one-time build/validate/deploy cost for the unified customer-intelligence lookup service and its 360 ops dashboard; set above Problem 11's $38,000 (a stateless streaming aggregator) because this service integrates four upstream models' real outputs into one composite score and API, and below Problem 9/10's own model-training pipeline costs since it trains no new model of its own -- edit to your institution's actual project cost."
+  },
+  "annual_application_cycles": {
+    "value": 12,
+    "source": "ASSUMPTION -- monthly cadence, matching the platform's established monthly statement/refresh grain; edit to your institution's actual cadence."
+  }
+}

@@ -101,6 +101,73 @@ P(Severe→Severe) − P(Low→Severe): 0.9557 (95% CI lower bound 0.9550). Both
 (monotonicity, coherence) met on this run; cross-validated against Problem 6's independently
 trained dynamic PD (z=8.80, p<0.001). **Recommended for production.**
 
+## Problem 9 -- Collections Optimization: propensity-to-cure classifier
+
+| Metric | Value |
+|---|---|
+| Holdout ROC-AUC (reproduced, bit-identical) | 0.8236 |
+| Holdout PR-AUC | 0.2655 |
+| F1 at optimal threshold (0.1554) | 0.3332 |
+| MCC | 0.2937 |
+
+KPI target (>= 0.60 ROC-AUC): met. **Recommended for production** -- net benefit $341,908,210/cycle,
+the platform's single largest value-creation figure.
+
+## Problem 10 -- Credit Line Management: risk-level x trend action-tier composition
+
+| KPI | Result |
+|---|---|
+| Risk-level monotonicity (top/bottom default-rate ratio) | 461.02x -- **passed** |
+| Trend coherence | 0 of 3 real cells -- **failed** |
+| Minimum tier population | 432 real customers in one cell -- **failed** |
+
+2 of 3 real hard-gate KPIs failed on this run. **Honestly NOT recommended for production** -- the
+one system in this platform's 9-problem value-creation total that is deliberately excluded for
+exactly this reason.
+
+## Problem 11 -- Real-Time Portfolio Monitoring: trailing-baseline control chart
+
+| Metric | Value |
+|---|---|
+| Cohort default-rate lift (candidate=1, reproduced) | 2.671x (95% CI [2.64, 2.70]) |
+| Accuracy / Precision / Recall / F1 | 0.795 / 0.692 / 0.378 / 0.488 |
+| MCC | 0.401 |
+
+Both real hard-gate KPIs met. **Recommended for production.**
+
+## Problem 12 -- 360 Degree Customer Intelligence: unified risk score composite
+
+| KPI | Result |
+|---|---|
+| Composite non-inferiority (unified vs. best single signal) | gap -0.0037, 95% CI within +/-0.005 -- **passed** |
+| Profile completeness | zero real nulls -- **passed** |
+| Minimum tier population | no undersized grades -- **passed** |
+
+Unified ROC-AUC 0.9590 vs. best single signal (static PD) 0.9626. All 3 real hard-gate KPIs
+passed. **Recommended for production** -- net benefit $1,275,022/cycle.
+
+## Problem 13 -- Risk-Adjusted Profitability Modeling: PD-adjusted profitability score
+
+| KPI | Result |
+|---|---|
+| Profitability-tier monotonicity | Low 70.63% -> Medium 5.92% -> High 0.29% default rate -- **passed** |
+| Risk-adjustment materiality (Spearman) | -0.9784, p < 0.001 -- **passed** |
+| Minimum tier population | no undersized tiers -- **passed** |
+
+All 3 real hard-gate KPIs passed. **Recommended for production** -- net benefit
+$58,060,687.58/cycle from the real 148,855-customer cross-tier segment.
+
+## Problem 14 -- Executive Decision Support Dashboard: platform-wide BI aggregation
+
+| KPI | Result |
+|---|---|
+| Aggregation completeness (all 13 prior problems, exactly once) | **passed** |
+| Aggregation scope correctness (foundational/reserve never summed; Problem 10 excluded) | **passed** |
+| Population consistency | **passed** |
+
+Both real hard-gate KPIs passed. **Recommended for production** -- total platform net value
+$429,926,252.73/cycle across 9 production-recommended systems.
+
 ## Reading this table honestly
 
 These are the platform's own real, measured numbers -- not benchmarked against any external

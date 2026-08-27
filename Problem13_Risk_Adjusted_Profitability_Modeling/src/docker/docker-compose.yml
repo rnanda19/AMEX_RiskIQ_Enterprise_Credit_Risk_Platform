@@ -1,0 +1,15 @@
+services:
+  amex-p13-api:
+    build:
+      context: ..
+      dockerfile: docker/Dockerfile
+    image: amex-p13-api:latest
+    container_name: amex-p13-api
+    ports:
+      - "8013:8013"
+    environment:
+      - API_KEY=${API_KEY:?Set API_KEY before running -- see src/.env.example}
+      - AMEX_P13_PROFILE_PATH=/app/data/profitability_scored_profile.parquet
+    volumes:
+      - ../data:/app/data:ro
+    restart: unless-stopped

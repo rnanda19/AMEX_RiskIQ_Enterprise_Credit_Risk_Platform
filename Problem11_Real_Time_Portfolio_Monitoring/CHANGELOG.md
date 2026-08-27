@@ -1,5 +1,20 @@
 # Changelog -- Problem 11: Real-Time Portfolio Monitoring
 
+## 2026-08-27 -- Global Standard hardening pass (delta, Problems 9-14)
+
+- **Real bug found and fixed:** `portfolio_alert_feed_service.py`'s `POLICY_PATH` default
+  hardcoded the author's real local Windows path -- same bug class already found and fixed for
+  Problems 5-8's services; fixed to default to the real policy JSON shipped alongside it in
+  `src/`. `.env.example`'s example value had the same leak -- replaced with a generic placeholder.
+- Added `tests/` (pytest): the real FastAPI ops-dashboard/alert-feed service driven end-to-end via
+  `TestClient` against the real, measured `portfolio_monitoring_deployment_policy.json` --
+  covering `/health`, `/policy-info`, the auth gate, month ingestion below/at/above the real
+  baseline-eligibility threshold, and the `/reset` test-only endpoint.
+- Added `src/docker/` (Dockerfile, docker-compose.yml, .dockerignore) -- this problem previously
+  had `MODEL_CARD.md`/`CHANGELOG.md`/`requirements.txt` from an earlier hardening pass but no
+  container packaging and no tests.
+- Wired into the platform's root `ci.yml`, `code-quality.yml`, and `Makefile`.
+
 ## 2026-08-27 -- Customer joint-deviation redesign (real rework, user-directed)
 
 - **Root cause diagnosed:** two real full-data runs of the customer-level cohort score collapsed to an exact 100%/0% split (ROC-AUC 0.5, MCC 0) because presence-based customer flagging carries zero information when over 75% of real customers share an identical full 13/13-month coverage window -- every tested customer had virtually the same exposure regardless of technique changes.

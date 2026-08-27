@@ -4,31 +4,38 @@
 
 Phase 4, Problem 10 of the platform: a 4-notebook build (Notebooks 54-57) covering credit-line management on the real Kaggle **American Express Default Prediction** dataset.
 
-## Status: Packaging Pending
+## Status: Complete -- Real Results Synced, Hardened (2026-08-27)
 
-Notebooks 54 (Business Understanding), 55 (Modeling), 56 (Validation & Deployment), and 57 (Financial Impact, Reporting & Packaging) exist in `notebooks/`. As of this update, Notebook 57's packaging run has not yet produced synced outputs in this repository -- `docs/`, `artifacts/`, `reports/`, and `tests/` are currently empty placeholders (see each folder's own `README.md`).
+**Real, synced results:** real risk-level monotonicity passed (461.02x top-to-bottom default-rate ratio), but real trend coherence and minimum-tier-population both failed -- **honestly NOT recommended for production**. This is the one system in the platform's 9-problem value-creation total that is deliberately excluded on its own real, data-driven KPI miss (real net benefit if deployed anyway: $4,108,042.50/cycle, shown for completeness, not as a deployment recommendation). See the [Executive Capstone Report](../Executive_Capstone_Report/) and root `README.md`'s Platform-at-a-Glance table.
 
-This README will be filled in with this problem's real, measured results (KPIs, financial impact, and a link to its HTML dashboard) once Notebook 57 has been run and its outputs synced -- no figures are stated here in the meantime, to avoid reporting anything not yet real.
+📊 [Financial Impact Dashboard](reports/financial_impact_reporting_packaging/credit_line_management_financial_impact_dashboard.html) · 📄 [Financial Impact Report (Word)](reports/financial_impact_reporting_packaging/Credit_Line_Management_Financial_Impact_Report.docx) · 📊 [Financial Impact Workbook (Excel)](reports/financial_impact_reporting_packaging/AMEX_Problem10_Financial_Impact_Workbook.xlsx)
+
+This problem also received the platform's Global Standard hardening delta (2026-08-27): a real, auth-protected FastAPI recommendation service (`src/credit_line_scoring_service.py`), Docker packaging, real unit tests, and `MODEL_CARD.md`/`CHANGELOG.md`/`requirements.txt` -- deployed here for completeness and honest transparency, matching this platform's standard of shipping every real result, including the ones that didn't clear their KPI bar. See `CHANGELOG.md` for the full detail.
 
 ## Project Structure
 
 ```
 Problem10_Credit_Line_Management/
-├── artifacts/
 ├── data/
 │   └── README.md
 ├── docs/
-├── models/
-│   └── README.md
+│   ├── credit_line_deployment_policy.json
+│   └── credit_line_policy.json
 ├── notebooks/
 │   ├── 54_credit_line_management_business_understanding.ipynb
 │   ├── 55_credit_line_management_modeling.ipynb
 │   ├── 56_credit_line_management_validation_deployment.ipynb
 │   └── 57_credit_line_management_financial_impact_reporting_packaging.ipynb
 ├── reports/
+│   ├── modeling/
+│   └── financial_impact_reporting_packaging/
 ├── src/
+│   ├── credit_line_scoring_service.py
 │   └── docker/
 ├── tests/
+├── MODEL_CARD.md
+├── CHANGELOG.md
+├── requirements.txt
 └── LICENSE
 ```
 

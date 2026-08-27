@@ -1,0 +1,12 @@
+numpy
+pandas
+matplotlib
+python-docx
+openpyxl
+scipy
+xgboost
+joblib
+fastapi
+uvicorn
+pydantic
+httpx

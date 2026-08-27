@@ -1,0 +1,139 @@
+{
+  "generated_at_utc": "2026-08-26T04:03:39.504584+00:00",
+  "problem": "Problem 10 -- Credit Line Management (Utilization-Trend + PD-Based Limit Optimization)",
+  "utilization_trend_reinterpretation": "This dataset has no true credit-limit or balance-to-limit utilization field (see Section 6). 'Utilization-trend' is honestly reinterpreted as PD_TREND = DYNAMIC_PD (Problem 6, real, current) minus STATIC_PD (Problem 1, real, origination-time) for the same customer.",
+  "risk_level_names": [
+    "Low Risk",
+    "Medium Risk",
+    "High Risk"
+  ],
+  "risk_level_cut_percentiles": [
+    33.333,
+    66.667
+  ],
+  "trend_names": [
+    "Trending Better",
+    "Stable",
+    "Trending Worse"
+  ],
+  "trend_cut_percentiles": [
+    33.333,
+    66.667
+  ],
+  "min_statements_for_dynamic_pd": 3,
+  "dynamic_pd_eligibility_coverage_pct": 97.55552795410023,
+  "statement_count_stats": {
+    "n_customers": 458913,
+    "min": 1,
+    "p10": 9.0,
+    "p25": 13.0,
+    "median": 13.0,
+    "mean": 12.053376130116165,
+    "max": 13
+  },
+  "reused_from_problem_1": {
+    "champion_model": "xgboost",
+    "champion_holdout_auc": 0.9620396555226549
+  },
+  "reused_from_problem_6": {
+    "policy_path": "C:\\Users\\rnand\\Downloads\\amex-default-prediction\\AMEX_Enterprise_Credit_Risk_Platform\\Phase3_Behavioral_Intelligence\\Problem6_Dynamic_Behavioral_Credit_Scoring\\policy\\dynamic_behavioral_scoring_policy.json",
+    "model_path": "C:\\Users\\rnand\\Downloads\\amex-default-prediction\\AMEX_Enterprise_Credit_Risk_Platform\\Phase3_Behavioral_Intelligence\\Problem6_Dynamic_Behavioral_Credit_Scoring\\deployment\\models\\dynamic_behavioral_xgboost_w3.joblib",
+    "preprocessing_path": "C:\\Users\\rnand\\Downloads\\amex-default-prediction\\AMEX_Enterprise_Credit_Risk_Platform\\Phase3_Behavioral_Intelligence\\Problem6_Dynamic_Behavioral_Credit_Scoring\\deployment\\models\\preprocessing_artifacts.joblib",
+    "winning_w": 3,
+    "recommended_for_production": true,
+    "reproduced_holdout_auc": 0.9540951936013714,
+    "feature_count": 243,
+    "usage": "Verbatim reuse -- no fresh PD fit for either static or dynamic scores. Notebook 55 scores every eligible customer with Problem 1's real champion model (static) and Problem 6's real persisted model (dynamic), then derives and validates the real PD_TREND signal on top."
+  },
+  "kpi_targets": {
+    "risk_level_monotonicity": {
+      "description": "PRIMARY, hard-gating KPI, same convention as Problems 4/8: the real observed default rate (Problem 1's real target label) must be strictly monotonically increasing across the real DYNAMIC-PD-based risk-level tertiles, Low Risk < Medium Risk < High Risk, and the High-Risk-tier default rate must be >= 1.5x the Low-Risk-tier default rate -- validates that the risk-level axis alone carries real signal before the trend axis is layered on top of it.",
+      "min_default_rate_ratio_top_to_bottom_tier": 1.5,
+      "require_strict_monotonicity": true,
+      "hard_gate": true
+    },
+    "trend_coherence": {
+      "description": "NEW hard-gating KPI for this problem (no Problem 4/6/8/9 analogue -- combining a static and a dynamic PD into a trend signal has no prior platform precedent to reuse): WITHIN EACH real risk-level tier, the real observed default rate for 'Trending Worse' customers must be STRICTLY GREATER than for 'Trending Better' customers. This is the specific, testable claim this whole problem depends on -- that PD_TREND adds real incremental information beyond risk level alone, not just noise around the same signal. If this gate fails, the honest conclusion is that this dataset's PD_TREND reinterpretation of 'utilization-trend' (Section 6) does not carry the signal this problem's design assumes, and that is reported plainly, not hidden.",
+      "hard_gate": true
+    },
+    "min_tier_population_pct": 10.0,
+    "min_tier_population_pct_description": "ASSUMPTION -- each of the 9 real risk-level x trend-segment cells (Section 8's action-tier matrix below) must hold >= 10% of the eligible validation population's expected 1/9 share (i.e. >= ~1.1% of the total), so no cell's default rate is a statistically meaningless number from a handful of customers. Set lower than Problem 8's 15% single-axis threshold because a 3x3 grid has 9 cells instead of 3, and tertile x tertile cells are not expected to be population-equal even before any real skew in the joint distribution.",
+    "action_tier_policy": {
+      "description": "ASSUMPTION, explicitly a business-rule policy layer, NOT a fitted treatment-response model (see Section 6's honesty note -- no real limit-change/outcome data exists in this dataset to fit one against). Maps the real risk-level tier x real trend segment (both measured, both hard-gated above) onto 5 operationally interpretable credit-line actions.",
+      "matrix": [
+        {
+          "risk_level": "Low Risk",
+          "trend": "Trending Better",
+          "action": "Increase (Large)",
+          "rationale": "Lowest current risk, real behavior improving -- the safest, highest-confidence candidates for a meaningful limit increase."
+        },
+        {
+          "risk_level": "Low Risk",
+          "trend": "Stable",
+          "action": "Increase (Small)",
+          "rationale": "Low current risk, no deterioration signal -- a modest increase is proportionate."
+        },
+        {
+          "risk_level": "Low Risk",
+          "trend": "Trending Worse",
+          "action": "Hold",
+          "rationale": "Low current risk, but real behavior deteriorating -- hold and re-evaluate next cycle rather than increase into an emerging trend."
+        },
+        {
+          "risk_level": "Medium Risk",
+          "trend": "Trending Better",
+          "action": "Increase (Small)",
+          "rationale": "Moderate current risk offset by real improvement -- a small increase rewards the trend without ignoring the absolute level."
+        },
+        {
+          "risk_level": "Medium Risk",
+          "trend": "Stable",
+          "action": "Hold",
+          "rationale": "Moderate risk, no trend signal either way -- no action is the proportionate default."
+        },
+        {
+          "risk_level": "Medium Risk",
+          "trend": "Trending Worse",
+          "action": "Decrease (Small)",
+          "rationale": "Moderate risk and real deterioration together -- a proactive, modest exposure reduction before the trend compounds."
+        },
+        {
+          "risk_level": "High Risk",
+          "trend": "Trending Better",
+          "action": "Hold",
+          "rationale": "High absolute risk, even if genuinely improving -- not yet safe to increase; held rather than decreased in acknowledgment of the real improving trend."
+        },
+        {
+          "risk_level": "High Risk",
+          "trend": "Stable",
+          "action": "Decrease (Small)",
+          "rationale": "High risk sustained with no improvement -- a proactive exposure reduction."
+        },
+        {
+          "risk_level": "High Risk",
+          "trend": "Trending Worse",
+          "action": "Freeze / Review",
+          "rationale": "Highest current risk AND real deterioration -- the customers an operations team should manually review first, before any automated action, for possible line freeze."
+        }
+      ]
+    },
+    "metrics_suite_requirement": "STANDING RULE (user directive, 2026-08-25, carried from Problems 6/7/8/9): Notebook 55/56 must compute and DISPLAY -- inline in the notebook AND in this problem's Word/Excel/HTML reports -- the full classification metrics suite: ROC-AUC, PR-AUC, Accuracy, Precision, Recall, F1, Specificity, Log Loss, Matthews Correlation Coefficient, and a full confusion matrix, wherever a threshold-based binary prediction is meaningful.",
+    "elevated_reporting_requirement": "STANDING RULE (user directive, 2026-08-25, carried from Problems 7/8/9): Problem 10's Word report must synthesize MAXIMUM DETAIL from every one of this problem's notebooks (54-57), with a narrative 'story' paragraph below every chart. Problem 10's HTML report must be an advanced, 'global standard' interactive dashboard with slicers, filters, full legends, and interactive KPI cards -- built in Notebook 57.",
+    "full_history_reference_auc": 0.9620396555226549,
+    "problem_6_reference": {
+      "winning_w": 3,
+      "recommended_for_production": true,
+      "reproduced_holdout_auc": 0.9540951936013714
+    }
+  },
+  "ead_per_account_usd": 5000,
+  "lgd_assumption": 0.45,
+  "random_seed": 42,
+  "warp_resource_cap": {
+    "cpu_fraction_cap": 0.92,
+    "ram_fraction_cap": 0.92,
+    "warp_thread_count": 15,
+    "max_ram_bytes": 30238967808,
+    "note": "Phase 4 tightened cap (92%/92%), min'd against the platform's original historical config -- see Section 2. Satisfies the user's 2026-08-26 directive to use the full 8-core/16-thread machine without risking the freeze this cap was specifically set to prevent."
+  }
+}

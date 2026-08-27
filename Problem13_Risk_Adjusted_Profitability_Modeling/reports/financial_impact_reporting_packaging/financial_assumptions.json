@@ -1,0 +1,18 @@
+{
+  "exposure_reduction_rate": {
+    "value": 0.25,
+    "source": "ASSUMPTION -- illustrative reduction in real EXPECTED_LOSS_USD achieved by proactively capping/reducing credit exposure on the real High Risk + Low Profitability cross-tier segment; set below Problem 9's own collections-intervention success rates (12-15%) is NOT comparable here -- this is a preventive exposure-management action on accounts before delinquency, not a post-delinquency cure attempt, so a materially higher achievable reduction is assumed; edit to your institution's own exposure-management outcome data."
+  },
+  "segment_review_cost_usd_per_account": {
+    "value": 18.0,
+    "source": "ASSUMPTION -- illustrative per-account cost to review and action this cross-tier segment (a credit-line-reduction memo plus system update); set above Problem 11's $12 per-account cohort-review cost since this decision requires cross-referencing two real signals (risk grade and profitability tier), not one; edit to your institution's actual cost."
+  },
+  "implementation_cost_usd": {
+    "value": 40000,
+    "source": "ASSUMPTION -- illustrative one-time build/validate/deploy cost for the profitability-scoring service and its reporting dashboard; set between Problem 12's $45,000 (a four-signal composite) and Problem 11's $38,000 (a stateless aggregator) since this service composes one upstream signal (Problem 12's UNIFIED_RISK_SCORE) with a new, simpler formula rather than four; edit to your institution's actual project cost."
+  },
+  "annual_application_cycles": {
+    "value": 12,
+    "source": "ASSUMPTION -- monthly cadence, matching the platform's established monthly statement/refresh grain; edit to your institution's actual cadence."
+  }
+}

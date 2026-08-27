@@ -1,0 +1,104 @@
+{
+  "generated_at_utc": "2026-08-26T09:35:42.717703+00:00",
+  "risk_level_names": [
+    "Low Risk",
+    "Medium Risk",
+    "High Risk"
+  ],
+  "trend_names": [
+    "Trending Better",
+    "Stable",
+    "Trending Worse"
+  ],
+  "risk_level_cut_low": 0.008852190338075161,
+  "risk_level_cut_high": 0.2653615474700928,
+  "trend_cut_low": -0.002448737470274078,
+  "trend_cut_high": 0.0049040267870024135,
+  "action_tier_matrix": [
+    {
+      "risk_level": "Low Risk",
+      "trend": "Trending Better",
+      "action": "Increase (Large)",
+      "rationale": "Lowest current risk, real behavior improving -- the safest, highest-confidence candidates for a meaningful limit increase."
+    },
+    {
+      "risk_level": "Low Risk",
+      "trend": "Stable",
+      "action": "Increase (Small)",
+      "rationale": "Low current risk, no deterioration signal -- a modest increase is proportionate."
+    },
+    {
+      "risk_level": "Low Risk",
+      "trend": "Trending Worse",
+      "action": "Hold",
+      "rationale": "Low current risk, but real behavior deteriorating -- hold and re-evaluate next cycle rather than increase into an emerging trend."
+    },
+    {
+      "risk_level": "Medium Risk",
+      "trend": "Trending Better",
+      "action": "Increase (Small)",
+      "rationale": "Moderate current risk offset by real improvement -- a small increase rewards the trend without ignoring the absolute level."
+    },
+    {
+      "risk_level": "Medium Risk",
+      "trend": "Stable",
+      "action": "Hold",
+      "rationale": "Moderate risk, no trend signal either way -- no action is the proportionate default."
+    },
+    {
+      "risk_level": "Medium Risk",
+      "trend": "Trending Worse",
+      "action": "Decrease (Small)",
+      "rationale": "Moderate risk and real deterioration together -- a proactive, modest exposure reduction before the trend compounds."
+    },
+    {
+      "risk_level": "High Risk",
+      "trend": "Trending Better",
+      "action": "Hold",
+      "rationale": "High absolute risk, even if genuinely improving -- not yet safe to increase; held rather than decreased in acknowledgment of the real improving trend."
+    },
+    {
+      "risk_level": "High Risk",
+      "trend": "Stable",
+      "action": "Decrease (Small)",
+      "rationale": "High risk sustained with no improvement -- a proactive exposure reduction."
+    },
+    {
+      "risk_level": "High Risk",
+      "trend": "Trending Worse",
+      "action": "Freeze / Review",
+      "rationale": "Highest current risk AND real deterioration -- the customers an operations team should manually review first, before any automated action, for possible line freeze."
+    }
+  ],
+  "reported_dynamic_pd_roc_auc": 0.9540951936013714,
+  "reproduced_dynamic_pd_roc_auc": 0.9540951936013714,
+  "reproduction_passed": true,
+  "worklist_verified": true,
+  "risk_level_ratio": 461.0151160978651,
+  "risk_level_ratio_ci_95": [
+    357.1864850704981,
+    632.674331266066
+  ],
+  "trend_coherence_gap_ci_95": {
+    "Low Risk": [
+      -0.005336763030251524,
+      -0.0025740768019217476
+    ],
+    "Medium Risk": [
+      -0.12530379668574582,
+      -0.11090258092305928
+    ],
+    "High Risk": [
+      -0.21001122675024758,
+      -0.18642816812169452
+    ]
+  },
+  "risk_level_monotonicity_ci_passed": true,
+  "trend_coherence_ci_passed": false,
+  "meets_kpi_with_ci": false,
+  "recommended_for_production": false,
+  "utilization_trend_reinterpretation": "This dataset has no true credit-limit or balance-to-limit utilization field (see Section 6). 'Utilization-trend' is honestly reinterpreted as PD_TREND = DYNAMIC_PD (Problem 6, real, current) minus STATIC_PD (Problem 1, real, origination-time) for the same customer.",
+  "ead_per_account_usd": 5000,
+  "lgd_assumption": 0.45,
+  "random_seed": 42
+}

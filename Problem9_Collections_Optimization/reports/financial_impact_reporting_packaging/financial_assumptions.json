@@ -1,0 +1,30 @@
+{
+  "ead_per_account_usd": {
+    "value": 5000,
+    "source": "Notebook 08 (inherited, real value read programmatically)"
+  },
+  "lgd_assumption": {
+    "value": 0.45,
+    "source": "Notebook 08 (inherited, real value read programmatically)"
+  },
+  "collections_intervention_success_rate": {
+    "value": 0.25,
+    "source": "ASSUMPTION -- illustrative probability that a genuinely non-self-curing account (a real TRUE NEGATIVE: model correctly predicted NOT cure, and the account did not cure) is nudged into curing by a live-agent Priority Outreach contact; set higher than Problem 8's 18% (a same-cycle review triggered by an already-realized escalation event), Problem 6's 20% (a trained score, contacted generically), and Problem 7's 15% (a statistical deviation count) because this is the platform's only technique that actively TARGETS a live-agent outreach at a specifically identified, high-severity, low-self-cure-propensity account, rather than a passive flag or a generic contact -- edit to your institution's own outcome data."
+  },
+  "unnecessary_outreach_cost_usd": {
+    "value": 25,
+    "source": "ASSUMPTION -- illustrative live-agent outreach cost (call or letter) spent on a customer this technique flagged for Priority Outreach who a real FALSE NEGATIVE later shows would have cured on their own that cycle; set above Problem 8's $20 (a quick triage review of transition history) because a full outreach contact costs more staff time than a review, and below Problem 6's $35 (a full account re-underwrite); edit to your institution's actual cost."
+  },
+  "automated_nudge_review_cost_avoided_usd": {
+    "value": 12,
+    "source": "ASSUMPTION -- illustrative manual-queue review cost avoided per real TRUE POSITIVE (model correctly predicted TO cure, and the account did cure) that is instead routed to a low-cost automated SMS/email nudge -- genuinely distinct from every other Phase 3/4 technique's financial model, since Problem 9's core value proposition is resource ALLOCATION efficiency, not only loss prevention; edit to your institution's actual manual-review cost."
+  },
+  "implementation_cost_usd": {
+    "value": 45000,
+    "source": "ASSUMPTION -- illustrative one-time build/validate/deploy cost for the real-time collections-optimization scoring service and its treatment-tier routing logic; set above Problem 8's $40,000 (a stateless scoring service alone) because this technique additionally operationalizes a 3-tier routing/queueing layer on top of the score, and below Problem 6's $60,000 (a full model training/retraining pipeline); edit to your institution's actual project cost."
+  },
+  "annual_application_cycles": {
+    "value": 12,
+    "source": "ASSUMPTION -- monthly re-scoring cadence, matching this platform's other statement-driven, ongoing existing-book monitoring cadences; edit to your institution's actual cadence."
+  }
+}

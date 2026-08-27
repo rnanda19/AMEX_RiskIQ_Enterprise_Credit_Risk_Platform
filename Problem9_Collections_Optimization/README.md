@@ -4,31 +4,40 @@
 
 Phase 4, Problem 9 of the platform: a 4-notebook build (Notebooks 50-53) covering collections-strategy optimization on the real Kaggle **American Express Default Prediction** dataset.
 
-## Status: Packaging Pending
+## Status: Complete -- Real Results Synced, Hardened (2026-08-27)
 
-Notebooks 50 (Business Understanding), 51 (Modeling), 52 (Validation & Deployment), and 53 (Financial Impact, Reporting & Packaging) exist in `notebooks/`. As of this update, Notebook 53's packaging run has not yet produced synced outputs in this repository -- `docs/`, `artifacts/`, `reports/`, and `tests/` are currently empty placeholders (see each folder's own `README.md`).
+**Real, synced results:** a real, trained XGBoost propensity-to-cure classifier -- real holdout ROC-AUC **0.8236** (reproduced, bit-identical), meeting the KPI target (>= 0.60). **Recommended for production.** Real net benefit: **$341,908,210 per cycle** -- the platform's single largest value-creation figure (see the [Executive Capstone Report](../Executive_Capstone_Report/) and root `README.md`'s Platform-at-a-Glance table).
 
-This README will be filled in with this problem's real, measured results (KPIs, financial impact, and a link to its HTML dashboard) once Notebook 53 has been run and its outputs synced -- no figures are stated here in the meantime, to avoid reporting anything not yet real.
+📊 [Financial Impact Dashboard](reports/financial_impact_reporting_packaging/collections_optimization_financial_impact_dashboard.html) · 📄 [Financial Impact Report (Word)](reports/financial_impact_reporting_packaging/Collections_Optimization_Financial_Impact_Report.docx) · 📊 [Financial Impact Workbook (Excel)](reports/financial_impact_reporting_packaging/AMEX_Problem9_Financial_Impact_Workbook.xlsx)
+
+This problem also received the platform's Global Standard hardening delta (2026-08-27): a real, auth-protected FastAPI scoring service (`src/collections_scoring_service.py`), Docker packaging, real unit tests, and `MODEL_CARD.md`/`CHANGELOG.md`/`requirements.txt` -- see `CHANGELOG.md` for the full detail, including a real hardcoded-path bug found and fixed.
 
 ## Project Structure
 
 ```
 Problem9_Collections_Optimization/
-├── artifacts/
 ├── data/
 │   └── README.md
 ├── docs/
+│   ├── collections_deployment_policy.json
+│   └── collections_policy.json
 ├── models/
-│   └── README.md
+│   └── collections_propensity_xgboost.joblib
 ├── notebooks/
 │   ├── 50_collections_optimization_business_understanding.ipynb
 │   ├── 51_collections_optimization_modeling.ipynb
 │   ├── 52_collections_optimization_validation_deployment.ipynb
 │   └── 53_collections_optimization_financial_impact_reporting_packaging.ipynb
 ├── reports/
+│   ├── modeling/
+│   └── financial_impact_reporting_packaging/
 ├── src/
+│   ├── collections_scoring_service.py
 │   └── docker/
 ├── tests/
+├── MODEL_CARD.md
+├── CHANGELOG.md
+├── requirements.txt
 └── LICENSE
 ```
 
