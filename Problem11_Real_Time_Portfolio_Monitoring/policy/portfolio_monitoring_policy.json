@@ -1,0 +1,61 @@
+{
+  "generated_at_utc": "2026-08-27T04:25:45.228670+00:00",
+  "problem": "Problem 11 -- Real-Time Portfolio Monitoring (Streaming Aggregation + Threshold Alerting)",
+  "control_limit_k_sigma": 2.5,
+  "min_trailing_months_for_baseline": 6,
+  "consecutive_breach_candidates": [
+    1,
+    2,
+    3,
+    4,
+    5,
+    6,
+    8,
+    10
+  ],
+  "customer_deviation_z_threshold": 2.0,
+  "baseline_eligibility_coverage_pct": 53.84615384615385,
+  "n_baseline_eligible_months": 7,
+  "monthly_volume_stats": {
+    "n_calendar_months_covered": 13,
+    "first_month": "2017-03-01",
+    "last_month": "2018-03-01",
+    "min_statements_in_a_month": 395630,
+    "max_statements_in_a_month": 458913,
+    "mean_statements_per_month": 425496.23076923075,
+    "min_unique_customers_in_a_month": 395630,
+    "max_unique_customers_in_a_month": 458913
+  },
+  "monitored_base_columns": {
+    "columns": [
+      "P_2",
+      "B_1",
+      "B_11",
+      "D_39",
+      "B_4",
+      "S_3",
+      "R_1",
+      "B_5"
+    ],
+    "count": 8,
+    "ranking_source": "Notebook 06's real SHAP TreeExplainer global importance (shap_top10_features)",
+    "unresolved_ranked_features": [
+      "interaction_P_2_last_x_B_2_last",
+      "interaction_P_2_last_x_B_18_last"
+    ]
+  },
+  "kpi_targets": {
+    "min_cohort_default_rate_lift": 1.3,
+    "min_cohort_default_rate_lift_description": "ASSUMPTION -- the PRIMARY, pass/fail KPI: among customers who, during a calendar month the portfolio's own trailing baseline flagged as a persistence-confirmed ALERT month (selected CONSECUTIVE_BREACH_CANDIDATES threshold), ALSO had their own real statement value in the SAME breaching column sit >= CUSTOMER_DEVIATION_Z_THRESHOLD real standard deviations from that month's real cross-sectional peer mean/std, in the SAME direction as the portfolio's own shift, the real observed default rate must be at least 1.3x the base population's real default rate. REVISED 2026-08-27 (second real-data fix, user-directed): the original version of this cohort ('LATEST statement falls in a flagged month', then 'ANY active month overlaps a flagged month') gave every tested customer virtually identical exposure, because >=75% of real customers share the SAME full 13/13-month coverage window -- confirmed on two real runs as exactly 100%/0% alerted with zero real discrimination (ROC-AUC exactly 0.5, MCC=0), not a real result about the technique. Requiring the customer's OWN reading to also be individually anomalous, in the same column and direction the portfolio itself was breaching, restores real per-customer variation even within that fully-covered majority (their month-presence is identical, but their own raw values are not). Still set softer than Problem 7's 1.5x customer-level lift because a flagged MONTH is a coarser unit than a flagged CUSTOMER-STATEMENT by construction.",
+    "secondary_auc_reporting": "Not a pass/fail gate, an honest reporting requirement: Notebook 59 must also report the threshold-free ROC-AUC and PR-AUC of a continuous 'months flagged in this customer's own cohort window' score against the real eventual-default label, for comparability with Problems 1/5/6/7's own AUC figures -- reported plainly even though a low AUC is the honestly expected outcome for a coarse, month-level aggregate signal, not a failure of this notebook.",
+    "metrics_suite_requirement": "STANDING RULE (user directive, 2026-08-25, carried from Problems 6/7): Notebook 59 (Modeling) and Notebook 60 (Validation & Deployment) must compute and DISPLAY -- inline in the notebook AND in this problem's Word/Excel/HTML reports -- the full classification metrics suite treating 'cohort in a flagged month' as the binary prediction at each CONSECUTIVE_BREACH_CANDIDATES threshold: ROC-AUC, PR-AUC, Accuracy, Precision, Recall, F1, Specificity, Log Loss, Matthews Correlation Coefficient, and a full confusion matrix.",
+    "elevated_reporting_requirement": "STANDING RULE (user directive, 2026-08-25): Problem 11's Word report must synthesize MAXIMUM DETAIL from every one of this problem's notebooks (58-60), with a narrative 'story' paragraph below every chart -- not a report scoped to Notebook 61's own financial figures alone. Problem 11's HTML report must be an advanced, 'global standard' interactive dashboard with slicers, filters, full legends, and interactive KPI cards -- built in Notebook 61, and must double as the real ops dashboard + alert feed the master plan names as this problem's deliverable.",
+    "full_history_reference_auc": 0.9614779100963606,
+    "problem_7_reference": {
+      "recommended_for_production": true,
+      "real_alert_capture_rate": 0.4051,
+      "winning_min_deviation_count": 10
+    }
+  },
+  "random_seed": 42
+}

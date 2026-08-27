@@ -1,0 +1,4 @@
+# Minimal runtime dependencies for portfolio_alert_feed_service.py -- auto-generated 2026-08-27 10:12
+fastapi==0.141.1
+uvicorn==0.52.1
+pydantic==2.13.4

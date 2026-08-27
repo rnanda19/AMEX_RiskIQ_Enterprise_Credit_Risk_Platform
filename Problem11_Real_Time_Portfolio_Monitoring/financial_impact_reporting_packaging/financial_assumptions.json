@@ -1,0 +1,30 @@
+{
+  "ead_per_account_usd": {
+    "value": 5000,
+    "source": "Notebook 08 (inherited, real value read programmatically)"
+  },
+  "lgd_assumption": {
+    "value": 0.45,
+    "source": "Notebook 08 (inherited, real value read programmatically)"
+  },
+  "cohort_intervention_success_rate": {
+    "value": 0.12,
+    "source": "ASSUMPTION -- illustrative efficacy of intensified monitoring/collections outreach applied to the WHOLE COHORT of customers whose latest statement falls in a real ALERT month; set below Problem 7's 15% per-customer intervention rate because this response is triggered by a coarser, whole-portfolio signal applied to an entire monthly cohort rather than a customer-specific behavioral deviation -- edit to your institution's own outcome data."
+  },
+  "cohort_review_cost_usd_per_account": {
+    "value": 12,
+    "source": "ASSUMPTION -- illustrative lightweight per-account triage cost for a customer in a flagged monthly cohort who does NOT go on to default; set below Problem 7's $15 since these accounts are triaged as part of a batch cohort review process (a monthly list), not individually investigated -- edit to your institution's actual cost."
+  },
+  "portfolio_risk_review_cost_usd_per_alert_month": {
+    "value": 2500,
+    "source": "ASSUMPTION -- illustrative one-time credit-risk-committee convening plus root-cause investigation cost incurred EACH TIME the control chart declares a real ALERT month -- a genuinely new cost stream with no Problem 5/6/7 analog, reflecting this technique's whole-portfolio, calendar-month event trigger rather than a per-customer signal; edit to your institution's actual review-committee cost."
+  },
+  "implementation_cost_usd": {
+    "value": 38000,
+    "source": "ASSUMPTION -- illustrative one-time build/validate/deploy cost for the real-time portfolio-monitoring streaming-aggregation service and its ops dashboard + alert feed; set above Problem 7's $30,000 (a stateless per-request scorer) because this service must maintain server-side running history (the alert feed) and an ops dashboard, and below Problem 6's $60,000 model-training pipeline since this technique trains no model at all -- edit to your institution's actual project cost."
+  },
+  "annual_application_cycles": {
+    "value": 12,
+    "source": "ASSUMPTION -- monthly re-aggregation cadence, matching this technique's own real calendar-month grain (see Notebook 58); edit to your institution's actual cadence."
+  }
+}

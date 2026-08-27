@@ -1,0 +1,39 @@
+{
+  "generated_at_utc": "2026-08-27T04:42:19.172610+00:00",
+  "control_limit_k_sigma": 2.5,
+  "min_trailing_months_for_baseline": 6,
+  "winning_consecutive_breach_candidate": 1,
+  "meets_kpi_target": true,
+  "recommended_for_production": true,
+  "monitored_base_columns": [
+    "P_2",
+    "B_1",
+    "B_11",
+    "D_39",
+    "B_4",
+    "S_3",
+    "R_1",
+    "B_5"
+  ],
+  "winning_candidate_metrics": {
+    "candidate_consecutive_breach_months": 1,
+    "n_alerted": 12971,
+    "pct_alerted": 14.13224671235414,
+    "default_rate_alerted": 0.691696862231131,
+    "default_rate_lift": 2.6712956789598543,
+    "meets_kpi_target": true,
+    "accuracy": 0.7952453068651057,
+    "precision": 0.691696862231131,
+    "recall": 0.3775140957670622,
+    "f1": 0.48844489207066444,
+    "specificity": 0.9412058750018377,
+    "mcc": 0.4007865657558358,
+    "confusion_matrix": {
+      "tn": 64018,
+      "fp": 3999,
+      "fn": 14794,
+      "tp": 8972
+    }
+  },
+  "random_seed": 42
+}
