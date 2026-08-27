@@ -232,7 +232,7 @@ work, not as progress toward an unverified number.
 | Phase 2 — Regulatory & Loss Provisioning | Problem 3 (ECL/IFRS9/CECL), Problem 4 (Delinquency/Loss Severity), Problem 5 (Early Payment Default) | **Complete, pushed to GitHub 2026-08-25** (12 notebooks + Global Standard hardening pass) |
 | Phase 3 — Behavioral Intelligence | Problems 6, 7, 8 | **Complete, pushed to GitHub 2026-08-25** (12 notebooks + real notebook-output artifacts + Global Standard hardening pass, all pushed 2026-08-25) — Problem 6 complete (Notebooks 38-41), RECOMMENDED FOR PRODUCTION (W=3 trailing window, 99.2% AUC retention); Problem 7 complete (Notebooks 42-45), concluded NOT RECOMMENDED FOR PRODUCTION (honest result -- real default-rate lift below KPI target; a v2 enhancement attempt, Notebooks 46-47, was built, showed genuine but insufficient improvement, and was deliberately abandoned per user decision, freeing 46-49 for Problem 8); Problem 8 complete -- Notebooks 46 (Business Understanding & Policy), 47 (Modeling), 48 (Validation & Deployment), and 49 (Financial-Impact Reporting & Packaging) all shipped, RECOMMENDED FOR PRODUCTION on this run (both hard-gate KPIs -- monotonicity and coherence -- met; Severe/Low default ratio 107.2x). All 12 Phase 3 notebooks (38-49) verified: syntax-clean, idempotent, pyflakes-clean. Hardening pass: 21 new tests (94 total platform-wide), Docker for all 3 services, MODEL_CARD/CHANGELOG/requirements.txt, BENCHMARKS.md entries, CI wiring -- see "Two more real bugs found" above. |
 | Phase 4 — Operational Risk Management | Problems 9, 10, 11 | **Complete, pushed to GitHub 2026-08-27** (Problem 11 pushed with real RECOMMENDED FOR PRODUCTION results; Problems 9 and 10 are code-complete, 12 notebooks total, but their real run results are not yet synced into this repository -- see each problem's own README for honest current status). |
-| Phase 5 — Customer & Business Intelligence | Problems 12, 13, 14 | **Started 2026-08-27.** Problem 12 (360° Customer Intelligence): code-complete, all 4 notebooks shipped (62-65) -- unified profile composes Problems 1/6/9/10's real outputs, both hard-gating KPIs (profile_completeness, composite_non_inferiority) designed with a 200-resample bootstrap CI, real lookup-by-customer_ID FastAPI service, 3x independent reproduction. Problem 13 (Risk-Adjusted Profitability Modeling): code-complete, all 4 notebooks shipped (66-69) -- real Spend-column revenue proxy discovered programmatically from the raw CSV, both hard-gating KPIs (profitability_tier_monotonicity, risk_adjustment_materiality) with a 200-resample bootstrap CI, real cross-tier (High Risk + Low Profitability) segment priced as this problem's own additive financial claim. Not yet run end-to-end by the user, not yet pushed to GitHub. Problem 14 not started. |
+| Phase 5 — Customer & Business Intelligence | Problems 12, 13, 14 | **Complete 2026-08-27 (code-complete for all 3 problems; real results for 12 & 13).** Problem 12 (360° Customer Intelligence): run end-to-end with real results (62-65) -- real composite AUC 0.9590 vs. best-single 0.9626; real net benefit $1,275,022/cycle (33,900.6% Year-1 ROI); recommended for production. Problem 13 (Risk-Adjusted Profitability Modeling): run end-to-end with real results (66-69) -- real Spearman(risk, profitability) = -0.978 on holdout; real net benefit $58,060,687.58/cycle (1,741,720.6% Year-1 ROI) from the real 148,855-customer cross-tier segment; recommended for production. Problem 14 (Executive Decision Support Dashboard): code-complete (70-73) -- real BI aggregation layer across all 13 prior problems, TOTAL_PLATFORM_NET_VALUE_USD computed with a partition-completeness proof and 4x independent reproduction, 7-tab interactive executive dashboard; not yet run by the user. All 12 Phase 5 notebooks committed locally, not yet pushed to GitHub. **This completes the entire 14-problem, 5-phase platform (Notebooks 1-73), code-complete.** |
 
 ## Phase 3 build plan — scoped 2026-08-25
 
@@ -570,8 +570,102 @@ test suite (27 tests) green.
 
 This completes Phase 5's second problem (Problem 13, Risk-Adjusted
 Profitability Modeling) end to end: all 4 notebooks (66-69) written,
-syntax-checked, and committed locally (not yet run by the user, not yet
-pushed to GitHub, per this platform's standing practice).
+syntax-checked, and committed locally. Notebooks 66-69 were then run
+end-to-end by the user with real results synced 2026-08-27: all hard
+gates passed, recommended for production, real Spearman(risk,
+profitability) = -0.978 on holdout, real net benefit $58,060,687.58/cycle
+(1,741,720.6% Year-1 ROI) from the real 148,855-customer cross-tier
+segment. Problem 12's real results synced the same day: composite AUC
+0.9590 vs. best-single 0.9626 (both hard-gating KPIs pass), real net
+benefit $1,275,022/cycle (33,900.6% Year-1 ROI).
 
-Next problem-roadmap item: Problem 14 (Executive Decision Support
-Dashboard), Notebooks 70-73 -- depends on all 13 prior problems.
+Notebook 70 (Business Understanding & Policy) shipped 2026-08-27, opening
+Problem 14 (Executive Decision Support Dashboard) -- the platform's grand
+finale, depending on all 13 prior problems per the master execution
+plan's "BI aggregation layer" -> "Executive dashboard" definition. Every
+one of the 13 prior problems' own canonical summary JSON(s) (spanning
+Phases 1-5, Problems 1-13) is registered and classified into one of three
+real categories: `foundational_model` (Problems 1, 2 -- Credit Scoring and
+Risk Tier Classification predate this platform's financial-impact-
+reporting convention entirely and carry no standalone dollar benefit;
+their value is realized downstream), `reserve_optimization` (Problem 3 --
+a reserve-accuracy gain, a genuinely different kind of number from a P&L
+benefit, kept as its own separate line rather than summed with the
+others), or `value_creation` (Problems 4-13 -- each carries a real
+net-benefit-per-cycle-equivalent figure). Two new hard-gating KPIs with no
+prior platform analog: `aggregation_completeness` (all 13 problems' real
+summary JSONs load and parse) and `aggregation_scope_correctness` (the
+platform total's real inclusion set is provably correct via a partition-
+completeness proof plus a per-problem data-driven exclusion reason --
+guarding against exactly the category error an executive rollup is most
+exposed to: silently summing a foundational model's AUC, a reserve
+figure, or a not-recommended system's benefit into one impressive-looking
+headline number).
+
+Notebook 71 (Modeling -- the real BI aggregation layer itself) shipped
+2026-08-27: builds the real 13-row executive rollup table via a single
+generic `_extract()` path-walker driven entirely by Notebook 70's own
+registry (zero per-problem special-casing), computes
+`TOTAL_PLATFORM_NET_VALUE_USD` as the sum of only the production-
+recommended `value_creation` problems' real figures, and validates both
+hard-gating KPIs -- including a real cross-check that Problem 7 (this
+platform's one built-but-not-recommended system, per its own real
+Notebook 45 result) is correctly excluded for a genuine, data-driven
+reason rather than a hardcoded skip. A real, genuinely new cross-problem
+consistency check confirms Problems 12 and 13's real `eligible_population`
+fields agree exactly (both real datasets score the same real Problem-10
+worklist population).
+
+Notebook 72 (Validation & Deployment) shipped 2026-08-27: independently
+reproduces the entire aggregation from scratch in a fresh kernel (re-
+reading all 13 real summary JSONs), cross-checks the persisted table
+row-by-row, re-validates both hard-gating KPIs fresh, and generates a
+real, auth-protected FastAPI **lookup** service
+(`GET /executive-summary`, `GET /problem/{problem_number}`) -- reusing
+Problems 12/13's precomputed-lookup architecture, since Problem 14's
+deliverable is a BI aggregation artifact, not a live model. Self-tested
+live via `TestClient` against all 13 real problem rows plus auth-
+rejection and unknown-problem-404 checks.
+
+Notebook 73 (Financial Impact, Reporting & Packaging -- the grand finale)
+shipped 2026-08-27, completing Problem 14, Phase 5, and the entire
+14-problem platform. This problem's own genuinely new, additive financial
+claim: EXECUTIVE DECISION-LATENCY REDUCTION -- real time saved by
+reviewing one unified dashboard instead of 13 separate reports, pricing a
+different constituency's time (C-suite/CRO review time) than any prior
+problem, net of the dashboard's own ongoing hosting cost. Section 8
+performs a FOURTH independent reproduction of the platform total (after
+Notebooks 71, 72, and 72's own self-test) by live-driving the exact
+deployed `executive_dashboard_service.py`. Builds a real portfolio
+risk-profitability map -- Problem 12's real `UNIFIED_RISK_GRADE` crossed
+with Problem 13's real `PROFITABILITY_TIER` on the real persisted
+profile -- explicitly documented as the honest analog to a geographic
+map, since this dataset carries no real location field (no fabricated
+geography is built). Packages a 7-tab interactive HTML executive
+dashboard (Overview, Problem Registry with real functional phase/
+category/status filters, Risk-Profitability Map as a real HTML/CSS
+heat-grid, Model Health Matrix, a live financial calculator, SMART
+Suggestions, Policy & Validation), a comprehensive Word report, and a
+7-sheet Excel workbook with real AutoFilter tables and conditional-
+formatting color scales (native PivotTable slicers are not generated --
+openpyxl has no API to create them -- so this workbook delivers the real,
+functional AutoFilter equivalent instead of overclaiming a feature the
+library cannot produce). All 73 repo notebooks pass
+`check_notebook_syntax.py`; full local test suite (27 tests) green. The
+entire 4-notebook chain (70-73) was additionally smoke-tested end-to-end
+against a realistic mock 13-problem dataset before delivery, confirming
+every KPI, reproduction, and generated artifact (Word/Excel/HTML/charts/
+FastAPI service) actually runs correctly, not just compiles.
+
+This completes Phase 5 (Problems 12, 13, 14) and the entire 14-problem,
+5-phase AMEX Enterprise Credit Risk Platform end to end: all 12 Phase 5
+notebooks (62-73) written, syntax-checked, and committed locally.
+Problems 12 and 13 have real, synced run results (above); Notebooks
+70-73 (Problem 14) are code-complete, not yet run by the user, not yet
+pushed to GitHub, per this platform's standing practice.
+
+Next: once the user runs Notebooks 70-73 and syncs real Problem 14
+results, the platform-wide mega report (paused since before Phase 5
+began, per the user's own standing instruction) can resume -- this time
+incorporating Phase 5's real notebook outputs and results, built to a
+Harvard-grade, global top-tier financial-institutional standard.
