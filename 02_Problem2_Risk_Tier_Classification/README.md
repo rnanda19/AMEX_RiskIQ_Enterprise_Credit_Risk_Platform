@@ -11,6 +11,10 @@ Phase 1, Problem 2 of a 14-problem enterprise credit risk platform: a **7-notebo
 - **Tiers defined:** 4, primary method: business_rule
 - **Primary method full KPI compliance:** True
 
+## Live Dashboards
+
+- 📊 [Risk Tier Classification Dashboard](https://rnanda19.github.io/AMEX_RiskIQ_Enterprise_Credit_Risk_Platform/02_Problem2_Risk_Tier_Classification/reports/financial_impact_reporting_packaging/risk_tier_classification_dashboard.html) — interactive tier population/bad-rate breakdown (business_rule vs quantile), chi-square/Cramér's V validation, fair-lending data-limitation statement
+
 ## 2. Problem Statement
 
 A continuous PD score is not, by itself, an actionable underwriting or pricing instrument -- credit policy is written in discrete risk grades (e.g. 'Prime', 'Subprime'), each carrying its own approval rule, pricing, and credit-limit policy. This build defines a real, validated, monotonic mapping from the continuous PD score to a small set of risk tiers, and exposes that mapping as a live service.
