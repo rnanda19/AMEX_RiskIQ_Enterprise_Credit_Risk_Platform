@@ -25,3 +25,20 @@ env/
 # OS
 .DS_Store
 Thumbs.db
+
+# Secrets hardening (2026-09-08) -- never commit real credentials/keys.
+# .example templates are still committed intentionally.
+.env.*
+!.env.example
+!**/.env.example
+*.pem
+*.key
+!**/*.key.example
+*.pfx
+*.p12
+.aws/
+.ssh/
+**/secrets/
+**/*_secret*
+**/*credentials*
+!**/*credentials*.example
