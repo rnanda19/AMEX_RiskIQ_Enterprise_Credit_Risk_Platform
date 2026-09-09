@@ -437,6 +437,7 @@ function renderTable() {
 renderTable();
 
 const INK = "#0B1F3A", ACCENT = "#C41E3A", GOLD = "#C9A227", BLUE2 = "#3a5a8c", GREY = "#8A93A6";
+const LGREEN = "#6FCF97";
 const includedRows = INCLUDED.map(n => ROWS_BY_NUM[n]);
 new Chart(document.getElementById("waterfallChart"), {
   type: "bar",
@@ -445,7 +446,7 @@ new Chart(document.getElementById("waterfallChart"), {
     datasets: [{
       label: "USD / cycle",
       data: includedRows.map(r => r.financial_value_usd).concat([429926252.73]),
-      backgroundColor: includedRows.map((r, i) => i % 2 === 0 ? INK : BLUE2).concat([GOLD]),
+      backgroundColor: includedRows.map((r, i) => LGREEN).concat([GOLD]),
       borderRadius: 4,
     }]
   },
@@ -457,7 +458,7 @@ new Chart(document.getElementById("waterfallChart"), {
 
 const catCounts = {};
 REGISTRY.forEach(r => { catCounts[r.category] = (catCounts[r.category] || 0) + 1; });
-const catColors = {foundational_model: GREY, reserve_optimization: GOLD, value_creation: INK, bi_aggregation_layer: ACCENT};
+const catColors = {foundational_model: GREY, reserve_optimization: GOLD, value_creation: LGREEN, bi_aggregation_layer: ACCENT};
 new Chart(document.getElementById("categoryChart"), {
   type: "doughnut",
   data: {
