@@ -9,6 +9,17 @@ reconstructed -- every line traces to a real commit.
 
 ## Unreleased
 
+- **Real bug found and fixed:** pushing the rate-limiting + Prometheus
+  changes below broke real CI -- `.github/workflows/ci.yml`'s
+  `unit-tests` job installs dependencies fresh from `requirements-dev.txt`
+  (not each service's own `requirements-api.txt`), which never listed
+  `slowapi` or `prometheus-client`. Problem 1's test step failed with a
+  real `ModuleNotFoundError: No module named 'slowapi'` on GitHub's
+  runners (confirmed via the real Actions run, then reproduced locally in
+  a clean venv installing only `requirements-dev.txt`). Fixed by adding
+  `slowapi==0.1.10` and `prometheus-client==0.21.1` to
+  `requirements-dev.txt`, pinned to the exact versions already verified
+  working elsewhere in this platform.
 - Added real, enforced rate limiting (`slowapi`, 60 requests/minute per
   client IP) to the primary scoring/mutating endpoint of all 14 FastAPI
   services -- `/health` and the `*-info`/lookup metadata endpoints are
