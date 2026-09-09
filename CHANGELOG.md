@@ -9,6 +9,53 @@ reconstructed -- every line traces to a real commit.
 
 ## Unreleased
 
+- Added real, enforced rate limiting (`slowapi`, 60 requests/minute per
+  client IP) to the primary scoring/mutating endpoint of all 14 FastAPI
+  services -- `/health` and the `*-info`/lookup metadata endpoints are
+  left unlimited since they are liveness or metadata reads, not scoring
+  load. Verified two ways: the full real `pytest` suite (172 tests) still
+  passes with the limiter active, and a live `uvicorn` run of Problem 7's
+  service was hammered with 65 real requests -- the first 60 returned
+  `200`, the next 5 returned a real `429 {"error":"Rate limit exceeded:
+  60 per 1 minute"}`. 6 of the 14 services needed their scoring
+  endpoint's body parameter renamed from `request` to `body` first,
+  since slowapi requires the literal name `request` for the real
+  `starlette.Request` object it inspects for the caller's IP.
+- Added a real, scraped Prometheus `/metrics` endpoint to Problem 7's
+  Early Warning System service (`prometheus-client==0.21.1`) as a
+  single-service pilot -- a `Counter` labeled by outcome
+  (`alert`/`no_alert`/`validation_error`/`error`) and a `Histogram` of
+  real wall-clock `/score` latency, both populated on every request, not
+  placeholders. Verified live: started a real `uvicorn` instance, sent 3
+  valid and 1 invalid `/score` request, then scraped `/metrics` and
+  confirmed the exact counts (`no_alert` 3, `validation_error` 1, latency
+  count 4) with no fabricated values; the service's own 10-test suite and
+  the full platform 172-test suite both still pass. See `MONITORING.md`
+  for the honest scope note -- this is Problem 7 only, not a
+  platform-wide observability stack.
+- Added `AUTH_HARDENING.md`: an honest assessment of the platform's
+  current shared-static-key `X-API-Key` auth (constant-time comparison,
+  but no per-caller identity, expiry, rotation, or scoping), why a real
+  OAuth2/JWT replacement was deliberately not attempted in this pass
+  (touches all 14 services' request path and all 172 tests that exercise
+  a protected endpoint -- real regression-risk surface, not a contained
+  change), and a concrete, scoped migration plan (client-credentials
+  grant, HS256 JWT, piloted on Problem 7 first) for when it is picked up.
+- Added `SECRETS_MANAGEMENT.md` plus a real, working proof-of-concept in
+  `docs/secrets_management_demo/`: a dev-mode HashiCorp Vault (`docker-compose.vault.yml`)
+  and a script (`vault_dev_example.sh`) that writes a real secret to it
+  and reads it back over Vault's actual HTTP API, asserting the value
+  matches exactly. A new `.github/workflows/vault-verify.yml` runs this
+  for real on every push/PR (this sandbox has no Docker, so -- like
+  `docker-verify.yml` before it -- the actual end-to-end run happens on
+  GitHub's runners, not claimed as verified here before CI has run it).
+  The platform's 14 services still read their secret from a plain
+  environment variable today; this is a documented, honestly-scoped
+  proof-of-concept for the pattern to migrate to, not a claim that any
+  service has been switched over.
+
+## 2026-09-09 -- Gap-analysis + GitHub-audit remediation
+
 - Fixed the 3 pre-existing pyflakes findings (unused `joblib` import,
   unused `typing.Dict` import, an f-string with no placeholders) in both
   the generated `src/` files and their source notebook cells, then

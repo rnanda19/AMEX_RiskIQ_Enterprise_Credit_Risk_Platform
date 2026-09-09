@@ -12,7 +12,10 @@ import secrets
 from pathlib import Path
 from typing import List, Optional
 
-from fastapi import Depends, FastAPI, HTTPException, Security
+from fastapi import Depends, FastAPI, HTTPException, Request, Security
+from slowapi import Limiter, _rate_limit_exceeded_handler
+from slowapi.errors import RateLimitExceeded
+from slowapi.util import get_remote_address
 from fastapi.security import APIKeyHeader
 from pydantic import BaseModel, Field
 
@@ -85,6 +88,13 @@ app = FastAPI(
     version="1.0.0",
 )
 
+# Rate limiting -- real, enforced (60 requests/minute per client IP on this service's
+# scoring/mutating endpoint(s); /health and the *-info endpoints are left unlimited since
+# they're liveness/metadata reads, not scoring load).
+limiter = Limiter(key_func=get_remote_address)
+app.state.limiter = limiter
+app.add_exception_handler(RateLimitExceeded, _rate_limit_exceeded_handler)
+
 
 @app.get("/health")
 def health():
@@ -107,15 +117,16 @@ def model_info():
 
 
 @app.post("/score", response_model=ECLResponse, dependencies=[Depends(require_api_key)])
-def score(request: ECLRequest):
-    if request.severity_tier not in bundle["tier_order"]:
+@limiter.limit("60/minute")
+def score(request: Request, body: ECLRequest):
+    if body.severity_tier not in bundle["tier_order"]:
         raise HTTPException(
             status_code=422,
-            detail=f"severity_tier must be one of {bundle['tier_order']}, got {request.severity_tier!r}",
+            detail=f"severity_tier must be one of {bundle['tier_order']}, got {body.severity_tier!r}",
         )
     try:
-        result = compute_ecl(request.pd_12m, request.severity_tier, bundle)
-        reasons = explain_ecl(request.pd_12m, request.severity_tier, bundle)
+        result = compute_ecl(body.pd_12m, body.severity_tier, bundle)
+        reasons = explain_ecl(body.pd_12m, body.severity_tier, bundle)
     except Exception as exc:
         raise HTTPException(status_code=500, detail="ECL computation failed: " + str(exc))
-    return ECLResponse(customer_id=request.customer_id, top_reasons=reasons, **result)
+    return ECLResponse(customer_id=body.customer_id, top_reasons=reasons, **result)

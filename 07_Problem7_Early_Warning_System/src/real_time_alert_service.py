@@ -10,13 +10,18 @@ import json
 import logging
 import os
 import secrets
+import time
 from pathlib import Path
 from typing import Dict, List, Optional
 
 import numpy as np
-from fastapi import Depends, FastAPI, HTTPException, Security
+from fastapi import Depends, FastAPI, HTTPException, Request, Response, Security
 from fastapi.security import APIKeyHeader
 from pydantic import BaseModel
+from prometheus_client import CONTENT_TYPE_LATEST, Counter, Histogram, generate_latest
+from slowapi import Limiter, _rate_limit_exceeded_handler
+from slowapi.errors import RateLimitExceeded
+from slowapi.util import get_remote_address
 
 # Self-contained default: the real frozen policy ships alongside this file in src/ (see
 # docs/early_warning_deployment_policy.json for the original copy). Override with
@@ -141,6 +146,27 @@ app = FastAPI(
     version="1.0.0",
 )
 
+# Rate limiting -- real, enforced (60 requests/minute per client IP on /score; /health and
+# /model-info are left unlimited since they're liveness/metadata reads, not scoring load).
+limiter = Limiter(key_func=get_remote_address)
+app.state.limiter = limiter
+app.add_exception_handler(RateLimitExceeded, _rate_limit_exceeded_handler)
+
+# Prometheus metrics -- real, scraped via GET /metrics (left unauthenticated/unlimited, like
+# /health, since a metrics scraper is infrastructure, not scoring load). Pilot for this one
+# service; see MONITORING.md for the honest platform-wide scope note.
+SCORE_REQUESTS_TOTAL = Counter(
+    "ews_score_requests_total", "Total /score requests by outcome", ["outcome"]
+)
+SCORE_LATENCY_SECONDS = Histogram(
+    "ews_score_latency_seconds", "Real wall-clock latency of /score, seconds"
+)
+
+
+@app.get("/metrics")
+def metrics():
+    return Response(generate_latest(), media_type=CONTENT_TYPE_LATEST)
+
 
 @app.get("/health")
 def health():
@@ -160,17 +186,25 @@ def model_info():
 
 
 @app.post("/score", response_model=AlertResponse, dependencies=[Depends(require_api_key)])
-def score(request: ScoreRequest):
+@limiter.limit("60/minute")
+def score(request: Request, body: ScoreRequest):
+    start_time = time.time()
     try:
-        result = compute_early_warning(request.statements)
+        result = compute_early_warning(body.statements)
     except ValueError as exc:
+        SCORE_LATENCY_SECONDS.observe(time.time() - start_time)
+        SCORE_REQUESTS_TOTAL.labels(outcome="validation_error").inc()
         raise HTTPException(status_code=422, detail=str(exc))
     except Exception as exc:
+        SCORE_LATENCY_SECONDS.observe(time.time() - start_time)
+        SCORE_REQUESTS_TOTAL.labels(outcome="error").inc()
         raise HTTPException(status_code=500, detail="Scoring failed: " + str(exc))
     alert = result["early_warning_score"] >= WINNING_MIN_DEVIATION_COUNT
     reasons = top_reason_codes(result["feature_deviations"])
+    SCORE_LATENCY_SECONDS.observe(time.time() - start_time)
+    SCORE_REQUESTS_TOTAL.labels(outcome="alert" if alert else "no_alert").inc()
     return AlertResponse(
-        customer_id=request.customer_id,
+        customer_id=body.customer_id,
         early_warning_score=result["early_warning_score"],
         monitored_feature_count=len(MONITORED_FEATURES),
         z_computable_feature_count=result["z_computable_feature_count"],

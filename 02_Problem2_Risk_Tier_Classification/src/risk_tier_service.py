@@ -15,7 +15,10 @@ from typing import List, Optional
 
 import joblib
 import numpy as np
-from fastapi import Depends, FastAPI, HTTPException, Security
+from fastapi import Depends, FastAPI, HTTPException, Request, Security
+from slowapi import Limiter, _rate_limit_exceeded_handler
+from slowapi.errors import RateLimitExceeded
+from slowapi.util import get_remote_address
 from fastapi.security import APIKeyHeader
 from pydantic import BaseModel, create_model
 
@@ -125,6 +128,13 @@ app = FastAPI(
     version="1.0.0",
 )
 
+# Rate limiting -- real, enforced (60 requests/minute per client IP on this service's
+# scoring/lookup endpoint; /health and the *-info endpoints are left unlimited since
+# they're liveness/metadata reads, not scoring load).
+limiter = Limiter(key_func=get_remote_address)
+app.state.limiter = limiter
+app.add_exception_handler(RateLimitExceeded, _rate_limit_exceeded_handler)
+
 
 def _predict_pd(x_matrix):
     xx = x_matrix.copy()
@@ -181,7 +191,8 @@ def policy_info():
 
 
 @app.post("/risk-tier", response_model=RiskTierResponse, dependencies=[Depends(require_api_key)])
-def risk_tier(features: CustomerFeatures, customer_id: Optional[str] = None):
+@limiter.limit("60/minute")
+def risk_tier(request: Request, features: CustomerFeatures, customer_id: Optional[str] = None):
     row = features.dict() if hasattr(features, "dict") else features.model_dump()
     x = np.zeros((1, len(all_feature_cols)), dtype=np.float32)
     for i, col in enumerate(all_feature_cols):

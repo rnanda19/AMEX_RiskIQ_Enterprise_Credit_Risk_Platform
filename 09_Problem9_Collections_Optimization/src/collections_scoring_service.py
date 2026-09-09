@@ -13,7 +13,10 @@ from typing import List, Optional
 
 import joblib
 import numpy as np
-from fastapi import Depends, FastAPI, HTTPException, Security
+from fastapi import Depends, FastAPI, HTTPException, Request, Security
+from slowapi import Limiter, _rate_limit_exceeded_handler
+from slowapi.errors import RateLimitExceeded
+from slowapi.util import get_remote_address
 from fastapi.security import APIKeyHeader
 from pydantic import BaseModel, create_model
 
@@ -110,6 +113,13 @@ app = FastAPI(
     version="1.0.0",
 )
 
+# Rate limiting -- real, enforced (60 requests/minute per client IP on this service's
+# scoring/mutating endpoint(s); /health and the *-info endpoints are left unlimited since
+# they're liveness/metadata reads, not scoring load).
+limiter = Limiter(key_func=get_remote_address)
+app.state.limiter = limiter
+app.add_exception_handler(RateLimitExceeded, _rate_limit_exceeded_handler)
+
 
 @app.get("/health")
 def health():
@@ -127,9 +137,10 @@ def model_info():
 
 
 @app.post("/score", response_model=ScoreResponse, dependencies=[Depends(require_api_key)])
-def score(request: ScoreRequest):
-    statement = request.current_statement.dict() if hasattr(request.current_statement, "dict") \
-        else request.current_statement.model_dump()
+@limiter.limit("60/minute")
+def score(request: Request, body: ScoreRequest):
+    statement = body.current_statement.dict() if hasattr(body.current_statement, "dict") \
+        else body.current_statement.model_dump()
     x_row = np.array(
         [[statement.get(c) if statement.get(c) is not None else _MEANS[c] for c in MONITORED_FEATURES]],
         dtype=np.float32,
@@ -146,6 +157,6 @@ def score(request: ScoreRequest):
     # known gap here rather than silently approximated.
     tier = "Automated Nudge" if propensity >= 0.5 else "Priority Outreach"
     return ScoreResponse(
-        customer_id=request.customer_id, propensity_to_cure=propensity, treatment_tier=tier,
+        customer_id=body.customer_id, propensity_to_cure=propensity, treatment_tier=tier,
         top_reasons=top_reasons,
     )

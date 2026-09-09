@@ -22,14 +22,22 @@ originally trained and evaluated.
 **No other problem (2 through 14) has an equivalent monitoring job.**
 This is a real, current gap -- not yet closed.
 
+**Problem 7 (Early Warning System) also has a real, scraped `/metrics`
+endpoint (added 2026-09-09)**, separate from the batch-drift job above --
+see the "Real-time Prometheus metrics" section below. It is a
+single-service pilot, not the platform-wide job replacement described in
+"The honest path to platform-wide monitoring" section.
+
 ## What "monitoring" does NOT mean here
 
 This is drift/quality monitoring of a batch of predictions against a
 saved baseline -- it is not:
 
-- A live metrics/observability stack. There is no Prometheus, Grafana, or
-  OpenTelemetry integration anywhere in this repository (`git grep -c`
-  for each returns 0).
+- A live metrics/observability stack across the platform. Problem 7 has a
+  real, minimal Prometheus `/metrics` endpoint (see below) -- the other 13
+  services, and any Grafana/OpenTelemetry integration, do not exist
+  (`git grep -ic prometheus` outside Problem 7 and `git grep -ic
+  "grafana\\|opentelemetry"` across the whole repo both return 0).
 - An alerting integration (Slack, PagerDuty, email). The job's own exit
   code is the only signal today; wiring that to a real notification
   channel is a real, not-yet-started item.
@@ -46,3 +54,41 @@ shared, parameterized module (baseline path, feature list, and champion
 model path as arguments) that each problem's own hardening pass can then
 adopt with a few lines of problem-specific config. That refactor is
 tracked in `ROADMAP.md` and has not yet been started.
+
+## Real-time Prometheus metrics (Problem 7 pilot, 2026-09-09)
+
+`07_Problem7_Early_Warning_System/src/real_time_alert_service.py` exposes
+a real, unauthenticated `GET /metrics` endpoint using the
+`prometheus_client` library (`prometheus-client==0.21.1`, added to that
+service's `requirements-api.txt`). It is left unauthenticated and outside
+the rate limiter for the same reason `/health` is -- a metrics scraper is
+infrastructure polling, not scoring load.
+
+Two real metrics are populated on every `/score` call, live, not
+simulated:
+
+- `ews_score_requests_total{outcome=...}` -- a `Counter` incremented once
+  per request, labeled `alert`, `no_alert`, `validation_error` (422), or
+  `error` (500).
+- `ews_score_latency_seconds` -- a `Histogram` observing the real
+  wall-clock seconds spent inside `compute_early_warning` plus response
+  assembly, on every outcome (including errors).
+
+Verified live end-to-end on 2026-09-09: started a real `uvicorn` instance
+of this service, sent 3 real valid `/score` requests and 1 real invalid
+one, then scraped `/metrics` and confirmed genuine Prometheus exposition
+output --
+`ews_score_requests_total{outcome="no_alert"} 3.0`,
+`ews_score_requests_total{outcome="validation_error"} 1.0`, and
+`ews_score_latency_seconds_count 4.0` -- matching the 4 real requests
+sent exactly, with no fabricated or placeholder values.
+
+**Scope, stated honestly**: this is a single-service pilot. The other 13
+services have no `/metrics` endpoint and no Prometheus dependency. There
+is no Grafana dashboard, no Alertmanager rule, and no scrape-target
+configuration (e.g. a `prometheus.yml` or Docker Compose service) checked
+into this repository -- scraping today means pointing a local
+Prometheus's `scrape_configs` at `http://<host>:8007/metrics` by hand.
+Extending this pattern to the other 13 services, and adding an actual
+Prometheus + Grafana stack to `docker-compose.yml`, are real,
+not-yet-started items.

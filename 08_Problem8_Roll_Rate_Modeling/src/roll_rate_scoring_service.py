@@ -13,7 +13,10 @@ import secrets
 from pathlib import Path
 from typing import Dict, List, Optional
 
-from fastapi import Depends, FastAPI, HTTPException, Security
+from fastapi import Depends, FastAPI, HTTPException, Request, Security
+from slowapi import Limiter, _rate_limit_exceeded_handler
+from slowapi.errors import RateLimitExceeded
+from slowapi.util import get_remote_address
 from fastapi.security import APIKeyHeader
 from pydantic import BaseModel, create_model
 
@@ -145,6 +148,13 @@ app = FastAPI(
     version="1.0.0",
 )
 
+# Rate limiting -- real, enforced (60 requests/minute per client IP on this service's
+# scoring/mutating endpoint(s); /health and the *-info endpoints are left unlimited since
+# they're liveness/metadata reads, not scoring load).
+limiter = Limiter(key_func=get_remote_address)
+app.state.limiter = limiter
+app.add_exception_handler(RateLimitExceeded, _rate_limit_exceeded_handler)
+
 
 @app.get("/health")
 def health():
@@ -166,9 +176,10 @@ def model_info():
 
 
 @app.post("/score", response_model=ScoreResponse, dependencies=[Depends(require_api_key)])
-def score(request: ScoreRequest):
-    statement = request.current_statement.dict() if hasattr(request.current_statement, "dict") \
-        else request.current_statement.model_dump()
+@limiter.limit("60/minute")
+def score(request: Request, body: ScoreRequest):
+    statement = body.current_statement.dict() if hasattr(body.current_statement, "dict") \
+        else body.current_statement.model_dump()
     try:
         severity_score = compute_severity_score(statement)
         state = assign_state(severity_score)
@@ -178,14 +189,14 @@ def score(request: ScoreRequest):
 
     escalated = None
     transition_probabilities = None
-    if request.previous_state is not None:
-        if request.previous_state not in STATE_NAMES:
-            raise HTTPException(status_code=400, detail=f"Unknown previous_state: {request.previous_state}")
-        escalated = _ORDINAL[state] > _ORDINAL[request.previous_state]
-        transition_probabilities = TRANSITION_MATRIX[request.previous_state]
+    if body.previous_state is not None:
+        if body.previous_state not in STATE_NAMES:
+            raise HTTPException(status_code=400, detail=f"Unknown previous_state: {body.previous_state}")
+        escalated = _ORDINAL[state] > _ORDINAL[body.previous_state]
+        transition_probabilities = TRANSITION_MATRIX[body.previous_state]
 
     return ScoreResponse(
-        customer_id=request.customer_id, severity_score=severity_score, state=state,
-        previous_state=request.previous_state, escalated=escalated,
+        customer_id=body.customer_id, severity_score=severity_score, state=state,
+        previous_state=body.previous_state, escalated=escalated,
         transition_probabilities=transition_probabilities, top_reasons=reasons,
     )

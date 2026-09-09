@@ -13,7 +13,10 @@ import secrets
 from pathlib import Path
 from typing import List, Optional
 
-from fastapi import Depends, FastAPI, HTTPException, Security
+from fastapi import Depends, FastAPI, HTTPException, Request, Security
+from slowapi import Limiter, _rate_limit_exceeded_handler
+from slowapi.errors import RateLimitExceeded
+from slowapi.util import get_remote_address
 from fastapi.security import APIKeyHeader
 from pydantic import BaseModel
 
@@ -99,6 +102,13 @@ app = FastAPI(
     version="1.1.0",
 )
 
+# Rate limiting -- real, enforced (60 requests/minute per client IP on this service's
+# scoring/mutating endpoint(s); /health and the *-info endpoints are left unlimited since
+# they're liveness/metadata reads, not scoring load).
+limiter = Limiter(key_func=get_remote_address)
+app.state.limiter = limiter
+app.add_exception_handler(RateLimitExceeded, _rate_limit_exceeded_handler)
+
 
 @app.get("/health")
 def health():
@@ -119,24 +129,25 @@ def policy_info():
 
 
 @app.post("/recommend", response_model=RecommendResponse, dependencies=[Depends(require_api_key)])
-def recommend(request: RecommendRequest):
-    if not (0.0 <= request.dynamic_pd <= 1.0) or not (0.0 <= request.dynamic_pd_early <= 1.0):
+@limiter.limit("60/minute")
+def recommend(request: Request, body: RecommendRequest):
+    if not (0.0 <= body.dynamic_pd <= 1.0) or not (0.0 <= body.dynamic_pd_early <= 1.0):
         raise HTTPException(status_code=422, detail="dynamic_pd and dynamic_pd_early must both be in [0, 1].")
-    pd_trend = request.dynamic_pd - request.dynamic_pd_early
-    risk_level = _assign_risk_level(request.dynamic_pd)
+    pd_trend = body.dynamic_pd - body.dynamic_pd_early
+    risk_level = _assign_risk_level(body.dynamic_pd)
     trend = _assign_trend(pd_trend)
     cell = ACTION_MAP.get((risk_level, trend))
     if cell is None:
         raise HTTPException(status_code=500, detail=f"No action defined for ({risk_level}, {trend}).")
     reasoning = [
-        f"dynamic_pd={request.dynamic_pd:.4f} -> {risk_level} "
+        f"dynamic_pd={body.dynamic_pd:.4f} -> {risk_level} "
         f"(cuts: <= {RISK_LEVEL_CUT_LOW:.4f} Low, <= {RISK_LEVEL_CUT_HIGH:.4f} Medium, else High)",
         f"pd_trend={pd_trend:.4f} (dynamic_pd - dynamic_pd_early, same-model two-window trend) -> {trend} "
         f"(cuts: <= {TREND_CUT_LOW:.4f} Better, <= {TREND_CUT_HIGH:.4f} Stable, else Worse)",
         f"({risk_level}, {trend}) -> {cell['action']}",
     ]
     return RecommendResponse(
-        customer_id=request.customer_id, dynamic_pd=request.dynamic_pd, dynamic_pd_early=request.dynamic_pd_early,
+        customer_id=body.customer_id, dynamic_pd=body.dynamic_pd, dynamic_pd_early=body.dynamic_pd_early,
         pd_trend=pd_trend, risk_level=risk_level, trend=trend, action=cell["action"],
         rationale=cell["rationale"], reasoning=reasoning,
     )

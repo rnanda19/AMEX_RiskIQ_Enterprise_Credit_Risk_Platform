@@ -14,7 +14,10 @@ from pathlib import Path
 from typing import List, Optional
 
 import polars as pl
-from fastapi import Depends, FastAPI, HTTPException, Security
+from fastapi import Depends, FastAPI, HTTPException, Request, Security
+from slowapi import Limiter, _rate_limit_exceeded_handler
+from slowapi.errors import RateLimitExceeded
+from slowapi.util import get_remote_address
 from fastapi.security import APIKeyHeader
 from pydantic import BaseModel
 
@@ -82,6 +85,13 @@ app = FastAPI(
     version="1.0.0",
 )
 
+# Rate limiting -- real, enforced (60 requests/minute per client IP on this service's
+# scoring/lookup endpoint; /health and the *-info endpoints are left unlimited since
+# they're liveness/metadata reads, not scoring load).
+limiter = Limiter(key_func=get_remote_address)
+app.state.limiter = limiter
+app.add_exception_handler(RateLimitExceeded, _rate_limit_exceeded_handler)
+
 
 @app.get("/health")
 def health():
@@ -100,7 +110,8 @@ def policy_info():
 
 
 @app.get("/profile/{customer_id}", response_model=ProfileResponse, dependencies=[Depends(require_api_key)])
-def get_profile(customer_id: str):
+@limiter.limit("60/minute")
+def get_profile(request: Request, customer_id: str):
     row = _PROFILE_INDEX.get(customer_id)
     if row is None:
         raise HTTPException(status_code=404, detail=f"No unified profile found for customer_id={customer_id!r}.")

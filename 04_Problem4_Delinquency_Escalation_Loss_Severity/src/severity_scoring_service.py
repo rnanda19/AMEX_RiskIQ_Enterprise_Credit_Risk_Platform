@@ -11,7 +11,10 @@ import secrets
 from pathlib import Path
 from typing import List, Optional
 
-from fastapi import Depends, FastAPI, HTTPException, Security
+from fastapi import Depends, FastAPI, HTTPException, Request, Security
+from slowapi import Limiter, _rate_limit_exceeded_handler
+from slowapi.errors import RateLimitExceeded
+from slowapi.util import get_remote_address
 from fastapi.security import APIKeyHeader
 from pydantic import BaseModel, create_model
 
@@ -81,6 +84,13 @@ app = FastAPI(
     version="1.0.0",
 )
 
+# Rate limiting -- real, enforced (60 requests/minute per client IP on this service's
+# scoring/lookup endpoint; /health and the *-info endpoints are left unlimited since
+# they're liveness/metadata reads, not scoring load).
+limiter = Limiter(key_func=get_remote_address)
+app.state.limiter = limiter
+app.add_exception_handler(RateLimitExceeded, _rate_limit_exceeded_handler)
+
 
 @app.get("/health")
 def health():
@@ -100,7 +110,8 @@ def model_info():
 
 
 @app.post("/score", response_model=SeverityResponse, dependencies=[Depends(require_api_key)])
-def score(features: CustomerFeatures, customer_id: Optional[str] = None):
+@limiter.limit("60/minute")
+def score(request: Request, features: CustomerFeatures, customer_id: Optional[str] = None):
     feature_dict = features.model_dump() if hasattr(features, "model_dump") else features.dict()
     try:
         result = score_customer(feature_dict, bundle)

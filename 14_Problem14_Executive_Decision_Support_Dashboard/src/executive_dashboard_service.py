@@ -10,7 +10,10 @@ import os
 import secrets
 from pathlib import Path
 
-from fastapi import Depends, FastAPI, HTTPException, Security
+from fastapi import Depends, FastAPI, HTTPException, Request, Security
+from slowapi import Limiter, _rate_limit_exceeded_handler
+from slowapi.errors import RateLimitExceeded
+from slowapi.util import get_remote_address
 from fastapi.security import APIKeyHeader
 
 _auth_logger = logging.getLogger(__name__ + ".auth")
@@ -52,6 +55,13 @@ app = FastAPI(
     version="1.0.0",
 )
 
+# Rate limiting -- real, enforced (60 requests/minute per client IP on this service's
+# scoring/lookup endpoint; /health and the *-info endpoints are left unlimited since
+# they're liveness/metadata reads, not scoring load).
+limiter = Limiter(key_func=get_remote_address)
+app.state.limiter = limiter
+app.add_exception_handler(RateLimitExceeded, _rate_limit_exceeded_handler)
+
 
 @app.get("/health")
 def health():
@@ -64,7 +74,8 @@ def executive_summary():
 
 
 @app.get("/problem/{problem_number}", dependencies=[Depends(require_api_key)])
-def get_problem(problem_number: int):
+@limiter.limit("60/minute")
+def get_problem(request: Request, problem_number: int):
     row = _ROWS_BY_PROBLEM.get(problem_number)
     if row is None:
         raise HTTPException(status_code=404, detail=f"No such problem_number={problem_number!r}. "
