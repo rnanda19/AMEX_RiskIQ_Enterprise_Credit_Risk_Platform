@@ -13,7 +13,7 @@ narrative version of both.
 | Root `shared/` library (metrics, config loader, PSI, tier/band assignment) | Done, 2026-08-24 | `shared/` |
 | `shared/` unit tests | Done, 2026-08-24 (27 tests) | `shared/tests/` |
 | Root CI workflow (notebook syntax check, unit tests) | Done, 2026-08-25 (split from lint — see below) | `.github/workflows/ci.yml` |
-| Code-quality workflow (lint, format check, security scan) | Done, 2026-08-25 (new — pyflakes + `black --check`, both advisory; `bandit`, blocking, 0 findings) | `.github/workflows/code-quality.yml` |
+| Code-quality workflow (lint, format check, security scan) | Done, 2026-08-25 (new — pyflakes + `black --check` + `bandit`); updated 2026-09-09: `pyflakes` and `black --check` both now blocking (0 findings), `bandit` still blocking, 0 findings | `.github/workflows/code-quality.yml` |
 | Problem 1 tests (FastAPI service, monitoring job) | Done, 2026-08-24 (9 tests) | `01_Problem1_Credit_Scoring_PD_Prediction/tests/` |
 | Problem 1 `CONTRIBUTING.md` / `MODEL_CARD.md` / `CHANGELOG.md` | Done, 2026-08-24 | repo root, `Problem1_.../` |
 | Problem 2 tests (risk-tier FastAPI service) | Done, 2026-08-24 (5 tests) | `02_Problem2_Risk_Tier_Classification/tests/` |
@@ -46,9 +46,10 @@ narrative version of both.
 | `docker-compose.yml` updated to require `API_KEY` at runtime (fail loud if unset) for all 8 | Done, 2026-08-25 | every `Problem*/src/docker/docker-compose.yml` |
 | 32 new tests for the auth + explainability pass (126 total) | Done, 2026-08-25 | every `Problem*/tests/` |
 | Wire existing notebooks to import from `shared/` instead of inline copies | **Deliberately deferred** — see below | — |
-| Real `docker build`/smoke test of any Dockerfile (this sandbox has no Docker Hub registry access) | **Unblocked 2026-09-09**: added `.github/workflows/docker-verify.yml`, which runs on GitHub's own ubuntu-latest runners (real Docker Hub access, unlike this sandbox) and does a real `docker build` + `docker run` + `curl /health` against Problem 7's self-contained Early Warning System container on every push/PR. First real (non-static) verification of any Dockerfile in this repo -- check the Actions tab after pushing to confirm it goes green. | `.github/workflows/docker-verify.yml` |
-| Repo-wide `black` reformatting | **Deliberately deferred** — advisory-only for now, see below | — |
-| Pre-commit hooks (pyflakes, notebook syntax check, before every commit) | **Not started** | — |
+| Problem 6 Notebooks 39/40 `(customer_ID, S_2)` tie-order determinism | **Found 2026-09-09, deliberately deferred** — see below | `06_Problem6_Dynamic_Behavioral_Credit_Scoring/notebooks/39_*.ipynb`, `40_*.ipynb` |
+| Real `docker build`/smoke test of any Dockerfile (this sandbox has no Docker Hub registry access) | **Extended 2026-09-09**: `.github/workflows/docker-verify.yml` now covers all 14 problems, up from just Problem 7 -- real `docker build` + `docker run` + `curl /health` for 12 of 14 (the 9 already-self-contained services plus Problems 3, 10, 14, and Problems 12/13 run for real against the exact synthetic fixture already committed in their own `tests/conftest.py`, via a new shared `.github/scripts/make_ci_fixture_parquet.py`); a real `docker build`-only (no run) for Problems 1 and 2, which need the deliberately-excluded multi-GB champion model to actually run. Also fixed a real bug while extending this: Problem 1's `Dockerfile` was `COPY`-ing `requirements-api.txt`/`main.py` from the build-context root, but those files live in `src/fastapi_service/` -- flagged but not fixed in the 2026-08-25 pass, fixed here by mirroring Problem 7's proven convention. Check the Actions tab after pushing to confirm all 4 docker-verify jobs go green. | `.github/workflows/docker-verify.yml`, `.github/scripts/make_ci_fixture_parquet.py` |
+| Repo-wide `black` reformatting | **Done 2026-09-09**: `black --line-length 120` applied across `shared/` and all 14 problems' `src/` -- 24 files reformatted, 0 logic changes, all 180 tests still passing. `format-check` in `code-quality.yml` flipped from advisory (`continue-on-error: true`) to blocking. | `.github/workflows/code-quality.yml` |
+| Pre-commit hooks (pyflakes, notebook syntax check, before every commit) | **Done 2026-09-09** | `.pre-commit-config.yaml` |
 
 Total: 126 tests passing across `shared/` and all eight problems as of
 2026-08-25 (`python -m pytest shared/tests Problem*/tests`, or `make test-all`) --
@@ -174,7 +175,47 @@ computed. This is next once every Phase 1/2 problem has its own
 equivalent tests in place (now true) so a regression anywhere is caught
 immediately, not discovered after the fact.
 
-### Immediate next steps (in order)
+### A known bug found, but deliberately not silently patched: Problem 6 Notebooks 39/40
+
+While extending `docker-verify.yml` (2026-09-09), a review of every `pl.scan_csv`
+call across the platform for the same non-determinism class already caught once
+before (see Notebook 47's `_csv_row_order` fix, and the same pattern later
+applied in Notebooks 48, 51/52, 63/64, 67/68) turned up two more instances:
+`06_Problem6_Dynamic_Behavioral_Credit_Scoring/notebooks/39_*.ipynb` and
+`40_*.ipynb` both build their trailing-window feature store with
+`pl.scan_csv(...).sort(["customer_ID", "S_2"])` and no tertiary tiebreaker —
+the exact vulnerable shape. If the real raw `train_data.csv` has any rows
+sharing an identical `(customer_ID, S_2)` key (Notebook 47 found 475 such
+pairs in this platform's own data), which of the tied rows lands inside a
+customer's trailing `W` statements — and in what order — is not guaranteed
+stable across runs, the same real reproducibility gap Notebook 47 fixed.
+
+The proven fix (`.with_row_index("_csv_row_order")` immediately after
+`scan_csv`, used as an explicit tertiary sort key) is a one-line-per-cell
+change and is not the hard part. The hard part, and the reason it is not
+applied in this pass: Notebook 39 trains real XGBoost models
+(`n_estimators=400`) across multiple candidate trailing windows against the
+full 16.4 GB raw `train_data.csv`, and Notebook 40 depends on Notebook 39's
+persisted model. Changing the sort order — even only for tied rows — can
+change exactly which statements fall inside a customer's trailing window,
+which changes the trained model's weights, which means this is not a
+tooling/infra-only change the way the `black` and Docker-CI work above was.
+Per this file's own standing rule ("don't change a notebook's actual computed
+output... re-run and re-verify before committing" — see `CONTRIBUTING.md`),
+patching the source without a real end-to-end re-run and re-verification
+against the full dataset would leave the notebook's checked-in outputs
+(and Problem 6's already-committed, already-benchmarked model artifact)
+silently out of sync with its own code — exactly the kind of gap this
+project's zero-fabrication standard exists to prevent. That re-run needs the
+same real-data, real-hardware environment the notebook was originally built
+on (this pass's own tooling sandbox has 2 vCPUs / 3.8 GB RAM, nowhere near
+enough to retrain against a 16.4 GB CSV in reasonable time) and a full
+re-verification pass (both notebooks, Problem 6's tests, `BENCHMARKS.md`,
+and the Executive Rollup's Problem 6 figures) once done — real work,
+deliberately scheduled on its own, not bundled into this pass. Tracked here
+instead of silently fixed so it isn't lost.
+
+### Why the notebooks aren't wired to `shared/` yet
 
 1. ~~Problem 2 tests~~ — done, 2026-08-24.
 2. ~~Package Problems 3, 4, 5 with the same hardening pattern as Phase 1,
@@ -188,19 +229,23 @@ immediately, not discovered after the fact.
    benchmark pass: real API-key authentication and real per-request
    explainability on all 8 deployed services~~ — done, 2026-08-25, see
    above.
-5. Real `docker build`/compose smoke test for all 13 Dockerfiles (Problems
-   1, 3-14) once run somewhere with real Docker Hub registry access — this
-   pass, like the Phase 2 one before it, could only statically verify
-   build-context correctness, not actually pull a base image and build
-   (this sandbox's Docker CLI has no daemon access).
-6. Fix Problem 1's `src/docker/Dockerfile` build-context bug (see above) —
-   flagged, not fixed, in this pass.
-7. Pre-commit hook: run `check_notebook_syntax.py` + `pyflakes` on
+5. ~~Real `docker build`/compose smoke test for all 13 Dockerfiles (Problems
+   1, 3-14) once run somewhere with real Docker Hub registry access~~ —
+   done, 2026-09-09, on GitHub's own runners: real `docker build` + `docker
+   run` + `/health` check for 12 of 14 problems, real `docker build`-only
+   for Problems 1/2 (need the deliberately-excluded multi-GB champion
+   model to actually run) — see `.github/workflows/docker-verify.yml`.
+6. ~~Fix Problem 1's `src/docker/Dockerfile` build-context bug (see
+   above)~~ — done, 2026-09-09.
+7. ~~Pre-commit hook: run `check_notebook_syntax.py` + `pyflakes` on
    `git commit`, so a broken notebook or an unused import is caught
-   before it's even pushed, not just in CI after the fact.
-8. Repo-wide `black` reformatting pass, once deliberately scheduled (not
+   before it's even pushed, not just in CI after the fact~~ — done,
+   2026-09-09, see `.pre-commit-config.yaml`.
+8. ~~Repo-wide `black` reformatting pass, once deliberately scheduled (not
    as a side effect of another change) — then flip `format-check` from
-   advisory to blocking.
+   advisory to blocking~~ — done, 2026-09-09: 24 files reformatted, 0
+   logic changes, all 180 tests still passing, `format-check` now
+   blocking.
 9. Wire all fourteen problems' notebooks to `shared/` (see above) — now
    that every problem has its own test safety net.
 10. A model inventory document, live/alerting monitoring, `pytest-cov`

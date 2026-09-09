@@ -39,7 +39,7 @@ jobs:
         # cell -- see docs/known_lint_findings.md for the full history.
 
   format-check:
-    name: Format check (black --check, advisory)
+    name: Format check (black --check)
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
@@ -55,8 +55,10 @@ jobs:
           09_Problem9_Collections_Optimization/src 10_Problem10_Credit_Line_Management/src
           11_Problem11_Real_Time_Portfolio_Monitoring/src 12_Problem12_360_Customer_Intelligence/src
           13_Problem13_Risk_Adjusted_Profitability_Modeling/src 14_Problem14_Executive_Decision_Support_Dashboard/src
-        continue-on-error: true  # advisory: repo-wide reformatting is a deliberate future pass
-          # (see ROADMAP.md), not something to apply as a side effect of adding this check
+        # Blocking as of 2026-09-09: the repo-wide reformatting pass flagged as a "deliberate
+        # future pass" (see ROADMAP.md) is done -- 24 files reformatted (black --line-length 120),
+        # 0 logic changes, all 180 tests still passing -- so this check no longer needs
+        # continue-on-error.
 
   security-scan:
     name: Security scan (bandit)

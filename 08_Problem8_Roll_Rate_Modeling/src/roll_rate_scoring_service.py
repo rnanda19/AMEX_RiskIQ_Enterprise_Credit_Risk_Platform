@@ -23,7 +23,9 @@ from pydantic import BaseModel, create_model
 # Self-contained default: the real frozen policy ships alongside this file in src/ (see
 # docs/roll_rate_deployment_policy.json for the original copy). Override with
 # AMEX_RR_POLICY_PATH to point elsewhere in production.
-POLICY_PATH = Path(os.environ.get("AMEX_RR_POLICY_PATH", str(Path(__file__).parent / "roll_rate_deployment_policy.json")))
+POLICY_PATH = Path(
+    os.environ.get("AMEX_RR_POLICY_PATH", str(Path(__file__).parent / "roll_rate_deployment_policy.json"))
+)
 with open(POLICY_PATH, "r", encoding="utf-8") as _f:
     _POLICY = json.load(_f)
 
@@ -143,8 +145,8 @@ def assign_state(score: float) -> str:
 app = FastAPI(
     title="AMEX Enterprise Credit Risk Platform -- Roll-Rate Modeling Scoring API",
     description="Assigns a customer's current statement a delinquency-severity state and looks up "
-                "real empirical next-state transition probabilities from a prior state. See "
-                "/model-info for the real validation metrics behind this technique.",
+    "real empirical next-state transition probabilities from a prior state. See "
+    "/model-info for the real validation metrics behind this technique.",
     version="1.0.0",
 )
 
@@ -178,8 +180,11 @@ def model_info():
 @app.post("/score", response_model=ScoreResponse, dependencies=[Depends(require_api_key)])
 @limiter.limit("60/minute")
 def score(request: Request, body: ScoreRequest):
-    statement = body.current_statement.dict() if hasattr(body.current_statement, "dict") \
+    statement = (
+        body.current_statement.dict()
+        if hasattr(body.current_statement, "dict")
         else body.current_statement.model_dump()
+    )
     try:
         severity_score = compute_severity_score(statement)
         state = assign_state(severity_score)
@@ -196,7 +201,11 @@ def score(request: Request, body: ScoreRequest):
         transition_probabilities = TRANSITION_MATRIX[body.previous_state]
 
     return ScoreResponse(
-        customer_id=body.customer_id, severity_score=severity_score, state=state,
-        previous_state=body.previous_state, escalated=escalated,
-        transition_probabilities=transition_probabilities, top_reasons=reasons,
+        customer_id=body.customer_id,
+        severity_score=severity_score,
+        state=state,
+        previous_state=body.previous_state,
+        escalated=escalated,
+        transition_probabilities=transition_probabilities,
+        top_reasons=reasons,
     )

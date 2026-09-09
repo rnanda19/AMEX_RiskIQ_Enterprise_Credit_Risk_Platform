@@ -43,7 +43,9 @@ def require_api_key(presented: str = Security(_api_key_header)) -> str:
     return presented
 
 
-POLICY_PATH = Path(os.environ.get("AMEX_P10_POLICY_PATH", str(Path(__file__).parent / "credit_line_deployment_policy.json")))
+POLICY_PATH = Path(
+    os.environ.get("AMEX_P10_POLICY_PATH", str(Path(__file__).parent / "credit_line_deployment_policy.json"))
+)
 with open(POLICY_PATH, "r", encoding="utf-8") as _f:
     _POLICY = json.load(_f)
 
@@ -96,9 +98,9 @@ def _assign_trend(pd_trend: float) -> str:
 app = FastAPI(
     title="AMEX Enterprise Credit Risk Platform -- Credit Line Management Recommendation API",
     description="Composes a real current dynamic PD and a real, immediately-preceding dynamic PD "
-                "(same model, two time points) into a risk-level x trend classification and a real "
-                "credit-line action recommendation. Every endpoint except /health requires a valid "
-                "X-API-Key header.",
+    "(same model, two time points) into a risk-level x trend classification and a real "
+    "credit-line action recommendation. Every endpoint except /health requires a valid "
+    "X-API-Key header.",
     version="1.1.0",
 )
 
@@ -147,7 +149,13 @@ def recommend(request: Request, body: RecommendRequest):
         f"({risk_level}, {trend}) -> {cell['action']}",
     ]
     return RecommendResponse(
-        customer_id=body.customer_id, dynamic_pd=body.dynamic_pd, dynamic_pd_early=body.dynamic_pd_early,
-        pd_trend=pd_trend, risk_level=risk_level, trend=trend, action=cell["action"],
-        rationale=cell["rationale"], reasoning=reasoning,
+        customer_id=body.customer_id,
+        dynamic_pd=body.dynamic_pd,
+        dynamic_pd_early=body.dynamic_pd_early,
+        pd_trend=pd_trend,
+        risk_level=risk_level,
+        trend=trend,
+        action=cell["action"],
+        rationale=cell["rationale"],
+        reasoning=reasoning,
     )

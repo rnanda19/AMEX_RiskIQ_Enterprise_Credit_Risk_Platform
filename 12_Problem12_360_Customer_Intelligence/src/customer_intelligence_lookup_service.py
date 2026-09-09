@@ -44,8 +44,14 @@ def require_api_key(presented: str = Security(_api_key_header)) -> str:
     return presented
 
 
-POLICY_PATH = Path(os.environ.get("AMEX_P12_POLICY_PATH", str(Path(__file__).parent / "customer_intelligence_deployment_policy.json")))
-PROFILE_PATH = Path(os.environ.get("AMEX_P12_PROFILE_PATH", str(Path(__file__).parent.parent / "data" / "data/unified_customer_profile.parquet")))
+POLICY_PATH = Path(
+    os.environ.get("AMEX_P12_POLICY_PATH", str(Path(__file__).parent / "customer_intelligence_deployment_policy.json"))
+)
+PROFILE_PATH = Path(
+    os.environ.get(
+        "AMEX_P12_PROFILE_PATH", str(Path(__file__).parent.parent / "data" / "data/unified_customer_profile.parquet")
+    )
+)
 with open(POLICY_PATH, "r", encoding="utf-8") as _f:
     _POLICY = json.load(_f)
 
@@ -80,8 +86,8 @@ class ProfileResponse(BaseModel):
 app = FastAPI(
     title="AMEX Enterprise Credit Risk Platform -- 360 Degree Customer Intelligence Lookup API",
     description="Serves each real customer's precomputed unified risk profile, composed from four real, "
-                "already-validated upstream signals. Every endpoint except /health requires a valid "
-                "X-API-Key header.",
+    "already-validated upstream signals. Every endpoint except /health requires a valid "
+    "X-API-Key header.",
     version="1.0.0",
 )
 
@@ -128,20 +134,34 @@ def get_profile(request: Request, customer_id: str):
             f"-> {cw * (1.0 - row['PROPENSITY_TO_CURE']):.4f} (as 1 - propensity), renormalized"
         )
     else:
-        reasoning.append("propensity_to_cure=null (customer is not currently collections-eligible; "
-                         "the collections adjustment term is honestly excluded, not imputed)")
+        reasoning.append(
+            "propensity_to_cure=null (customer is not currently collections-eligible; "
+            "the collections adjustment term is honestly excluded, not imputed)"
+        )
     reasoning.append(
         f"unified_risk_score={row['UNIFIED_RISK_SCORE']:.4f} -> {row['UNIFIED_RISK_GRADE']} "
         f"(cuts: <= {GRADE_CUT_LOW:.4f} {UNIFIED_RISK_GRADE_NAMES[0]}, "
         f"<= {GRADE_CUT_HIGH:.4f} {UNIFIED_RISK_GRADE_NAMES[1]}, else {UNIFIED_RISK_GRADE_NAMES[2]})"
     )
     return ProfileResponse(
-        customer_id=row["customer_ID"], static_pd=row["STATIC_PD"], dynamic_pd=row["DYNAMIC_PD"],
-        pd_trend=row["PD_TREND"], risk_level=row["RISK_LEVEL"], trend_segment=row["TREND_SEGMENT"],
-        credit_line_action=row["CREDIT_LINE_ACTION"], collections_eligible=row["COLLECTIONS_ELIGIBLE"],
-        propensity_to_cure=row.get("PROPENSITY_TO_CURE"), treatment_tier=row.get("TREATMENT_TIER"),
-        unified_risk_score=row["UNIFIED_RISK_SCORE"], unified_risk_grade=row["UNIFIED_RISK_GRADE"],
+        customer_id=row["customer_ID"],
+        static_pd=row["STATIC_PD"],
+        dynamic_pd=row["DYNAMIC_PD"],
+        pd_trend=row["PD_TREND"],
+        risk_level=row["RISK_LEVEL"],
+        trend_segment=row["TREND_SEGMENT"],
+        credit_line_action=row["CREDIT_LINE_ACTION"],
+        collections_eligible=row["COLLECTIONS_ELIGIBLE"],
+        propensity_to_cure=row.get("PROPENSITY_TO_CURE"),
+        treatment_tier=row.get("TREATMENT_TIER"),
+        unified_risk_score=row["UNIFIED_RISK_SCORE"],
+        unified_risk_grade=row["UNIFIED_RISK_GRADE"],
         rationale=f"Composite of static PD ({sw:.0%}), dynamic PD ({dw:.0%})"
-                  + (f", and collections propensity ({cw:.0%})" if row.get("PROPENSITY_TO_CURE") is not None else " (collections term not applicable)") + ".",
+        + (
+            f", and collections propensity ({cw:.0%})"
+            if row.get("PROPENSITY_TO_CURE") is not None
+            else " (collections term not applicable)"
+        )
+        + ".",
         reasoning=reasoning,
     )

@@ -15,6 +15,7 @@ inline logic. Existing notebooks are not yet wired to call this (see
 shared/__init__.py) -- this is the extraction step; the notebook rewiring
 is a separate, explicitly staged follow-up.
 """
+
 from __future__ import annotations
 
 import json
@@ -35,9 +36,7 @@ class PlatformConfig:
         self.project_root = project_root
         self.artifacts_dir = artifacts_dir
 
-        self.pillar_dirs: Dict[str, Path] = {
-            k: Path(v) for k, v in project_config["pillar_dirs"].items()
-        }
+        self.pillar_dirs: Dict[str, Path] = {k: Path(v) for k, v in project_config["pillar_dirs"].items()}
         self.detected_logical_cores: int = project_config["hardware"]["logical_cores_detected"]
         self.random_seed: int = project_config["random_seed"]
 
@@ -58,9 +57,7 @@ class PlatformConfig:
         this is meant to surface loudly).
         """
         if name not in self.pillar_dirs:
-            raise KeyError(
-                f"Unknown pillar '{name}'. Available: {sorted(self.pillar_dirs)}"
-            )
+            raise KeyError(f"Unknown pillar '{name}'. Available: {sorted(self.pillar_dirs)}")
         return self.pillar_dirs[name]
 
 
@@ -92,9 +89,7 @@ def load_platform_config(
     config_path = artifacts_dir / "project_config.json"
 
     if not config_path.exists():
-        raise FileNotFoundError(
-            f"{config_path} not found.\nFix: run 01_business_understanding.ipynb first."
-        )
+        raise FileNotFoundError(f"{config_path} not found.\nFix: run 01_business_understanding.ipynb first.")
     with open(config_path, "r", encoding="utf-8") as f:
         raw_config = json.load(f)
 
@@ -103,8 +98,7 @@ def load_platform_config(
         summary_path = artifacts_dir / f"{name}.json"
         if not summary_path.exists():
             raise FileNotFoundError(
-                f"{summary_path} not found.\nFix: run the notebook that produces "
-                f"'{name}' first."
+                f"{summary_path} not found.\nFix: run the notebook that produces " f"'{name}' first."
             )
         with open(summary_path, "r", encoding="utf-8") as f:
             summaries[name] = json.load(f)

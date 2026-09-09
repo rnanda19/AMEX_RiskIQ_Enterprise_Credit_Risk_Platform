@@ -43,8 +43,15 @@ def require_api_key(presented: str = Security(_api_key_header)) -> str:
     return presented
 
 
-POLICY_PATH = Path(os.environ.get("AMEX_P13_POLICY_PATH", str(Path(__file__).parent / "profitability_deployment_policy.json")))
-PROFILE_PATH = Path(os.environ.get("AMEX_P13_PROFILE_PATH", str(Path(__file__).parent.parent / "data" / "data/profitability_scored_profile.parquet")))
+POLICY_PATH = Path(
+    os.environ.get("AMEX_P13_POLICY_PATH", str(Path(__file__).parent / "profitability_deployment_policy.json"))
+)
+PROFILE_PATH = Path(
+    os.environ.get(
+        "AMEX_P13_PROFILE_PATH",
+        str(Path(__file__).parent.parent / "data" / "data/profitability_scored_profile.parquet"),
+    )
+)
 with open(POLICY_PATH, "r", encoding="utf-8") as _f:
     _POLICY = json.load(_f)
 
@@ -75,8 +82,8 @@ class ProfitabilityResponse(BaseModel):
 app = FastAPI(
     title="AMEX Enterprise Credit Risk Platform -- Risk-Adjusted Profitability Scoring Lookup API",
     description="Serves each real customer's precomputed PD-adjusted profitability score. Dollar figures "
-                "rest partly on explicit ASSUMPTION revenue inputs -- see /policy-info. Every endpoint "
-                "except /health requires a valid X-API-Key header.",
+    "rest partly on explicit ASSUMPTION revenue inputs -- see /policy-info. Every endpoint "
+    "except /health requires a valid X-API-Key header.",
     version="1.0.0",
 )
 
@@ -123,12 +130,15 @@ def get_profitability(request: Request, customer_id: str):
         f"<= ${CUT_HIGH:.2f} {PROFITABILITY_TIER_NAMES[1]}, else {PROFITABILITY_TIER_NAMES[2]})",
     ]
     return ProfitabilityResponse(
-        customer_id=row["customer_ID"], unified_risk_score=row["UNIFIED_RISK_SCORE"],
+        customer_id=row["customer_ID"],
+        unified_risk_score=row["UNIFIED_RISK_SCORE"],
         spend_percentile_rank=row["SPEND_PERCENTILE_RANK"],
         revenue_per_account_usd=row["REVENUE_PER_ACCOUNT_USD"],
-        pd_adjusted_revenue_usd=row["PD_ADJUSTED_REVENUE_USD"], expected_loss_usd=row["EXPECTED_LOSS_USD"],
-        profitability_score_usd=row["PROFITABILITY_SCORE"], profitability_tier=row["PROFITABILITY_TIER"],
+        pd_adjusted_revenue_usd=row["PD_ADJUSTED_REVENUE_USD"],
+        expected_loss_usd=row["EXPECTED_LOSS_USD"],
+        profitability_score_usd=row["PROFITABILITY_SCORE"],
+        profitability_tier=row["PROFITABILITY_TIER"],
         rationale="PD-adjusted revenue (real relative spend rank, ASSUMPTION dollar scale) minus "
-                  "expected loss (real unified risk score x Notebook 08's real EAD/LGD).",
+        "expected loss (real unified risk score x Notebook 08's real EAD/LGD).",
         reasoning=reasoning,
     )

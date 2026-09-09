@@ -45,10 +45,15 @@ def main():
     thresholds = config["thresholds"]
 
     import pandas as pd
+
     new_df = pd.read_csv(args.new_data_csv)
 
-    result = {"run_at_utc": datetime.now(timezone.utc).isoformat(), "new_data_csv": args.new_data_csv,
-              "n_rows": len(new_df), "checks": []}
+    result = {
+        "run_at_utc": datetime.now(timezone.utc).isoformat(),
+        "new_data_csv": args.new_data_csv,
+        "n_rows": len(new_df),
+        "checks": [],
+    }
     alert = False
 
     if "target" in new_df.columns:
@@ -58,8 +63,14 @@ def main():
         alert = alert or (status == "ALERT")
         result["checks"].append({"metric": "default_rate_swing_pp", "value": round(delta_pp, 3), "status": status})
     else:
-        result["checks"].append({"metric": "default_rate_swing_pp", "value": None,
-                                  "status": "NOT_COMPUTABLE", "detail": "no 'target' column -- outcomes not yet realized/labeled"})
+        result["checks"].append(
+            {
+                "metric": "default_rate_swing_pp",
+                "value": None,
+                "status": "NOT_COMPUTABLE",
+                "detail": "no 'target' column -- outcomes not yet realized/labeled",
+            }
+        )
 
     for feat in baseline["psi_top_n_features"]:
         if feat not in new_df.columns:
@@ -72,8 +83,14 @@ def main():
             share = _psi(baseline["quantile_bin_edges"][feat], new_df[feat].to_numpy(dtype=float))
             result["checks"].append({"metric": f"bin_share::{feat}", "value": share, "status": "REPORTED"})
         except (TypeError, ValueError) as exc:
-            result["checks"].append({"metric": f"bin_share::{feat}", "value": None,
-                                      "status": "NOT_COMPUTABLE", "detail": f"column not numeric/encoded: {exc}"})
+            result["checks"].append(
+                {
+                    "metric": f"bin_share::{feat}",
+                    "value": None,
+                    "status": "NOT_COMPUTABLE",
+                    "detail": f"column not numeric/encoded: {exc}",
+                }
+            )
 
     write_header = not Path(args.out_log).exists()
     with open(args.out_log, "a", encoding="utf-8", newline="") as f:

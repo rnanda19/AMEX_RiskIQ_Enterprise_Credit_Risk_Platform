@@ -19,6 +19,7 @@ def test_bin_share_sums_to_approximately_one():
 
 def pytest_approx_one():
     import pytest
+
     return pytest.approx(1.0, abs=1e-3)
 
 

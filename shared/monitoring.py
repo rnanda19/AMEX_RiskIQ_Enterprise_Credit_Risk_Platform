@@ -7,6 +7,7 @@ carries forward unchanged: this reports the new-window bin share against
 fixed train-side bin edges, not a full two-sided PSI, since the notebook's
 monitoring_baseline.json does not (yet) persist per-bin train counts.
 """
+
 from __future__ import annotations
 
 from typing import Optional

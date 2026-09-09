@@ -7,6 +7,7 @@ notebook keeps its own inline copy for now (see shared/__init__.py for why),
 but any NEW notebook, service, or test in this platform should import from
 here rather than re-typing the algorithm again.
 """
+
 from __future__ import annotations
 
 import numpy as np

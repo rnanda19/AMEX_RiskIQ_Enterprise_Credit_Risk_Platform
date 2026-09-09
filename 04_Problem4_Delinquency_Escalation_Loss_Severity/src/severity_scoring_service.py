@@ -22,7 +22,9 @@ from severity_scorer import load_bundle, score_customer, top_contributing_featur
 
 # Self-contained default: the bundle ships alongside this file. Override with
 # AMEX_SEVERITY_BUNDLE_PATH to point elsewhere.
-BUNDLE_PATH = Path(os.environ.get("AMEX_SEVERITY_BUNDLE_PATH", str(Path(__file__).parent / "severity_scoring_bundle.json")))
+BUNDLE_PATH = Path(
+    os.environ.get("AMEX_SEVERITY_BUNDLE_PATH", str(Path(__file__).parent / "severity_scoring_bundle.json"))
+)
 bundle = load_bundle(BUNDLE_PATH)
 
 # ---------------------------------------------------------------------------
@@ -56,6 +58,7 @@ def require_api_key(presented: str = Security(_api_key_header)) -> str:
         raise HTTPException(status_code=401, detail="Missing or invalid X-API-Key header.")
     return presented
 
+
 # One optional float field per real feature the model was fit on -- a missing field is treated
 # exactly like a missing statement value (imputed to that feature's real training mean), same as
 # score_customer()'s own _is_missing() handling.
@@ -79,8 +82,8 @@ class SeverityResponse(BaseModel):
 app = FastAPI(
     title="AMEX Enterprise Credit Risk Platform -- Delinquency Escalation Severity Scoring API",
     description="Scores one customer's real D_* engineered features into a 3-tier escalation "
-                "severity score and LGD. See /model-info for the real frozen policy (weights, "
-                "cutpoints, tier LGDs) this service applies, from Notebook 27's real run.",
+    "severity score and LGD. See /model-info for the real frozen policy (weights, "
+    "cutpoints, tier LGDs) this service applies, from Notebook 27's real run.",
     version="1.0.0",
 )
 

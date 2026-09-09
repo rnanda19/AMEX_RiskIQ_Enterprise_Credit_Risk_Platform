@@ -43,8 +43,12 @@ def require_api_key(presented: str = Security(_api_key_header)) -> str:
     return presented
 
 
-POLICY_PATH = Path(os.environ.get("AMEX_P9_POLICY_PATH", str(Path(__file__).parent / "collections_deployment_policy.json")))
-MODEL_PATH = Path(os.environ.get("AMEX_P9_MODEL_PATH", str(Path(__file__).parent / "collections_propensity_xgboost.joblib")))
+POLICY_PATH = Path(
+    os.environ.get("AMEX_P9_POLICY_PATH", str(Path(__file__).parent / "collections_deployment_policy.json"))
+)
+MODEL_PATH = Path(
+    os.environ.get("AMEX_P9_MODEL_PATH", str(Path(__file__).parent / "collections_propensity_xgboost.joblib"))
+)
 with open(POLICY_PATH, "r", encoding="utf-8") as _f:
     _POLICY = json.load(_f)
 MODEL = joblib.load(MODEL_PATH)
@@ -109,7 +113,7 @@ def _assign_tier(propensity: float, median_propensity: float, severity: float, m
 app = FastAPI(
     title="AMEX Enterprise Credit Risk Platform -- Collections Optimization Scoring API",
     description="Scores a customer's current statement for propensity-to-cure and recommends a real "
-                "treatment tier. Every endpoint except /health requires a valid X-API-Key header.",
+    "treatment tier. Every endpoint except /health requires a valid X-API-Key header.",
     version="1.0.0",
 )
 
@@ -139,8 +143,11 @@ def model_info():
 @app.post("/score", response_model=ScoreResponse, dependencies=[Depends(require_api_key)])
 @limiter.limit("60/minute")
 def score(request: Request, body: ScoreRequest):
-    statement = body.current_statement.dict() if hasattr(body.current_statement, "dict") \
+    statement = (
+        body.current_statement.dict()
+        if hasattr(body.current_statement, "dict")
         else body.current_statement.model_dump()
+    )
     x_row = np.array(
         [[statement.get(c) if statement.get(c) is not None else _MEANS[c] for c in MONITORED_FEATURES]],
         dtype=np.float32,
@@ -157,6 +164,8 @@ def score(request: Request, body: ScoreRequest):
     # known gap here rather than silently approximated.
     tier = "Automated Nudge" if propensity >= 0.5 else "Priority Outreach"
     return ScoreResponse(
-        customer_id=body.customer_id, propensity_to_cure=propensity, treatment_tier=tier,
+        customer_id=body.customer_id,
+        propensity_to_cure=propensity,
+        treatment_tier=tier,
         top_reasons=top_reasons,
     )

@@ -5,6 +5,7 @@ ranking, a known 10-row example worked by hand), not a re-statement of the
 implementation itself -- the point is to catch a real regression, not to
 just restate the code as a test.
 """
+
 import numpy as np
 import pytest
 

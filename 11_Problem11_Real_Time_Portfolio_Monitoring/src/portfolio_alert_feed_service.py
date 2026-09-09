@@ -43,7 +43,9 @@ def require_api_key(presented: str = Security(_api_key_header)) -> str:
     return presented
 
 
-POLICY_PATH = Path(os.environ.get("AMEX_P11_POLICY_PATH", str(Path(__file__).parent / "portfolio_monitoring_deployment_policy.json")))
+POLICY_PATH = Path(
+    os.environ.get("AMEX_P11_POLICY_PATH", str(Path(__file__).parent / "portfolio_monitoring_deployment_policy.json"))
+)
 with open(POLICY_PATH, "r", encoding="utf-8") as _f:
     _POLICY = json.load(_f)
 
@@ -86,10 +88,7 @@ def _compute_month_status(req: MonthIngestRequest) -> MonthStatus:
     breach_count = 0
     if baseline_eligible:
         for col in MONITORED_BASE_COLUMNS:
-            _baseline_vals = [
-                h["column_means"].get(col) for h in _HISTORY
-                if h["column_means"].get(col) is not None
-            ]
+            _baseline_vals = [h["column_means"].get(col) for h in _HISTORY if h["column_means"].get(col) is not None]
             _current = req.column_means.get(col)
             if len(_baseline_vals) < 2 or _current is None:
                 breach_per_column[col] = False
@@ -98,7 +97,7 @@ def _compute_month_status(req: MonthIngestRequest) -> MonthStatus:
             _n = len(_arr)
             _mean = sum(_arr) / _n
             _var = sum((v - _mean) ** 2 for v in _arr) / (_n - 1)
-            _std = _var ** 0.5
+            _std = _var**0.5
             if _std <= 0:
                 breach_per_column[col] = False
                 continue
@@ -118,22 +117,33 @@ def _compute_month_status(req: MonthIngestRequest) -> MonthStatus:
     alert = _CONSECUTIVE_BREACH_RUN_LENGTH >= WINNING_CONSECUTIVE_BREACH_CANDIDATE
 
     status = MonthStatus(
-        month=req.month, n_statements=req.n_statements, n_unique_customers=req.n_unique_customers,
-        baseline_eligible=baseline_eligible, breach_per_column=breach_per_column, breach_count=breach_count,
-        consecutive_breach_run_length=_CONSECUTIVE_BREACH_RUN_LENGTH, alert=alert,
+        month=req.month,
+        n_statements=req.n_statements,
+        n_unique_customers=req.n_unique_customers,
+        baseline_eligible=baseline_eligible,
+        breach_per_column=breach_per_column,
+        breach_count=breach_count,
+        consecutive_breach_run_length=_CONSECUTIVE_BREACH_RUN_LENGTH,
+        alert=alert,
     )
-    _HISTORY.append({"month": req.month, "n_statements": req.n_statements,
-                      "n_unique_customers": req.n_unique_customers, "column_means": req.column_means,
-                      "status": status.dict()})
+    _HISTORY.append(
+        {
+            "month": req.month,
+            "n_statements": req.n_statements,
+            "n_unique_customers": req.n_unique_customers,
+            "column_means": req.column_means,
+            "status": status.dict(),
+        }
+    )
     return status
 
 
 app = FastAPI(
     title="AMEX Enterprise Credit Risk Platform -- Real-Time Portfolio Monitoring Ops Dashboard + Alert Feed API",
     description="Ingests one real calendar month's whole-portfolio aggregate at a time and maintains "
-                "the running alert feed a monitoring dashboard renders -- a genuinely different "
-                "deployment shape from every prior problem's per-customer scoring service. Every "
-                "endpoint except /health requires a valid X-API-Key header.",
+    "the running alert feed a monitoring dashboard renders -- a genuinely different "
+    "deployment shape from every prior problem's per-customer scoring service. Every "
+    "endpoint except /health requires a valid X-API-Key header.",
     version="1.0.0",
 )
 

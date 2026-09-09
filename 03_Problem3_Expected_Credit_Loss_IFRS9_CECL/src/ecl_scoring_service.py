@@ -60,7 +60,9 @@ def require_api_key(presented: str = Security(_api_key_header)) -> str:
 
 class ECLRequest(BaseModel):
     customer_id: Optional[str] = None
-    pd_12m: float = Field(..., ge=0.0, le=1.0, description="Customer's real 12-month PD from Problem 1's champion model")
+    pd_12m: float = Field(
+        ..., ge=0.0, le=1.0, description="Customer's real 12-month PD from Problem 1's champion model"
+    )
     severity_tier: str = Field(..., description="One of the real severity tiers from Problem 4's model")
 
 
@@ -83,8 +85,8 @@ class ECLResponse(BaseModel):
 app = FastAPI(
     title="AMEX Enterprise Credit Risk Platform -- Expected Credit Loss (IFRS9/CECL) API",
     description="Computes IFRS9-staged and CECL Expected Credit Loss for one customer, given "
-                "their real PD and severity tier. See /model-info for the real frozen policy "
-                "this service applies (Notebook 30's ECL policy, Notebook 32's deployment bundle).",
+    "their real PD and severity tier. See /model-info for the real frozen policy "
+    "this service applies (Notebook 30's ECL policy, Notebook 32's deployment bundle).",
     version="1.0.0",
 )
 

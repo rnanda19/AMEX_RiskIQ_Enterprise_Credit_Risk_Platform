@@ -65,6 +65,7 @@ def require_api_key(presented: str = Security(_api_key_header)) -> str:
         raise HTTPException(status_code=401, detail="Missing or invalid X-API-Key header.")
     return presented
 
+
 with open(ARTIFACTS_DIR / "project_config.json", "r", encoding="utf-8") as f:
     _config = json.load(f)
 _pillar_dirs = {k: Path(v) for k, v in _config["pillar_dirs"].items()}
@@ -79,8 +80,9 @@ CHAMPION_METRICS = _nb05_summary["champion_metrics"]
 
 with open(_risk_tier_policy_dir / "risk_tier_policy.json", "r", encoding="utf-8") as f:
     RISK_TIER_POLICY = json.load(f)
-_BR_THRESHOLDS = sorted(RISK_TIER_POLICY["bucketing_methods"]["business_rule"]["pd_thresholds"],
-                        key=lambda b: b["tier_order"])
+_BR_THRESHOLDS = sorted(
+    RISK_TIER_POLICY["bucketing_methods"]["business_rule"]["pd_thresholds"], key=lambda b: b["tier_order"]
+)
 
 
 def assign_tier(pd_value):
@@ -167,10 +169,12 @@ def _top_reason_codes(x_raw, n=3):
             continue
         occluded = x_raw.copy()
         occluded[0, i] = baseline[0, i]
-        impacts.append(ReasonCode(
-            factor=col,
-            contribution_to_predicted_pd=base_pred - _predict_pd(occluded),
-        ))
+        impacts.append(
+            ReasonCode(
+                factor=col,
+                contribution_to_predicted_pd=base_pred - _predict_pd(occluded),
+            )
+        )
     impacts.sort(key=lambda r: abs(r.contribution_to_predicted_pd), reverse=True)
     return impacts[:n]
 
@@ -211,6 +215,11 @@ def risk_tier(request: Request, features: CustomerFeatures, customer_id: Optiona
         raise HTTPException(status_code=500, detail="Scoring failed: " + str(exc))
     tier = assign_tier(pd_score)
     reasons = _top_reason_codes(x)
-    return RiskTierResponse(customer_id=customer_id, predicted_pd=pd_score, risk_tier=tier,
-                             tier_method="business_rule", champion_model=CHAMPION_NAME,
-                             top_reasons=reasons)
+    return RiskTierResponse(
+        customer_id=customer_id,
+        predicted_pd=pd_score,
+        risk_tier=tier,
+        tier_method="business_rule",
+        champion_model=CHAMPION_NAME,
+        top_reasons=reasons,
+    )

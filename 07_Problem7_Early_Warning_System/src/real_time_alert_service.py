@@ -30,7 +30,9 @@ from slowapi.util import get_remote_address
 # Self-contained default: the real frozen policy ships alongside this file in src/ (see
 # docs/early_warning_deployment_policy.json for the original copy). Override with
 # AMEX_EWS_POLICY_PATH to point elsewhere in production.
-POLICY_PATH = Path(os.environ.get("AMEX_EWS_POLICY_PATH", str(Path(__file__).parent / "early_warning_deployment_policy.json")))
+POLICY_PATH = Path(
+    os.environ.get("AMEX_EWS_POLICY_PATH", str(Path(__file__).parent / "early_warning_deployment_policy.json"))
+)
 with open(POLICY_PATH, "r", encoding="utf-8") as _f:
     _POLICY = json.load(_f)
 
@@ -127,8 +129,7 @@ class AlertResponse(BaseModel):
 def compute_early_warning(statements: List[Dict[str, Optional[float]]]) -> dict:
     if len(statements) < MIN_STATEMENTS_FOR_BASELINE:
         raise ValueError(
-            f"Need >= {MIN_STATEMENTS_FOR_BASELINE} statements to form a baseline + latest, got "
-            f"{len(statements)}."
+            f"Need >= {MIN_STATEMENTS_FOR_BASELINE} statements to form a baseline + latest, got " f"{len(statements)}."
         )
     baseline_statements = statements[:-1]
     latest_statement = statements[-1]
@@ -173,9 +174,9 @@ def top_reason_codes(feature_deviations: Dict[str, Optional[float]], n=3):
 app = FastAPI(
     title="AMEX Enterprise Credit Risk Platform -- Early Warning System Real-Time Alert API",
     description="Flags a customer whose LATEST statement deviates from THEIR OWN recent baseline in "
-                "enough monitored features at once -- an unsupervised, rule-based control-chart "
-                "technique, complementary to Problem 6's trained recency model. See /model-info for "
-                "the real validation metrics behind this policy.",
+    "enough monitored features at once -- an unsupervised, rule-based control-chart "
+    "technique, complementary to Problem 6's trained recency model. See /model-info for "
+    "the real validation metrics behind this policy.",
     version="1.0.0",
 )
 
@@ -188,12 +189,8 @@ app.add_exception_handler(RateLimitExceeded, _rate_limit_exceeded_handler)
 # Prometheus metrics -- real, scraped via GET /metrics (left unauthenticated/unlimited, like
 # /health, since a metrics scraper is infrastructure, not scoring load). Pilot for this one
 # service; see MONITORING.md for the honest platform-wide scope note.
-SCORE_REQUESTS_TOTAL = Counter(
-    "ews_score_requests_total", "Total /score requests by outcome", ["outcome"]
-)
-SCORE_LATENCY_SECONDS = Histogram(
-    "ews_score_latency_seconds", "Real wall-clock latency of /score, seconds"
-)
+SCORE_REQUESTS_TOTAL = Counter("ews_score_requests_total", "Total /score requests by outcome", ["outcome"])
+SCORE_LATENCY_SECONDS = Histogram("ews_score_latency_seconds", "Real wall-clock latency of /score, seconds")
 
 
 @app.get("/metrics")
@@ -227,7 +224,7 @@ def issue_token(
         "exp": now + JWT_EXPIRY_SECONDS,
     }
     token = jwt.encode(payload, expected_secret, algorithm=JWT_ALGORITHM)
-        # 'bearer' is the standard OAuth2 token_type value (RFC 6750), not a credential (bandit false positive).
+    # 'bearer' is the standard OAuth2 token_type value (RFC 6750), not a credential (bandit false positive).
     return {"access_token": token, "token_type": "bearer", "expires_in": JWT_EXPIRY_SECONDS}  # nosec B105
 
 

@@ -82,8 +82,8 @@ class DynamicBehavioralResponse(BaseModel):
 app = FastAPI(
     title="AMEX Enterprise Credit Risk Platform -- Dynamic/Behavioral Credit Scoring API",
     description="Re-scores default risk using only a customer's most recent 3 chronological "
-                "statements -- a RECENCY score, complementary to Problem 1's full-history champion, not a "
-                "replacement for it. See /model-info for the real validation metrics behind this model.",
+    "statements -- a RECENCY score, complementary to Problem 1's full-history champion, not a "
+    "replacement for it. See /model-info for the real validation metrics behind this model.",
     version="1.0.0",
 )
 
@@ -151,5 +151,6 @@ def score(request: Request, features: CustomerFeatures, customer_id: Optional[st
     except Exception as exc:
         raise HTTPException(status_code=500, detail="Scoring failed: " + str(exc))
     reasons = _top_reason_codes(x)
-    return DynamicBehavioralResponse(customer_id=customer_id, predicted_pd=pd_score,
-                                      trailing_window_w=TRAILING_WINDOW_W, top_reasons=reasons)
+    return DynamicBehavioralResponse(
+        customer_id=customer_id, predicted_pd=pd_score, trailing_window_w=TRAILING_WINDOW_W, top_reasons=reasons
+    )

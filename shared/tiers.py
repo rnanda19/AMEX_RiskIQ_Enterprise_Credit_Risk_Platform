@@ -10,6 +10,7 @@ threshold-bucketed policy in this platform (e.g. a severity-tier policy
 shaped like Problem 4's LGD tiers) without re-deriving the same
 half-open-interval-with-fallback logic again.
 """
+
 from __future__ import annotations
 
 from typing import Any, Dict, List

@@ -5,18 +5,28 @@ name: Docker Build & Run Verification
 # never actually docker-built, started, and health-checked (see ROADMAP.md --
 # "Real docker build/smoke test of any Dockerfile ... Blocked on environment,
 # not on the work"). GitHub's ubuntu-latest runners ship Docker preinstalled
-# and have real Docker Hub access, so this job does the real thing: build the
+# and have real Docker Hub access, so these jobs do the real thing: build the
 # image, run the container, and curl its live /health endpoint.
 #
-# Problem 7 (Early Warning System) is the target because its service is
-# genuinely self-contained -- the real frozen policy JSON ships in git
-# alongside the code, so no external model artifact or volume mount is
-# needed for it to start and serve /health for real. Problem 1's service
-# (and most others) requires the multi-GB champion model that is
-# deliberately excluded from this public repo (see models/README.md), so it
-# cannot be health-checked this way without a real production data mount --
-# that is a separate, already-documented limitation, not something this
-# workflow works around or hides.
+# Coverage, by why each group is or isn't fully run:
+#   - Fully build+run+health-checked (real container, real /health response):
+#     Problems 3, 4, 5, 6, 7, 8, 9, 10, 11, 14 -- every one of these ships a
+#     real, small deployable artifact (a scoring bundle, a trained model
+#     joblib, or a frozen policy JSON) directly in git, so the container needs
+#     no external volume mount to start and serve /health for real.
+#   - Fully build+run+health-checked with a small SYNTHETIC fixture volume:
+#     Problems 12, 13 -- their real per-customer parquet profile is ~29-38MB
+#     and deliberately excluded from this public repo (see each problem's
+#     data/README.md); the fixture mounted here is the exact same small,
+#     structurally-real fixture already used by that problem's own pytest
+#     suite (see tests/conftest.py), not new or different data.
+#   - Build-only (no run): Problems 1, 2 -- both require the real multi-GB
+#     champion PD model, deliberately excluded from this public repo (see
+#     models/README.md); a real docker build is still verified, but a real
+#     run/health-check would need a genuine production model mount this
+#     sandbox and this CI runner both intentionally don't have. This is a
+#     documented, structural limitation of a public portfolio repo, not
+#     something this workflow works around or hides.
 
 on:
   push:
@@ -25,8 +35,12 @@ on:
     branches: [main]
 
 jobs:
-  docker-build-and-run:
-    name: Build, run, and health-check the Early Warning System container
+  # ---------------------------------------------------------------------------
+  # Problem 7 -- kept as its own named job (the original, first real Docker CI
+  # verification added to this repo, 2026-09-09).
+  # ---------------------------------------------------------------------------
+  docker-build-and-run-p7:
+    name: Build, run, and health-check the Early Warning System container (Problem 7)
     runs-on: ubuntu-latest
     defaults:
       run:
@@ -39,7 +53,7 @@ jobs:
 
       - name: Run the container
         run: |
-          docker run -d --name amex-ews-api -p 8007:8007 amex-ews-api:ci
+          docker run -d --name amex-ews-api -p 8007:8007 -e API_KEY=ci-test-key amex-ews-api:ci
           echo "Waiting for the container to become healthy..."
           for i in $(seq 1 15); do
             if curl -sf http://localhost:8007/health > /tmp/health_response.json; then
@@ -70,3 +84,228 @@ jobs:
       - name: Tear down
         if: always()
         run: docker rm -f amex-ews-api || true
+
+  # ---------------------------------------------------------------------------
+  # Problems 3, 4, 5, 6, 8, 9, 10, 11, 14 -- fully self-contained (or shipping a
+  # small real model in models/), so a real build+run+health-check needs no
+  # external data at all. One matrix, two build-context shapes.
+  # ---------------------------------------------------------------------------
+  docker-build-and-run-self-contained:
+    name: Build, run, and health-check ${{ matrix.label }}
+    runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - name: p3-ecl
+            label: the ECL Scoring API (Problem 3)
+            context: 03_Problem3_Expected_Credit_Loss_IFRS9_CECL/src
+            dockerfile: docker/Dockerfile
+            port: 8003
+          - name: p4-severity
+            label: the Loss Severity Scoring API (Problem 4)
+            context: 04_Problem4_Delinquency_Escalation_Loss_Severity/src
+            dockerfile: docker/Dockerfile
+            port: 8004
+          - name: p5-earlydefault
+            label: the Early Payment Default API (Problem 5)
+            context: 05_Problem5_Early_Payment_Default_Detection
+            dockerfile: src/docker/Dockerfile
+            port: 8002
+          - name: p6-dynamicbehavioral
+            label: the Dynamic Behavioral Scoring API (Problem 6)
+            context: 06_Problem6_Dynamic_Behavioral_Credit_Scoring
+            dockerfile: src/docker/Dockerfile
+            port: 8006
+          - name: p8-rollrate
+            label: the Roll-Rate Scoring API (Problem 8)
+            context: 08_Problem8_Roll_Rate_Modeling/src
+            dockerfile: docker/Dockerfile
+            port: 8005
+          - name: p9-collections
+            label: the Collections Optimization API (Problem 9)
+            context: 09_Problem9_Collections_Optimization/src
+            dockerfile: docker/Dockerfile
+            port: 8009
+          - name: p10-creditline
+            label: the Credit Line Management API (Problem 10)
+            context: 10_Problem10_Credit_Line_Management/src
+            dockerfile: docker/Dockerfile
+            port: 8010
+          - name: p11-portfolio
+            label: the Real-Time Portfolio Monitoring API (Problem 11)
+            context: 11_Problem11_Real_Time_Portfolio_Monitoring/src
+            dockerfile: docker/Dockerfile
+            port: 8011
+          - name: p14-executive
+            label: the Executive Decision Support API (Problem 14)
+            context: 14_Problem14_Executive_Decision_Support_Dashboard/src
+            dockerfile: docker/Dockerfile
+            port: 8014
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Build the real image
+        run: docker build -f ${{ matrix.context }}/${{ matrix.dockerfile }} -t amex-${{ matrix.name }}:ci ${{ matrix.context }}
+
+      - name: Run the container
+        run: |
+          docker run -d --name amex-${{ matrix.name }} -p ${{ matrix.port }}:${{ matrix.port }} -e API_KEY=ci-test-key amex-${{ matrix.name }}:ci
+          echo "Waiting for the container to become healthy..."
+          for i in $(seq 1 15); do
+            if curl -sf http://localhost:${{ matrix.port }}/health > /tmp/health_${{ matrix.name }}.json; then
+              echo "Container responded on attempt $i:"
+              cat /tmp/health_${{ matrix.name }}.json
+              exit 0
+            fi
+            sleep 2
+          done
+          echo "Container never became healthy -- dumping logs:"
+          docker logs amex-${{ matrix.name }}
+          exit 1
+
+      - name: Verify the real response shape
+        run: |
+          python3 -c "
+          import json
+          with open('/tmp/health_${{ matrix.name }}.json') as f:
+              body = json.load(f)
+          assert body.get('status') == 'ok', f'Unexpected /health body: {body}'
+          print('Real /health response verified:', body)
+          "
+
+      - name: Show container logs (always, for visibility)
+        if: always()
+        run: docker logs amex-${{ matrix.name }} || true
+
+      - name: Tear down
+        if: always()
+        run: docker rm -f amex-${{ matrix.name }} || true
+
+  # ---------------------------------------------------------------------------
+  # Problems 12, 13 -- self-contained code, but their lookup service reads a
+  # real per-customer parquet profile at import time. The real file (~29-38MB)
+  # is deliberately not committed to this public repo (see each problem's
+  # data/README.md); this job mounts the exact same small, synthetic-but-
+  # structurally-real fixture already used by that problem's own pytest suite
+  # (see tests/conftest.py -- same column names/dtypes/row shapes, not new or
+  # different data), so the real container genuinely starts and serves /health.
+  # ---------------------------------------------------------------------------
+  docker-build-and-run-with-fixture:
+    name: Build, run, and health-check ${{ matrix.label }}
+    runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - name: p12-customerintel
+            label: the 360 Customer Intelligence API (Problem 12)
+            context: 12_Problem12_360_Customer_Intelligence/src
+            dockerfile: docker/Dockerfile
+            port: 8012
+            profile_env: AMEX_P12_PROFILE_PATH
+            fixture_filename: unified_customer_profile.parquet
+            fixture_module: p12
+          - name: p13-profitability
+            label: the Risk-Adjusted Profitability API (Problem 13)
+            context: 13_Problem13_Risk_Adjusted_Profitability_Modeling/src
+            dockerfile: docker/Dockerfile
+            port: 8013
+            profile_env: AMEX_P13_PROFILE_PATH
+            fixture_filename: profitability_scored_profile.parquet
+            fixture_module: p13
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+
+      - name: Install polars (fixture generation only)
+        run: pip install --no-cache-dir polars>=0.20
+
+      - name: Generate the same small, synthetic-but-structurally-real fixture used by tests/conftest.py
+        run: |
+          mkdir -p /tmp/ci_fixture_data
+          python3 .github/scripts/make_ci_fixture_parquet.py \
+            --module ${{ matrix.fixture_module }} \
+            --out /tmp/ci_fixture_data/${{ matrix.fixture_filename }}
+
+      - name: Build the real image
+        run: docker build -f ${{ matrix.context }}/${{ matrix.dockerfile }} -t amex-${{ matrix.name }}:ci ${{ matrix.context }}
+
+      - name: Run the container with the fixture profile mounted
+        run: |
+          docker run -d --name amex-${{ matrix.name }} \
+            -p ${{ matrix.port }}:${{ matrix.port }} \
+            -e API_KEY=ci-test-key \
+            -e ${{ matrix.profile_env }}=/app/data/${{ matrix.fixture_filename }} \
+            -v /tmp/ci_fixture_data:/app/data:ro \
+            amex-${{ matrix.name }}:ci
+          echo "Waiting for the container to become healthy..."
+          for i in $(seq 1 15); do
+            if curl -sf http://localhost:${{ matrix.port }}/health > /tmp/health_${{ matrix.name }}.json; then
+              echo "Container responded on attempt $i:"
+              cat /tmp/health_${{ matrix.name }}.json
+              exit 0
+            fi
+            sleep 2
+          done
+          echo "Container never became healthy -- dumping logs:"
+          docker logs amex-${{ matrix.name }}
+          exit 1
+
+      - name: Verify the real response shape
+        run: |
+          python3 -c "
+          import json
+          with open('/tmp/health_${{ matrix.name }}.json') as f:
+              body = json.load(f)
+          assert body.get('status') == 'ok', f'Unexpected /health body: {body}'
+          assert body.get('profiles_loaded') == 2, f'Expected the 2-row fixture to load: {body}'
+          print('Real /health response verified:', body)
+          "
+
+      - name: Show container logs (always, for visibility)
+        if: always()
+        run: docker logs amex-${{ matrix.name }} || true
+
+      - name: Tear down
+        if: always()
+        run: docker rm -f amex-${{ matrix.name }} || true
+
+  # ---------------------------------------------------------------------------
+  # Problems 1, 2 -- build-only. Both require the real multi-GB champion PD
+  # model (deliberately excluded from this public repo, see models/README.md)
+  # to actually serve a request, so a real run/health-check isn't possible on
+  # a CI runner without a production data mount. A real `docker build` IS
+  # verified for both -- this is the first real (non-static) verification of
+  # either Dockerfile, and it's what caught and proved the fix for Problem 1's
+  # previously-broken COPY paths (see the Dockerfile's own 2026-09-09 comment).
+  # ---------------------------------------------------------------------------
+  docker-build-only-large-model:
+    name: Build (no run -- real model excluded from repo) ${{ matrix.label }}
+    runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - name: p1-pd
+            label: the PD Scoring API (Problem 1)
+            context: 01_Problem1_Credit_Scoring_PD_Prediction/src
+            dockerfile: docker/Dockerfile
+          - name: p2-risktier
+            label: the Risk Tier Scoring API (Problem 2)
+            context: 02_Problem2_Risk_Tier_Classification/src
+            dockerfile: docker/Dockerfile
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Build the real image
+        run: docker build -f ${{ matrix.context }}/${{ matrix.dockerfile }} -t amex-${{ matrix.name }}:ci ${{ matrix.context }}
+
+      - name: Confirm the image was actually produced
+        run: |
+          docker image inspect amex-${{ matrix.name }}:ci > /dev/null
+          echo "Real image built successfully -- amex-${{ matrix.name }}:ci"

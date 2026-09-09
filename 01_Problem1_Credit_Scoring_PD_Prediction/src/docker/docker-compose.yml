@@ -1,6 +1,8 @@
 services:
   amex-pd-api:
-    build: .
+    build:
+      context: ..
+      dockerfile: docker/Dockerfile
     image: amex-pd-api:latest
     container_name: amex-pd-api
     ports:

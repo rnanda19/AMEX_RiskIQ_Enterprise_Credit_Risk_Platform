@@ -39,17 +39,28 @@ demonstrable. This document is that discipline, written down.
 ## Before committing
 
 ```bash
-pip install -r requirements-dev.txt
+pip install -r requirements-dev.txt pyflakes black bandit
 python -m pytest shared/tests ProblemN_.../tests -v
 python scripts/check_notebook_syntax.py .
 pyflakes shared/ scripts/ ProblemN_.../src ProblemN_.../tests
+black --check --line-length 120 shared/ ProblemN_.../src
 ```
 
-All four run in CI on every push to `main` (see `.github/workflows/ci.yml`).
-Lint is currently advisory (`continue-on-error: true`) — see `ROADMAP.md`
-for making it blocking once the existing notebook-generated `src/` files
-are swept for the same class of unused-import findings this already
-surfaced (see `docs/known_lint_findings.md`).
+All of the above run in CI on every push to `main` (`.github/workflows/ci.yml`
+for the first two, `.github/workflows/code-quality.yml` for lint/format/security).
+As of 2026-09-09, `pyflakes`, `black --check`, and `bandit` are all blocking
+(0 findings/0 diff repo-wide) — see `docs/known_lint_findings.md` for the lint
+history and the "Repo-wide `black` reformatting" entry in `ROADMAP.md` for the
+formatting pass that made `black --check` safe to make blocking.
+
+`pre-commit` (see `.pre-commit-config.yaml`) runs the notebook syntax check and
+`pyflakes` locally before every commit, so either is caught before it's even
+pushed:
+
+```bash
+pip install pre-commit
+pre-commit install       # one-time, per clone
+```
 
 ## What NOT to do
 

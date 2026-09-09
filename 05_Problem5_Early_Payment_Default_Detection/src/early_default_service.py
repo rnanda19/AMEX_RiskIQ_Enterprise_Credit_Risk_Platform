@@ -90,7 +90,7 @@ class EarlyDefaultResponse(BaseModel):
 app = FastAPI(
     title="AMEX Enterprise Credit Risk Platform -- Early Payment Default Scoring API",
     description="Scores default risk using only a customer's first 3 chronological "
-                "statements. See /model-info for the real validation metrics behind this model.",
+    "statements. See /model-info for the real validation metrics behind this model.",
     version="1.0.0",
 )
 
@@ -170,5 +170,6 @@ def score(request: Request, features: CustomerFeatures, customer_id: Optional[st
     except Exception as exc:
         raise HTTPException(status_code=500, detail="Scoring failed: " + str(exc))
     reasons = _top_reason_codes(x)
-    return EarlyDefaultResponse(customer_id=customer_id, predicted_pd=pd_score,
-                                 early_window_k=EARLY_WINDOW_K, top_reasons=reasons)
+    return EarlyDefaultResponse(
+        customer_id=customer_id, predicted_pd=pd_score, early_window_k=EARLY_WINDOW_K, top_reasons=reasons
+    )
