@@ -46,7 +46,7 @@ narrative version of both.
 | `docker-compose.yml` updated to require `API_KEY` at runtime (fail loud if unset) for all 8 | Done, 2026-08-25 | every `Problem*/src/docker/docker-compose.yml` |
 | 32 new tests for the auth + explainability pass (126 total) | Done, 2026-08-25 | every `Problem*/tests/` |
 | Wire existing notebooks to import from `shared/` instead of inline copies | **Deliberately deferred** — see below | — |
-| Real `docker build`/smoke test of any Dockerfile (this sandbox has no Docker Hub registry access; static build-context verification passed for all 3 new Dockerfiles — see below) | **Blocked on environment, not on the work** | — |
+| Real `docker build`/smoke test of any Dockerfile (this sandbox has no Docker Hub registry access) | **Unblocked 2026-09-09**: added `.github/workflows/docker-verify.yml`, which runs on GitHub's own ubuntu-latest runners (real Docker Hub access, unlike this sandbox) and does a real `docker build` + `docker run` + `curl /health` against Problem 7's self-contained Early Warning System container on every push/PR. First real (non-static) verification of any Dockerfile in this repo -- check the Actions tab after pushing to confirm it goes green. | `.github/workflows/docker-verify.yml` |
 | Repo-wide `black` reformatting | **Deliberately deferred** — advisory-only for now, see below | — |
 | Pre-commit hooks (pyflakes, notebook syntax check, before every commit) | **Not started** | — |
 

@@ -33,8 +33,10 @@ jobs:
           12_Problem12_360_Customer_Intelligence/src 12_Problem12_360_Customer_Intelligence/tests
           13_Problem13_Risk_Adjusted_Profitability_Modeling/src 13_Problem13_Risk_Adjusted_Profitability_Modeling/tests
           14_Problem14_Executive_Decision_Support_Dashboard/src 14_Problem14_Executive_Decision_Support_Dashboard/tests
-        continue-on-error: true  # advisory for now -- see ROADMAP.md "make lint blocking";
-          # known pre-existing findings logged in docs/known_lint_findings.md
+        # Blocking as of 2026-09-09: the 3 pre-existing findings (unused joblib
+        # import, unused typing.Dict import, an f-string with no placeholders)
+        # were fixed in both the generated src/ file and its source notebook
+        # cell -- see docs/known_lint_findings.md for the full history.
 
   format-check:
     name: Format check (black --check, advisory)

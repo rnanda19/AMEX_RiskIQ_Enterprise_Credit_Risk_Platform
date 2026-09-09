@@ -14,6 +14,18 @@ A complete, production-grade 14-problem, 5-phase credit risk platform built end-
 
 Every number in this repository is either computed live by that notebook's own code on the real dataset, or is an explicitly labeled, editable `ASSUMPTION` where the dataset genuinely has no ground truth for it — never silently presented as fact.
 
+### At a glance -- real charts from the Executive Rollup Report
+
+<table>
+<tr>
+<td width="34%"><img src="00_Executive_Rollup_Report/platform_value_waterfall.png" alt="Real net value build-up waterfall across the 9 production-recommended problems, totaling $429.9M/cycle"></td>
+<td width="33%"><img src="00_Executive_Rollup_Report/category_breakdown.png" alt="All 14 problems grouped by category: foundational models, reserve optimization, value creation, and BI aggregation"></td>
+<td width="33%"><img src="00_Executive_Rollup_Report/model_health_matrix.png" alt="Real model health matrix for all 14 problems -- 11 recommended, 1 explicitly not recommended, 2 foundational"></td>
+</tr>
+</table>
+
+Every chart above is generated directly from this platform's own real results (not mockups) -- including Problem 10's honest "NOT RECOMMENDED" status in the health matrix, disclosed the same way a strong result would be. The full Executive Rollup Report (linked above) has the complete set plus the narrative behind each number.
+
 ## Table of Contents
 
 All 14 problems, grouped by phase and listed in strict numeric order (each links to that problem's own README):

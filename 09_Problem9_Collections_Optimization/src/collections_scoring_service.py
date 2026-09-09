@@ -9,7 +9,7 @@ import logging
 import os
 import secrets
 from pathlib import Path
-from typing import Dict, List, Optional
+from typing import List, Optional
 
 import joblib
 import numpy as np

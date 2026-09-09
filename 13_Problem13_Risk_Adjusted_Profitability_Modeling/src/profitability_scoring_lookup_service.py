@@ -117,7 +117,7 @@ def get_profitability(customer_id: str):
         revenue_per_account_usd=row["REVENUE_PER_ACCOUNT_USD"],
         pd_adjusted_revenue_usd=row["PD_ADJUSTED_REVENUE_USD"], expected_loss_usd=row["EXPECTED_LOSS_USD"],
         profitability_score_usd=row["PROFITABILITY_SCORE"], profitability_tier=row["PROFITABILITY_TIER"],
-        rationale=f"PD-adjusted revenue (real relative spend rank, ASSUMPTION dollar scale) minus "
-                  f"expected loss (real unified risk score x Notebook 08's real EAD/LGD).",
+        rationale="PD-adjusted revenue (real relative spend rank, ASSUMPTION dollar scale) minus "
+                  "expected loss (real unified risk score x Notebook 08's real EAD/LGD).",
         reasoning=reasoning,
     )
