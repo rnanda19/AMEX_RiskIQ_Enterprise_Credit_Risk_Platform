@@ -56,7 +56,8 @@ RECOMMENDED_FOR_PRODUCTION = _POLICY["recommended_for_production"]
 # without standing up new infrastructure, not oversights.
 # ---------------------------------------------------------------------------
 _auth_logger = logging.getLogger(__name__ + ".auth")
-_DEV_DEFAULT_SHARED_SECRET = "dev-only-CHANGE-ME-before-deploying"
+# This IS the published, non-secret placeholder -- the name and value say so (bandit false positive).
+_DEV_DEFAULT_SHARED_SECRET = "dev-only-CHANGE-ME-before-deploying"  # nosec B105
 JWT_ALGORITHM = "HS256"
 JWT_AUDIENCE = "amex-ews-api"
 JWT_ISSUER = "amex-ews-token-service"
@@ -226,7 +227,8 @@ def issue_token(
         "exp": now + JWT_EXPIRY_SECONDS,
     }
     token = jwt.encode(payload, expected_secret, algorithm=JWT_ALGORITHM)
-    return {"access_token": token, "token_type": "bearer", "expires_in": JWT_EXPIRY_SECONDS}
+        # 'bearer' is the standard OAuth2 token_type value (RFC 6750), not a credential (bandit false positive).
+    return {"access_token": token, "token_type": "bearer", "expires_in": JWT_EXPIRY_SECONDS}  # nosec B105
 
 
 @app.get("/health")

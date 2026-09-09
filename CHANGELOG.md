@@ -9,6 +9,23 @@ reconstructed -- every line traces to a real commit.
 
 ## Unreleased
 
+- **Real CI failures found and fixed** after pushing the OAuth2/JWT pilot
+  below: (1) `ci.yml`'s `unit-tests` job installs from
+  `requirements-dev.txt`, which was missing `PyJWT` -- Problem 7's tests
+  failed with a real `ModuleNotFoundError` on GitHub's runners, the same
+  class of gap already fixed once for `slowapi`/`prometheus-client`; (2)
+  `code-quality.yml`'s bandit security scan flagged 2 real (but false-
+  positive) `B105 hardcoded_password_string` findings -- the published
+  dev-only placeholder secret's variable name (`_DEV_DEFAULT_SHARED_SECRET`)
+  and the literal string `"bearer"` (the standard OAuth2 `token_type`
+  value, RFC 6750) both matched bandit's naming heuristic. Confirmed both
+  are real bandit findings, not oversights, by reproducing them on an
+  unsuppressed copy of the file, then suppressed each individually with
+  an explicit `# nosec B105` plus an inline comment stating why -- not a
+  blanket `continue-on-error`, consistent with this repo's real,
+  0-findings-required bandit gate. Reverified: bandit now reports 0
+  issues across the full scanned scope, and the full 180-test platform
+  suite still passes.
 - **Real OAuth2 client-credentials + JWT pilot completed on Problem 7**
   (Early Warning System), replacing that service's `X-API-Key` header on
   `/score` and `/model-info` with a real `POST /token` (client-credentials
