@@ -49,6 +49,7 @@ narrative version of both.
 | Problem 6 Notebooks 39/40 `(customer_ID, S_2)` tie-order determinism | **Found 2026-09-09, deliberately deferred** — see below | `06_Problem6_Dynamic_Behavioral_Credit_Scoring/notebooks/39_*.ipynb`, `40_*.ipynb` |
 | Real `docker build`/smoke test of any Dockerfile (this sandbox has no Docker Hub registry access) | **Extended 2026-09-09**: `.github/workflows/docker-verify.yml` now covers all 14 problems, up from just Problem 7 -- real `docker build` + `docker run` + `curl /health` for 12 of 14 (the 9 already-self-contained services plus Problems 3, 10, 14, and Problems 12/13 run for real against the exact synthetic fixture already committed in their own `tests/conftest.py`, via a new shared `.github/scripts/make_ci_fixture_parquet.py`); a real `docker build`-only (no run) for Problems 1 and 2, which need the deliberately-excluded multi-GB champion model to actually run. Also fixed a real bug while extending this: Problem 1's `Dockerfile` was `COPY`-ing `requirements-api.txt`/`main.py` from the build-context root, but those files live in `src/fastapi_service/` -- flagged but not fixed in the 2026-08-25 pass, fixed here by mirroring Problem 7's proven convention. | `.github/workflows/docker-verify.yml`, `.github/scripts/make_ci_fixture_parquet.py` |
 | Real `docker build` failure on Problems 5/6, found on the first real CI run of the newly-extended matrix above | **Found and fixed 2026-09-09** — see below | `05_Problem5_.../src/requirements-api.txt`, `06_Problem6_.../src/requirements-api.txt` |
+| CI guard against the same bug class recurring (a pinned package that doesn't support its Dockerfile's Python version) | **Done 2026-09-09** — new blocking `dependency-python-compat` job, checks all 54 pins across all 14 services against live PyPI metadata; verified it actually catches the real bug (tested against a reverted copy of the Problem 5 pin) | `.github/scripts/check_pinned_python_compat.py`, `.github/workflows/code-quality.yml` |
 | Repo-wide `black` reformatting | **Done 2026-09-09**: `black --line-length 120` applied across `shared/` and all 14 problems' `src/` -- 24 files reformatted, 0 logic changes, all 180 tests still passing. `format-check` in `code-quality.yml` flipped from advisory (`continue-on-error: true`) to blocking. | `.github/workflows/code-quality.yml` |
 | Pre-commit hooks (pyflakes, notebook syntax check, before every commit) | **Done 2026-09-09** | `.pre-commit-config.yaml` |
 
@@ -219,6 +220,21 @@ real FastAPI service (`uvicorn early_default_service:app` /
 is not a training-time change — each problem's training-time
 `requirements.txt` leaves `xgboost` unpinned, so the already-trained model
 artifacts are untouched; only the serving container's dependency pin moved.
+
+A one-off fix for a class of bug is still a gap until the class itself is
+guarded against — so `.github/scripts/check_pinned_python_compat.py` was
+added the same pass: for every `Problem*/src/docker/Dockerfile`, it reads
+the base image's Python version and every `pkg==version` pin in the
+requirements file that Dockerfile `COPY`'s in, asks PyPI's own JSON API
+whether that exact release supports that Python version, and fails loud on
+any mismatch (or on a pin that doesn't exist on PyPI at all) — wired in as
+a new blocking `dependency-python-compat` job in `code-quality.yml`.
+Verified it actually catches the real bug, not just the fixed state: run
+against a reverted copy of Problem 5's `requirements-api.txt`
+(`xgboost==3.3.0` restored), it fails with the exact diagnosis
+(`xgboost==3.3.0 requires Python >=3.12, but .../Dockerfile uses
+python:3.11-slim`); run against the real, current, fixed repo, it checks
+all 54 pinned packages across all 14 services and passes clean.
 
 ### A known bug found, but deliberately not silently patched: Problem 6 Notebooks 39/40
 

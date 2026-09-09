@@ -80,3 +80,21 @@ jobs:
           09_Problem9_Collections_Optimization/src 10_Problem10_Credit_Line_Management/src
           11_Problem11_Real_Time_Portfolio_Monitoring/src 12_Problem12_360_Customer_Intelligence/src
           13_Problem13_Risk_Adjusted_Profitability_Modeling/src 14_Problem14_Executive_Decision_Support_Dashboard/src -q
+
+  dependency-python-compat:
+    name: Dependency / Python-version compatibility (requirements-api.txt vs Dockerfile)
+    runs-on: ubuntu-latest
+    # Added 2026-09-09, in direct response to a real bug: Problems 5/6 pinned
+    # xgboost==3.3.0 (Requires-Python >=3.12) inside a python:3.11-slim Dockerfile,
+    # which broke the real `docker build` step in docker-verify.yml the first time
+    # these Dockerfiles were ever build-tested with real registry access. This job
+    # catches that bug class here -- fast, offline of Docker -- instead of relying
+    # on a live docker-build failure to notice the next one. See ROADMAP.md and
+    # .github/scripts/check_pinned_python_compat.py for the full root-cause writeup.
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+      - run: pip install packaging
+      - run: python .github/scripts/check_pinned_python_compat.py

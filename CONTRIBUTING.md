@@ -44,14 +44,21 @@ python -m pytest shared/tests ProblemN_.../tests -v
 python scripts/check_notebook_syntax.py .
 pyflakes shared/ scripts/ ProblemN_.../src ProblemN_.../tests
 black --check --line-length 120 shared/ ProblemN_.../src
+python .github/scripts/check_pinned_python_compat.py
 ```
 
 All of the above run in CI on every push to `main` (`.github/workflows/ci.yml`
-for the first two, `.github/workflows/code-quality.yml` for lint/format/security).
-As of 2026-09-09, `pyflakes`, `black --check`, and `bandit` are all blocking
-(0 findings/0 diff repo-wide) — see `docs/known_lint_findings.md` for the lint
-history and the "Repo-wide `black` reformatting" entry in `ROADMAP.md` for the
-formatting pass that made `black --check` safe to make blocking.
+for the first two, `.github/workflows/code-quality.yml` for lint/format/security/
+dependency-Python-compat). As of 2026-09-09, `pyflakes`, `black --check`, and
+`bandit` are all blocking (0 findings/0 diff repo-wide) — see
+`docs/known_lint_findings.md` for the lint history and the "Repo-wide `black`
+reformatting" entry in `ROADMAP.md` for the formatting pass that made
+`black --check` safe to make blocking. Also blocking as of 2026-09-09:
+`check_pinned_python_compat.py`, which checks every `Problem*/src/requirements-api.txt`
+pin against its paired Dockerfile's Python version via live PyPI metadata —
+added in direct response to a real bug (Problems 5/6 pinned `xgboost==3.3.0`,
+which requires Python >=3.12, inside a `python:3.11-slim` image) — see
+`ROADMAP.md` for the full root-cause writeup.
 
 `pre-commit` (see `.pre-commit-config.yaml`) runs the notebook syntax check and
 `pyflakes` locally before every commit, so either is caught before it's even
