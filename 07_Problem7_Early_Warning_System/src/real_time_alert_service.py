@@ -3,7 +3,10 @@
 # Unlike Problems 1/5/6's services, this one scores a CUSTOMER'S STATEMENT HISTORY (a list of past
 # records), not a single flat feature row -- the baseline is computed from that history at scoring
 # time, exactly reproducing Notebooks 43/44's rolling z-score computation.
-# API_KEY (see .env.example) gates every endpoint below except /health.
+# OAuth2 client-credentials + JWT (pilot) gates /score and /model-info -- POST /token
+# first to get a bearer token (see .env.example for the shared secret used as both
+# the client_secret and the JWT signing key in this pilot). /health, /metrics, and
+# /token itself are unauthenticated.
 # Run with:
 #     uvicorn real_time_alert_service:app --host 0.0.0.0 --port 8007
 import json
@@ -14,9 +17,10 @@ import time
 from pathlib import Path
 from typing import Dict, List, Optional
 
+import jwt
 import numpy as np
-from fastapi import Depends, FastAPI, HTTPException, Request, Response, Security
-from fastapi.security import APIKeyHeader
+from fastapi import Depends, FastAPI, Form, HTTPException, Request, Response, Security
+from fastapi.security import OAuth2PasswordBearer
 from pydantic import BaseModel
 from prometheus_client import CONTENT_TYPE_LATEST, Counter, Histogram, generate_latest
 from slowapi import Limiter, _rate_limit_exceeded_handler
@@ -37,35 +41,63 @@ MONITORED_FEATURES = _POLICY["monitored_features"]
 RECOMMENDED_FOR_PRODUCTION = _POLICY["recommended_for_production"]
 
 # ---------------------------------------------------------------------------
-# Authentication -- real, enforced on every endpoint below except /health.
-# Duplicated verbatim across all 8 platform services (not imported from
-# shared/) so each service stays self-contained for its own Docker build
-# context, matching the self-contained-policy-copy pattern already used
-# elsewhere in this repo. Set API_KEY in your environment before deploying
-# anywhere reachable by anyone but you -- the fallback below is published
-# publicly in this file and must never be treated as a real secret.
+# Authentication -- OAuth2 client-credentials grant + JWT (pilot, this service
+# only; see AUTH_HARDENING.md for why the platform's other 13 services still
+# use the shared X-API-Key pattern and the honest scope/limits of this pilot).
+# A caller first POSTs to /token with grant_type=client_credentials,
+# client_id, and client_secret to get a short-lived signed JWT, then sends it
+# as `Authorization: Bearer <token>` on /score and /model-info.
+#
+# Real, stated simplifications of this pilot, not hidden: there is a single
+# hardcoded registered client_id (no client registry/database), and the same
+# shared secret (API_KEY) is reused as both that client's credential AND the
+# HS256 JWT signing key -- a real production rollout would keep those
+# separate. Both are deliberate choices to pilot the OAuth2/JWT *pattern*
+# without standing up new infrastructure, not oversights.
 # ---------------------------------------------------------------------------
 _auth_logger = logging.getLogger(__name__ + ".auth")
-_DEV_DEFAULT_API_KEY = "dev-only-CHANGE-ME-before-deploying"
-_api_key_header = APIKeyHeader(name="X-API-Key", auto_error=False)
+_DEV_DEFAULT_SHARED_SECRET = "dev-only-CHANGE-ME-before-deploying"
+JWT_ALGORITHM = "HS256"
+JWT_AUDIENCE = "amex-ews-api"
+JWT_ISSUER = "amex-ews-token-service"
+JWT_SCOPE = "score"
+JWT_EXPIRY_SECONDS = 900  # 15 minutes
+REGISTERED_CLIENT_ID = "ews-service-client"
+_oauth2_scheme = OAuth2PasswordBearer(tokenUrl="/token", auto_error=False)
 
 
-def _configured_api_key() -> str:
+def _configured_shared_secret() -> str:
     key = os.environ.get("API_KEY")
     if not key:
         _auth_logger.warning(
             "API_KEY is not set -- falling back to the published dev-only default. Set API_KEY "
             "before deploying this service anywhere reachable by anyone but you."
         )
-        return _DEV_DEFAULT_API_KEY
+        return _DEV_DEFAULT_SHARED_SECRET
     return key
 
 
-def require_api_key(presented: str = Security(_api_key_header)) -> str:
-    expected = _configured_api_key()
-    if not presented or not secrets.compare_digest(presented, expected):
-        raise HTTPException(status_code=401, detail="Missing or invalid X-API-Key header.")
-    return presented
+def require_bearer_token(token: Optional[str] = Security(_oauth2_scheme)) -> dict:
+    if not token:
+        raise HTTPException(
+            status_code=401,
+            detail="Missing bearer token. POST /token (grant_type=client_credentials) to obtain one.",
+        )
+    try:
+        payload = jwt.decode(
+            token,
+            _configured_shared_secret(),
+            algorithms=[JWT_ALGORITHM],
+            audience=JWT_AUDIENCE,
+            issuer=JWT_ISSUER,
+        )
+    except jwt.ExpiredSignatureError:
+        raise HTTPException(status_code=401, detail="Token expired -- request a new one from /token.")
+    except jwt.InvalidTokenError as exc:
+        raise HTTPException(status_code=401, detail=f"Invalid token: {exc}")
+    if payload.get("scope") != JWT_SCOPE:
+        raise HTTPException(status_code=403, detail=f"Token missing required scope: {JWT_SCOPE}")
+    return payload
 
 
 class ScoreRequest(BaseModel):
@@ -168,12 +200,41 @@ def metrics():
     return Response(generate_latest(), media_type=CONTENT_TYPE_LATEST)
 
 
+@app.post("/token")
+def issue_token(
+    grant_type: str = Form(...),
+    client_id: str = Form(...),
+    client_secret: str = Form(...),
+):
+    """Real OAuth2 client-credentials grant. Not rate-limited or otherwise brute-force-protected
+    in this pilot -- see AUTH_HARDENING.md's follow-on list."""
+    if grant_type != "client_credentials":
+        raise HTTPException(
+            status_code=400,
+            detail="unsupported_grant_type: only 'client_credentials' is implemented by this pilot.",
+        )
+    expected_secret = _configured_shared_secret()
+    if client_id != REGISTERED_CLIENT_ID or not secrets.compare_digest(client_secret, expected_secret):
+        raise HTTPException(status_code=401, detail="invalid_client: unknown client_id or bad client_secret.")
+    now = int(time.time())
+    payload = {
+        "iss": JWT_ISSUER,
+        "sub": client_id,
+        "aud": JWT_AUDIENCE,
+        "scope": JWT_SCOPE,
+        "iat": now,
+        "exp": now + JWT_EXPIRY_SECONDS,
+    }
+    token = jwt.encode(payload, expected_secret, algorithm=JWT_ALGORITHM)
+    return {"access_token": token, "token_type": "bearer", "expires_in": JWT_EXPIRY_SECONDS}
+
+
 @app.get("/health")
 def health():
     return {"status": "ok", "winning_min_deviation_count": WINNING_MIN_DEVIATION_COUNT}
 
 
-@app.get("/model-info", dependencies=[Depends(require_api_key)])
+@app.get("/model-info", dependencies=[Depends(require_bearer_token)])
 def model_info():
     return {
         "z_threshold": Z_THRESHOLD,
@@ -185,7 +246,7 @@ def model_info():
     }
 
 
-@app.post("/score", response_model=AlertResponse, dependencies=[Depends(require_api_key)])
+@app.post("/score", response_model=AlertResponse, dependencies=[Depends(require_bearer_token)])
 @limiter.limit("60/minute")
 def score(request: Request, body: ScoreRequest):
     start_time = time.time()

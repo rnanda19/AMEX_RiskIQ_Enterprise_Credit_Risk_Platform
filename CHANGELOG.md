@@ -9,6 +9,33 @@ reconstructed -- every line traces to a real commit.
 
 ## Unreleased
 
+- **Real OAuth2 client-credentials + JWT pilot completed on Problem 7**
+  (Early Warning System), replacing that service's `X-API-Key` header on
+  `/score` and `/model-info` with a real `POST /token` (client-credentials
+  grant) + `Authorization: Bearer <token>` flow, per the scoped migration
+  plan in `AUTH_HARDENING.md`. The token is a genuine HS256-signed JWT
+  (`PyJWT==2.3.0`) with real `iss`/`sub`/`aud`/`scope`/`iat`/`exp` claims
+  (15-minute expiry), validated on every protected request. Verified two
+  ways: Problem 7's test suite grew from 10 to 18 real tests (issuing a
+  real token, rejecting a wrong client_secret/unknown client_id/bad
+  grant_type, rejecting a missing/invalid/expired/wrong-scope token, and
+  -- the regression check that matters most -- confirming the *old*
+  `X-API-Key` header alone no longer authenticates the endpoint), and a
+  live end-to-end run against a real `uvicorn` instance (old header ->
+  real 401; `/token` -> real signed JWT; that token against `/score` and
+  `/model-info` -> real 200s; a wrong client_secret -> real 401). The
+  full 180-test platform suite (172 + 8 new) passes. `AUTH_HARDENING.md`,
+  `SECURITY.md`, Problem 7's own `README.md`, and `LOAD_TESTING.md` all
+  updated to reflect this honestly -- 13 of 14 services still use
+  `X-API-Key`; this is a single-service pilot, with its real
+  simplifications (one hardcoded client, reused secret as both client
+  credential and JWT signing key, `/token` itself not yet rate-limited)
+  stated plainly, not hidden.
+- Also fixed a real gap found while touching Problem 7's dependency
+  files again: its root `requirements.txt` had `slowapi` but was missing
+  `prometheus-client` (added during the earlier Prometheus pilot entry
+  below but never added to this file) -- added both `prometheus-client`
+  and `PyJWT` to keep it consistent with `requirements-api.txt`.
 - **Real bug found and fixed:** pushing the rate-limiting + Prometheus
   changes below broke real CI -- `.github/workflows/ci.yml`'s
   `unit-tests` job installs dependencies fresh from `requirements-dev.txt`

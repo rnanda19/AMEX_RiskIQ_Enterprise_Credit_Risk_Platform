@@ -47,15 +47,20 @@ please report those directly to their respective maintainers.
 
 ## API Hardening
 
-Every one of the 14 deployed FastAPI services enforces two real controls
-on its primary scoring/mutating endpoint: a shared `X-API-Key` header
-(see each service's `.env.example`) and a 60-requests-per-minute rate
-limit per client IP (`slowapi`), returning a real `429` once exceeded.
-`/health` and metadata (`*-info`/lookup) endpoints stay unauthenticated
-and unlimited by design -- they carry no scoring load and are meant to be
-polled freely (e.g. by Docker `HEALTHCHECK`). TLS termination is not yet
-implemented at the application layer -- see `TLS.md` for the real,
-current state and the honest path to closing that gap. The `X-API-Key`
-control itself is a single shared static secret per service, not
-per-caller identity or OAuth2/JWT -- see `AUTH_HARDENING.md` for the
-honest current-state assessment and a concrete, scoped migration plan.
+Every one of the 14 deployed FastAPI services enforces a
+60-requests-per-minute rate limit per client IP (`slowapi`) on its
+primary scoring/mutating endpoint, returning a real `429` once exceeded.
+`/health` and metadata (`*-info`/lookup) endpoints stay unlimited by
+design -- they carry no scoring load and are meant to be polled freely
+(e.g. by Docker `HEALTHCHECK`). TLS termination is not yet implemented at
+the application layer -- see `TLS.md` for the real, current state and
+the honest path to closing that gap.
+
+Authentication is not uniform across the platform, by design, and stated
+honestly: 13 of the 14 services use a shared `X-API-Key` header (a single
+static secret per service, not per-caller identity -- see
+`AUTH_HARDENING.md`); Problem 7 (Early Warning System) instead pilots a
+real OAuth2 client-credentials + JWT flow (`POST /token`, then
+`Authorization: Bearer <token>`), also documented in full in
+`AUTH_HARDENING.md` along with its real verification results and stated
+limitations.

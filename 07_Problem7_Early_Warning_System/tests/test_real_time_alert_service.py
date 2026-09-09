@@ -1,14 +1,44 @@
 import os
+import time
 
+import jwt
 from fastapi.testclient import TestClient
 
 # Must be set before real_time_alert_service (and its module-level `app`) is imported below.
 os.environ["API_KEY"] = "pytest-only-test-key"
 
-from real_time_alert_service import app, compute_early_warning, top_reason_codes  # noqa: E402
+from real_time_alert_service import (  # noqa: E402
+    JWT_ALGORITHM,
+    JWT_AUDIENCE,
+    JWT_ISSUER,
+    JWT_SCOPE,
+    REGISTERED_CLIENT_ID,
+    app,
+    compute_early_warning,
+    top_reason_codes,
+)
 
 client = TestClient(app)
-AUTH = {"X-API-Key": "pytest-only-test-key"}
+SHARED_SECRET = "pytest-only-test-key"
+
+
+def _fetch_real_token(client_id=REGISTERED_CLIENT_ID, client_secret=SHARED_SECRET, grant_type="client_credentials"):
+    """Drives the real /token endpoint end-to-end -- not a shortcut that fabricates a token the
+    endpoint itself never issued."""
+    return client.post(
+        "/token",
+        data={"grant_type": grant_type, "client_id": client_id, "client_secret": client_secret},
+    )
+
+
+def _bearer_auth():
+    resp = _fetch_real_token()
+    assert resp.status_code == 200, resp.text
+    token = resp.json()["access_token"]
+    return {"Authorization": f"Bearer {token}"}
+
+
+AUTH = _bearer_auth()
 
 
 def test_health_reports_the_real_winning_min_deviation_count(real_policy):
@@ -17,6 +47,35 @@ def test_health_reports_the_real_winning_min_deviation_count(real_policy):
     body = resp.json()
     assert body["status"] == "ok"
     assert body["winning_min_deviation_count"] == real_policy["winning_min_deviation_count"]
+
+
+def test_token_endpoint_issues_a_real_bearer_token_for_the_registered_client():
+    resp = _fetch_real_token()
+    assert resp.status_code == 200
+    body = resp.json()
+    assert body["token_type"] == "bearer"
+    assert body["expires_in"] == 900
+    decoded = jwt.decode(
+        body["access_token"], SHARED_SECRET, algorithms=[JWT_ALGORITHM], audience=JWT_AUDIENCE, issuer=JWT_ISSUER
+    )
+    assert decoded["sub"] == REGISTERED_CLIENT_ID
+    assert decoded["scope"] == JWT_SCOPE
+    assert decoded["exp"] - decoded["iat"] == 900
+
+
+def test_token_endpoint_rejects_wrong_client_secret():
+    resp = _fetch_real_token(client_secret="not-the-real-secret")
+    assert resp.status_code == 401
+
+
+def test_token_endpoint_rejects_unknown_client_id():
+    resp = _fetch_real_token(client_id="some-other-client")
+    assert resp.status_code == 401
+
+
+def test_token_endpoint_rejects_unsupported_grant_type():
+    resp = _fetch_real_token(grant_type="password")
+    assert resp.status_code == 400
 
 
 def test_model_info_matches_the_real_policy_exactly(real_policy):
@@ -34,9 +93,57 @@ def test_model_info_matches_the_real_policy_exactly(real_policy):
     assert body["recommended_for_production"] == real_policy["recommended_for_production"]
 
 
-def test_model_info_without_api_key_is_rejected():
+def test_model_info_without_a_token_is_rejected():
     resp = client.get("/model-info")
     assert resp.status_code == 401
+
+
+def test_model_info_with_the_old_x_api_key_header_alone_is_rejected():
+    """Real regression check: the platform's old shared X-API-Key header must NOT authenticate
+    this endpoint any more -- this pilot genuinely replaced it, not just added a second option."""
+    resp = client.get("/model-info", headers={"X-API-Key": SHARED_SECRET})
+    assert resp.status_code == 401
+
+
+def test_model_info_with_an_invalid_token_is_rejected():
+    resp = client.get("/model-info", headers={"Authorization": "Bearer not-a-real-jwt"})
+    assert resp.status_code == 401
+
+
+def test_model_info_with_an_expired_token_is_rejected():
+    now = int(time.time())
+    expired = jwt.encode(
+        {
+            "iss": JWT_ISSUER,
+            "sub": REGISTERED_CLIENT_ID,
+            "aud": JWT_AUDIENCE,
+            "scope": JWT_SCOPE,
+            "iat": now - 1000,
+            "exp": now - 100,
+        },
+        SHARED_SECRET,
+        algorithm=JWT_ALGORITHM,
+    )
+    resp = client.get("/model-info", headers={"Authorization": f"Bearer {expired}"})
+    assert resp.status_code == 401
+
+
+def test_model_info_with_a_token_missing_the_required_scope_is_rejected():
+    now = int(time.time())
+    wrong_scope = jwt.encode(
+        {
+            "iss": JWT_ISSUER,
+            "sub": REGISTERED_CLIENT_ID,
+            "aud": JWT_AUDIENCE,
+            "scope": "some-other-scope",
+            "iat": now,
+            "exp": now + 900,
+        },
+        SHARED_SECRET,
+        algorithm=JWT_ALGORITHM,
+    )
+    resp = client.get("/model-info", headers={"Authorization": f"Bearer {wrong_scope}"})
+    assert resp.status_code == 403
 
 
 def test_score_matches_a_direct_computation_against_the_real_policy(deviating_statements):
@@ -51,7 +158,7 @@ def test_score_matches_a_direct_computation_against_the_real_policy(deviating_st
     assert api_body["feature_deviations"] == direct["feature_deviations"]
 
 
-def test_score_without_api_key_is_rejected(deviating_statements):
+def test_score_without_a_token_is_rejected(deviating_statements):
     resp = client.post("/score", json={"statements": deviating_statements})
     assert resp.status_code == 401
 

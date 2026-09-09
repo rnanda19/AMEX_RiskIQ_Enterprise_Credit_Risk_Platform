@@ -1,12 +1,14 @@
 # Authentication Hardening -- Platform-Wide
 
 Real, current state, verified 2026-09-09 (`grep -rln require_api_key
---include="*.py"`).
+--include="*.py"` for the 13 unchanged services; the OAuth2/JWT pilot
+below verified via a real running server, not just unit tests).
 
-## What exists today
+## What exists today: two different patterns, by design
 
-All 14 deployed FastAPI services use the same pattern: a single, shared
-static secret compared against an `X-API-Key` request header.
+**13 of the 14 deployed FastAPI services** (all except Problem 7) still
+use the platform's original pattern: a single, shared static secret
+compared against an `X-API-Key` request header.
 
 ```python
 _api_key_header = APIKeyHeader(name="X-API-Key", auto_error=False)
@@ -33,71 +35,89 @@ A few honest details worth stating plainly, not glossed over:
   restarting the service, which invalidates the key for every caller at
   once, not just the one being revoked.
 
-This is a real, working control -- it stops an anonymous, keyless caller
-cold, and is the correct minimum bar for a solo portfolio project's
-demo services. It is not, and is not being represented as, an
-enterprise-grade identity system.
+This remains a real, working control for those 13 services -- it stops
+an anonymous, keyless caller cold, and is the correct minimum bar for a
+solo portfolio project's demo services. It is not, and is not being
+represented as, an enterprise-grade identity system.
 
-## Why OAuth2/JWT is not implemented yet, stated honestly
+**Problem 7 (Early Warning System) is the one exception**, piloting a
+real OAuth2 client-credentials + JWT flow instead -- see below.
 
-Replacing shared-API-key auth with real OAuth2 (e.g. the
-`OAuth2PasswordBearer`/`OAuth2ClientCredentials` flows FastAPI ships
-support for) plus signed JWTs is a materially larger change than the
-rate-limiting rollout in this same changelog entry, for three concrete
-reasons:
+## The Problem 7 OAuth2/JWT pilot, implemented and verified 2026-09-09
 
-1. **It needs an issuer.** Shared-key auth needs nothing but the key
-   itself; JWT auth needs something to actually issue and sign tokens --
-   at minimum a `/token` endpoint per service (or one shared auth
-   service all 14 trust), a signing key, and a chosen algorithm (HS256
-   with a shared secret is the simplest real option that needs no new
-   infrastructure; RS256 with a real key pair is the stronger, more
-   "real OAuth2" option but needs key management this platform doesn't
-   have yet).
-2. **It touches all 14 services' request path**, not just their
-   dependency list -- every `dependencies=[Depends(require_api_key)]`
-   call site (`grep` count: 14 files, 1-2 protected endpoints each)
-   would need to change to a token-decoding dependency, and every
-   existing test that currently sends `X-API-Key` (all 172 real tests
-   that exercise a protected endpoint) would need to instead mint or
-   stub a real signed token. That is a real regression-risk surface
-   across the entire platform, not a contained, low-risk change.
-3. **No user sign-off yet for a live pilot this session.** Consistent
-   with this platform's standing practice of piloting risky, cross-
-   cutting changes on one service first (see the rate-limiting and
-   Prometheus entries in `CHANGELOG.md`), a real OAuth2/JWT pilot would
-   itself be a reasonable next step -- but doing it silently, without
-   the person driving this hardening work agreeing on which flow
-   (password, client-credentials) and which algorithm (HS256 vs. RS256)
-   to commit to, risks building the wrong thing twice.
+`07_Problem7_Early_Warning_System/src/real_time_alert_service.py` now
+implements a real OAuth2 **client-credentials** grant (this is a
+service-to-service scoring API, not a human login form, so
+client-credentials is the correct grant type, not password or
+authorization-code):
 
-## A concrete, scoped migration plan (not yet started)
+1. `POST /token` with form fields `grant_type=client_credentials`,
+   `client_id=ews-service-client`, `client_secret=<the API_KEY value>`
+   returns a real, signed JSON Web Token: `{"access_token": "...",
+   "token_type": "bearer", "expires_in": 900}`.
+2. The token is a genuine HS256-signed JWT (via `PyJWT==2.3.0`) with real
+   claims -- `iss`, `sub`, `aud`, `scope`, `iat`, `exp` (15-minute
+   expiry) -- not a static string dressed up to look like one.
+3. `/score` and `/model-info` now require `Authorization: Bearer
+   <token>` instead of `X-API-Key`, validated by `require_bearer_token`:
+   signature verified against the shared secret, `aud`/`iss` checked,
+   expiry checked, and the `scope` claim must equal `"score"`.
+4. `/health`, `/metrics`, and `/token` itself stay unauthenticated (the
+   last one is how a caller gets a token in the first place).
 
-If and when this is picked up, the lowest-risk real path is:
+**Verified two ways, not just asserted:**
 
-1. **Pilot on Problem 7** (same service already piloting rate limiting
-   and Prometheus, so its `.env.example`, tests, and docs are already
-   the most current in the platform): add a `python-jose[cryptography]`
-   or `PyJWT` dependency, a `/token` endpoint implementing the OAuth2
-   **client-credentials** flow (this is a service-to-service scoring
-   API, not a human login form, so client-credentials is the correct
-   grant type -- not password or authorization-code), issuing a
-   short-lived (e.g. 15-minute) HS256-signed JWT against the same
-   `API_KEY`-style shared secret used today (so no new infrastructure is
-   needed for the pilot).
-2. Change `require_api_key`'s dependency to decode and validate that JWT
-   (signature, expiry, and an `aud`/`scope` claim identifying it as
-   valid for this service) instead of comparing a static string.
-3. Update Problem 7's tests to mint a real token via the new `/token`
-   endpoint in a fixture, then use it exactly like today's
-   `X-API-Key` header is used, and re-run its 10-test suite plus the
-   full 172-test platform suite to confirm no regression, the same
-   verification bar every other change in this changelog has met.
-4. Document the pilot's real, verified scope in this file (which
-   service, which grant type, which algorithm, which tests changed) --
-   the same honest-scope pattern `MONITORING.md` and `LOAD_TESTING.md`
-   already follow -- before considering rolling it out to the other 13
-   services.
+- Problem 7's test suite grew from 10 to 18 tests, all real and all
+  passing: issuing a real token via the actual `/token` endpoint (not a
+  hand-fabricated one) and decoding it to check its claims; rejecting a
+  wrong `client_secret`, an unknown `client_id`, and an unsupported
+  `grant_type`; rejecting a missing token, an invalid token, a genuinely
+  expired token (a real JWT signed with an `exp` in the past), and a
+  token with the wrong `scope`; and -- the real regression check that
+  matters most -- confirming the **old `X-API-Key` header alone no
+  longer authenticates `/model-info`**, proving this replaced the old
+  control rather than merely adding a second option beside it. The full
+  180-test platform suite (172 pre-existing + 8 new) passes.
+- Live end-to-end against a real running `uvicorn` instance: `X-API-Key`
+  alone against `/model-info` -> real `401`; `POST /token` with the
+  correct client credentials -> a real signed JWT; that token against
+  `/model-info` -> real `200`; that token against `/score` with a real
+  payload -> a real `200` with real computed scoring output; `POST
+  /token` with a wrong `client_secret` -> real `401`.
 
-This document will be updated the day any part of that plan is actually
-implemented and verified -- not before.
+**Real, stated simplifications of this pilot, not hidden:**
+
+- There is a single hardcoded registered client (`ews-service-client`) --
+  no client registry or database. A real multi-client rollout would need
+  one.
+- The same shared secret (`API_KEY`) is reused as both that client's
+  credential *and* the JWT's HS256 signing key. A real production setup
+  would keep those separate (and likely move to RS256 with a real key
+  pair, so the service verifying tokens doesn't need to hold the same
+  secret used to issue them). This pilot deliberately reused the one
+  secret specifically to avoid standing up new infrastructure just to
+  prove the pattern.
+- `/token` itself is not rate-limited or otherwise brute-force-protected
+  in this pilot -- a real deployment would want that (this platform
+  already has a real rate-limiting implementation on `/score`; extending
+  it to `/token` is a small, real follow-on, not attempted here to avoid
+  the same kind of test-interaction risk already seen and deliberately
+  avoided on Problem 11's `/reset`/`/alert-feed` endpoints -- see
+  `CHANGELOG.md`).
+- No token revocation exists (nor did key revocation before this pilot) -
+  a compromised token remains valid until its 15-minute expiry.
+
+## Path to platform-wide rollout (not yet started)
+
+Now that the pattern is real and verified on one service, extending it
+to the other 13 is a mechanical repeat of the same steps applied here:
+add the `PyJWT` dependency, add the same `/token` endpoint and
+`require_bearer_token` dependency, swap the `Depends(require_api_key)`
+call sites, and rewrite each service's tests the same way Problem 7's
+were rewritten (mint a real token via `/token` in place of the static
+`X-API-Key` header). That is a real, contained, well-understood change
+now -- it was a genuinely open design question before this pilot existed
+to prove the pattern out. It has not been done for the other 13 services
+in this pass; each would need its own dedicated test run and live
+verification before being called done, the same bar this document holds
+itself to.

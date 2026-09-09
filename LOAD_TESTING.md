@@ -18,6 +18,19 @@ real 30-second run, each user looping with a 50-150ms think time between
 requests -- run headless (`locust -f locustfile.py --headless -u 10 -r 2
 -t 30s`).
 
+**Note added 2026-09-09, after this run:** Problem 7 has since piloted a
+real OAuth2/JWT flow (see `AUTH_HARDENING.md`) that replaced the
+`X-API-Key` header used in the run above with a `POST /token` + bearer
+token step. The run and its numbers below are an accurate historical
+record of what was actually measured at the time, on the auth mechanism
+that existed then -- they were not re-run against the new flow. Exactly
+reproducing this test today against Problem 7 would need the locustfile
+updated to fetch a token once (tokens last 15 minutes, comfortably longer
+than any of these runs) and send it as `Authorization: Bearer <token>`
+instead of `X-API-Key` -- not done here, since the point of this document
+is the real throughput/latency/rate-limit behavior, which the auth
+mechanism swap does not change.
+
 ## Real results
 
 | Metric | Real value |
@@ -66,9 +79,11 @@ platform yet -- see `ROADMAP.md`).
 
 ## Extending this to the other services
 
-The same locustfile pattern (a `HttpUser` posting a realistic payload
-with the real `X-API-Key` header) applies directly to any of the other 13
-services once each can run standalone -- most need only their small,
+The same locustfile pattern (a `HttpUser` posting a realistic payload,
+authenticated the way each target service actually requires -- `X-API-Key`
+for 13 of the 14 services, or the `POST /token` + bearer-token flow for
+Problem 7, per `AUTH_HARDENING.md`) applies directly to any of the other
+13 services once each can run standalone -- most need only their small,
 already-git-tracked artifacts (policy JSON, frozen transition matrices)
 the way Problem 7 does; the exceptions are the services built on a large
 trained model file excluded from this repo.

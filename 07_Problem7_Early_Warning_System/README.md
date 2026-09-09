@@ -63,7 +63,7 @@ Notebook 42 (Business Understanding & Policy -- defines the z-score technique, c
 uvicorn real_time_alert_service:app --reload
 ```
 
-Every endpoint except `/health` requires a valid `X-API-Key` header (see `.env.example`). `/score` also returns a real `top_reasons` field ranking this customer's own computed feature deviations by magnitude (see `CHANGELOG.md`).
+`/score` and `/model-info` require a real OAuth2 bearer token, not a static `X-API-Key` header -- this service pilots a genuine client-credentials + JWT flow (see the platform's `AUTH_HARDENING.md`): `POST /token` with `grant_type=client_credentials`, `client_id=ews-service-client`, and `client_secret=<API_KEY>` to get a short-lived signed token, then send it as `Authorization: Bearer <token>`. `/health`, `/metrics`, and `/token` itself are unauthenticated. `/score` is also rate-limited (60 requests/minute per client IP -- see `LOAD_TESTING.md` for real measured numbers) and returns a real `top_reasons` field ranking this customer's own computed feature deviations by magnitude (see `CHANGELOG.md`).
 
 ## 7. Reproducing This
 

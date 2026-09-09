@@ -9,3 +9,5 @@ uvicorn
 pydantic
 httpx
 slowapi
+prometheus-client
+PyJWT
