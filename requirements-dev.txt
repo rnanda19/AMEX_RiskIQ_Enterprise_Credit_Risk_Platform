@@ -15,3 +15,4 @@ polars>=0.20
 slowapi==0.1.10
 prometheus-client==0.21.1
 PyJWT==2.3.0
+python-multipart==0.0.32
