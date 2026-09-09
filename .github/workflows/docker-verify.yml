@@ -46,7 +46,7 @@ jobs:
       run:
         working-directory: 07_Problem7_Early_Warning_System/src
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v7
 
       - name: Build the real image
         run: docker build -f docker/Dockerfile -t amex-ews-api:ci .
@@ -143,7 +143,7 @@ jobs:
             dockerfile: docker/Dockerfile
             port: 8014
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v7
 
       - name: Build the real image
         run: docker build -f ${{ matrix.context }}/${{ matrix.dockerfile }} -t amex-${{ matrix.name }}:ci ${{ matrix.context }}
@@ -215,7 +215,7 @@ jobs:
             fixture_filename: profitability_scored_profile.parquet
             fixture_module: p13
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v7
 
       - name: Set up Python
         uses: actions/setup-python@v5
@@ -300,7 +300,7 @@ jobs:
             context: 02_Problem2_Risk_Tier_Classification/src
             dockerfile: docker/Dockerfile
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v7
 
       - name: Build the real image
         run: docker build -f ${{ matrix.context }}/${{ matrix.dockerfile }} -t amex-${{ matrix.name }}:ci ${{ matrix.context }}
