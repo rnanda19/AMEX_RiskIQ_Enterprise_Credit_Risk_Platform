@@ -47,7 +47,8 @@ narrative version of both.
 | 32 new tests for the auth + explainability pass (126 total) | Done, 2026-08-25 | every `Problem*/tests/` |
 | Wire existing notebooks to import from `shared/` instead of inline copies | **Deliberately deferred** — see below | — |
 | Problem 6 Notebooks 39/40 `(customer_ID, S_2)` tie-order determinism | **Found 2026-09-09, deliberately deferred** — see below | `06_Problem6_Dynamic_Behavioral_Credit_Scoring/notebooks/39_*.ipynb`, `40_*.ipynb` |
-| Real `docker build`/smoke test of any Dockerfile (this sandbox has no Docker Hub registry access) | **Extended 2026-09-09**: `.github/workflows/docker-verify.yml` now covers all 14 problems, up from just Problem 7 -- real `docker build` + `docker run` + `curl /health` for 12 of 14 (the 9 already-self-contained services plus Problems 3, 10, 14, and Problems 12/13 run for real against the exact synthetic fixture already committed in their own `tests/conftest.py`, via a new shared `.github/scripts/make_ci_fixture_parquet.py`); a real `docker build`-only (no run) for Problems 1 and 2, which need the deliberately-excluded multi-GB champion model to actually run. Also fixed a real bug while extending this: Problem 1's `Dockerfile` was `COPY`-ing `requirements-api.txt`/`main.py` from the build-context root, but those files live in `src/fastapi_service/` -- flagged but not fixed in the 2026-08-25 pass, fixed here by mirroring Problem 7's proven convention. Check the Actions tab after pushing to confirm all 4 docker-verify jobs go green. | `.github/workflows/docker-verify.yml`, `.github/scripts/make_ci_fixture_parquet.py` |
+| Real `docker build`/smoke test of any Dockerfile (this sandbox has no Docker Hub registry access) | **Extended 2026-09-09**: `.github/workflows/docker-verify.yml` now covers all 14 problems, up from just Problem 7 -- real `docker build` + `docker run` + `curl /health` for 12 of 14 (the 9 already-self-contained services plus Problems 3, 10, 14, and Problems 12/13 run for real against the exact synthetic fixture already committed in their own `tests/conftest.py`, via a new shared `.github/scripts/make_ci_fixture_parquet.py`); a real `docker build`-only (no run) for Problems 1 and 2, which need the deliberately-excluded multi-GB champion model to actually run. Also fixed a real bug while extending this: Problem 1's `Dockerfile` was `COPY`-ing `requirements-api.txt`/`main.py` from the build-context root, but those files live in `src/fastapi_service/` -- flagged but not fixed in the 2026-08-25 pass, fixed here by mirroring Problem 7's proven convention. | `.github/workflows/docker-verify.yml`, `.github/scripts/make_ci_fixture_parquet.py` |
+| Real `docker build` failure on Problems 5/6, found on the first real CI run of the newly-extended matrix above | **Found and fixed 2026-09-09** — see below | `05_Problem5_.../src/requirements-api.txt`, `06_Problem6_.../src/requirements-api.txt` |
 | Repo-wide `black` reformatting | **Done 2026-09-09**: `black --line-length 120` applied across `shared/` and all 14 problems' `src/` -- 24 files reformatted, 0 logic changes, all 180 tests still passing. `format-check` in `code-quality.yml` flipped from advisory (`continue-on-error: true`) to blocking. | `.github/workflows/code-quality.yml` |
 | Pre-commit hooks (pyflakes, notebook syntax check, before every commit) | **Done 2026-09-09** | `.pre-commit-config.yaml` |
 
@@ -175,6 +176,50 @@ computed. This is next once every Phase 1/2 problem has its own
 equivalent tests in place (now true) so a regression anywhere is caught
 immediately, not discovered after the fact.
 
+### A real bug found and fixed: Problems 5/6 `docker build` failure (xgboost==3.3.0 needs Python 3.12)
+
+The `docker-verify.yml` extension above (2026-09-09) was the first time Problem
+5's and Problem 6's Dockerfiles were ever actually built with real Docker
+registry access — the 2026-08-25 Phase 2/3 hardening pass added these two
+Dockerfiles but this sandbox had no registry access to build-test them at the
+time, so they shipped unverified. The very first real CI run after the
+extension (`docker-verify.yml` run on commit `56a8834`) failed both jobs:
+"Build, run, and health-check the Early Payment Default API (Problem 5)" and
+"...the Dynamic Behavioral Scoring API (Problem 6)", both at the **"Build the
+real image"** step (`docker build` itself), both in ~14 seconds — too fast to
+be a slow pip-compile or a health-check timeout.
+
+Root cause, confirmed by direct reproduction (not guessed): both services'
+`src/requirements-api.txt` pin `xgboost==3.3.0`. That release's own PyPI
+metadata declares `Requires-Python: >=3.12`
+(`https://pypi.org/pypi/xgboost/3.3.0/json` → `info.requires_python`), and its
+only wheels are `py3-none-manylinux_2_28_{x86_64,aarch64}` builds gated to
+Python 3.12+ — but both Dockerfiles' base image is `python:3.11-slim`. Inside
+the real build, `pip install -r requirements-api.txt` fails immediately with
+`ERROR: No matching distribution found for xgboost==3.3.0` (confirmed by
+running the exact same `pip install` against Python 3.11.15 outside Docker,
+after this session's own Docker registry access turned out to be blocked at
+the proxy level for `registry-1.docker.io` — a sandbox-specific limitation
+unrelated to the real bug, ruled out by reproducing the underlying `pip`
+failure directly instead). `xgboost==3.2.0` is the newest release that still
+supports Python 3.11 (`Requires-Python: >=3.10`) and ships the equivalent
+`manylinux_2_28` wheel.
+
+Fix applied and independently re-verified end-to-end (not just "should work"):
+pinned `xgboost==3.2.0` in both `05_Problem5_.../src/requirements-api.txt` and
+`06_Problem6_.../src/requirements-api.txt`. Verified by, for both services: a
+clean `pip install -r requirements-api.txt` into a fresh Python 3.11.15 venv
+(exit 0, no conflicts against the already-pinned `numpy==2.4.6` /
+`scikit-learn==1.9.0`); loading each service's real, already-committed
+`.joblib` model artifact with the resulting `xgboost==3.2.0` (loads cleanly —
+only a routine cross-version pickle notice, not an error); and starting each
+real FastAPI service (`uvicorn early_default_service:app` /
+`dynamic_behavioral_service:app`) against its real model and hitting its real
+`/health` endpoint, which returned `200 {"status":"ok", ...}` for both. This
+is not a training-time change — each problem's training-time
+`requirements.txt` leaves `xgboost` unpinned, so the already-trained model
+artifacts are untouched; only the serving container's dependency pin moved.
+
 ### A known bug found, but deliberately not silently patched: Problem 6 Notebooks 39/40
 
 While extending `docker-verify.yml` (2026-09-09), a review of every `pl.scan_csv`
@@ -246,14 +291,19 @@ instead of silently fixed so it isn't lost.
    advisory to blocking~~ — done, 2026-09-09: 24 files reformatted, 0
    logic changes, all 180 tests still passing, `format-check` now
    blocking.
-9. Wire all fourteen problems' notebooks to `shared/` (see above) — now
-   that every problem has its own test safety net.
-10. A model inventory document, live/alerting monitoring, `pytest-cov`
+9. ~~Fix the real Problem 5/6 `docker build` failure surfaced by item 5's own
+   new CI coverage (`xgboost==3.3.0` requires Python >=3.12, but both
+   services' Dockerfile is `python:3.11-slim`)~~ — done, 2026-09-09,
+   re-pinned to `xgboost==3.2.0`, re-verified end-to-end (real model load +
+   real `/health` 200) for both services — see above.
+10. Wire all fourteen problems' notebooks to `shared/` (see above) — now
+    that every problem has its own test safety net.
+11. A model inventory document, live/alerting monitoring, `pytest-cov`
     coverage measurement, and Dependabot — named as lower-priority items
     by the model-risk benchmark pass, not blockers.
-11. ~~Phase 4 (Problems 9, 10, 11) and Phase 5 (Problems 12, 13, 14)~~ —
+12. ~~Phase 4 (Problems 9, 10, 11) and Phase 5 (Problems 12, 13, 14)~~ —
     done, see status table below.
-12. Kaggle notebook(s) and LinkedIn write-ups showcasing the platform
+13. Kaggle notebook(s) and LinkedIn write-ups showcasing the platform
     (tracked outside this repo — see the project's own working notes).
 13. ~~Global Standard hardening delta: extend Problems 1-8's tests, Docker,
     MODEL_CARD/CHANGELOG/requirements.txt, and CI/lint/security wiring to

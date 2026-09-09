@@ -1,9 +1,11 @@
 # Minimal runtime dependencies for dynamic_behavioral_service.py -- auto-generated 2026-08-25 11:56
+# xgboost pinned to 3.2.0, not 3.3.0 -- 3.3.0+ requires Python >=3.12, this service's
+# Dockerfile base image is python:3.11-slim. See ROADMAP.md "Fixed 2026-09-09" entry.
 fastapi==0.141.1
 uvicorn==0.52.1
 pydantic==2.13.4
 joblib==1.5.3
 numpy==2.4.6
 scikit-learn==1.9.0
-xgboost==3.3.0
+xgboost==3.2.0
 slowapi==0.1.10

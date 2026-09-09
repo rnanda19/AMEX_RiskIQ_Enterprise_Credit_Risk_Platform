@@ -3,6 +3,17 @@
 Dates below are real commit dates from this repository's git history, not
 estimated.
 
+## 2026-09-09 -- Fixed real Docker build failure (xgboost pin)
+
+- `src/requirements-api.txt` pinned `xgboost==3.3.0`, a release that requires
+  Python >=3.12 per its own PyPI metadata -- incompatible with this service's
+  `python:3.11-slim` Docker base image. This broke the real `docker build`
+  step the first time it was ever run with real registry access (see
+  root-repo `ROADMAP.md` for the full root-cause writeup). Re-pinned to
+  `xgboost==3.2.0` (last release supporting Python 3.11) and re-verified
+  end-to-end: clean `pip install`, the real committed model artifact loads,
+  and the real service returns `200` from `/health`.
+
 ## 2026-08-25 -- Authentication + explainability hardening
 
 - Added real API-key authentication (`X-API-Key` header) to
