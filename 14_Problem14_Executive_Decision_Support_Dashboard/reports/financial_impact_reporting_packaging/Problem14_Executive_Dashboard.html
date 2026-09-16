@@ -20,27 +20,44 @@
   :root { --ink:#0B1F3A; --accent:#C41E3A; --gold:#C9A227; --muted:#8A93A6; --bg:#F2F4F8; --card:#FFFFFF; --good:#16a34a; --bad:#C2410C; }
   * { box-sizing: border-box; }
   body { font-family: Calibri, Arial, sans-serif; background: var(--bg); color: var(--ink); margin: 0; padding: 24px; }
-  h1 { font-size: 23px; margin-bottom: 4px; }
+  h1 { font-size: 23px; margin-bottom: 4px; background: linear-gradient(90deg, var(--ink) 0%, #2563EB 55%, #0D9488 100%); -webkit-background-clip: text; background-clip: text; color: transparent; display: inline-block; }
+  .badge-banner { position: relative; }
+  .badge-banner::after { content: ""; position: absolute; top: 0; left: 0; right: 0; height: 2px; background: linear-gradient(90deg, #2563EB, #0D9488, #7C3AED, #C9A227, #059669); background-size: 200% 100%; animation: shimmer 6s linear infinite; border-radius: 2px; }
+  @keyframes shimmer { from { background-position: 0% 0; } to { background-position: 200% 0; } }
   h2 { font-size: 17px; margin-top: 0; }
   .sub { color: var(--muted); margin-bottom: 20px; }
   .kpi-row { display: flex; flex-wrap: wrap; gap: 14px; margin-bottom: 20px; }
-  .kpi { background: var(--card); border-radius: 10px; padding: 14px 18px; box-shadow: 0 1px 3px rgba(0,0,0,.12); min-width: 170px; flex: 1; transition: transform .15s; }
+  .kpi { background: var(--card); border-radius: 10px; padding: 14px 18px 14px 16px; box-shadow: 0 1px 3px rgba(0,0,0,.12); min-width: 170px; flex: 1; transition: transform .15s, box-shadow .15s; border-top: 4px solid var(--kpi-accent, var(--gold)); background: linear-gradient(180deg, color-mix(in srgb, var(--kpi-accent, var(--gold)) 7%, var(--card)) 0%, var(--card) 60%); }
   .kpi:hover { transform: translateY(-2px); box-shadow: 0 4px 10px rgba(0,0,0,.16); }
   .kpi .label { font-size: 11px; color: var(--muted); text-transform: uppercase; letter-spacing: .03em; }
   .kpi .value { font-size: 20px; font-weight: 700; margin-top: 4px; }
   .kpi .sub2 { font-size: 11px; color: var(--muted); margin-top: 2px; }
   .tabs { display: flex; gap: 4px; margin-bottom: 16px; border-bottom: 2px solid #E4E7EE; flex-wrap: wrap; }
-  .tab-btn { background: none; border: none; padding: 10px 16px; font-size: 13px; font-weight: 600; color: var(--muted); cursor: pointer; border-bottom: 3px solid transparent; }
-  .tab-btn.active { color: var(--ink); border-bottom-color: var(--accent); }
+  .tab-btn { background: none; border: none; padding: 10px 16px; font-size: 13px; font-weight: 600; color: var(--muted); cursor: pointer; border-bottom: 3px solid transparent; border-radius: 6px 6px 0 0; transition: background .15s, color .15s; }
+  .tab-btn:hover { background: rgba(11,31,58,.05); color: var(--ink); }
+  .tab-btn.active { color: var(--ink); border-bottom-color: var(--accent); background: rgba(201,162,39,.08); }
   .tab-panel { display: none; }
+  .tab-panel.active { animation: tabFadeSlide .38s cubic-bezier(.2,.7,.3,1) both; }
+  @keyframes tabFadeSlide { from { opacity: 0; transform: translateY(8px); } to { opacity: 1; transform: translateY(0); } }
   .tab-panel.active { display: block; }
-  .panel { background: var(--card); border-radius: 10px; padding: 18px; margin-bottom: 20px; box-shadow: 0 1px 3px rgba(0,0,0,.12); }
+  .panel { background: var(--card); border-radius: 10px; padding: 18px; margin-bottom: 20px; box-shadow: 0 1px 3px rgba(0,0,0,.12); border-left: 4px solid var(--panel-accent, var(--ink)); transition: box-shadow .2s; }
+  .panel:hover { box-shadow: 0 4px 14px rgba(0,0,0,.14); }
+  .panel:nth-of-type(5n+1) { --panel-accent: #2563EB; }
+  .panel:nth-of-type(5n+2) { --panel-accent: #0D9488; }
+  .panel:nth-of-type(5n+3) { --panel-accent: #7C3AED; }
+  .panel:nth-of-type(5n+4) { --panel-accent: #B45309; }
+  .panel:nth-of-type(5n+5) { --panel-accent: #4F46E5; }
   table { width: 100%; border-collapse: collapse; font-size: 13px; }
   th, td { text-align: left; padding: 8px 10px; border-bottom: 1px solid #E4E7EE; }
   th { background: var(--ink); color: #fff; position: sticky; top: 0; }
   select, input[type=range], input[type=text] { padding: 6px 10px; border-radius: 6px; border: 1px solid var(--muted); font-size: 13px; }
   canvas { max-height: 380px; }
   .badge { display: inline-block; padding: 3px 10px; border-radius: 12px; font-size: 12px; font-weight: 700; color: #fff; }
+  .cat-chip { display: inline-block; padding: 2px 9px; border-radius: 10px; font-size: 11px; font-weight: 700; color: #fff; white-space: nowrap; }
+  .cat-chip.foundational_model { background: #4F46E5; }
+  .cat-chip.reserve_optimization { background: #B45309; }
+  .cat-chip.value_creation { background: #0D9488; }
+  .cat-chip.bi_aggregation { background: #7C3AED; }
   .badge.good { background: var(--good); }
   .badge.bad { background: var(--bad); }
   .badge.neutral { background: var(--muted); }
@@ -87,8 +104,8 @@
 </style>
 </head>
 <body>
-<h1>AMEX RiskIQ -- Problem 14: Executive Decision Support Dashboard</h1>
-<div class="sub">The platform's grand-finale BI aggregation layer -- converts all 13 prior problems' real, already-validated results into one executive view. Real Notebook 70-73 results synthesized here; ASSUMPTION values clearly marked and adjustable in the Financial Calculator tab.</div>
+<h1 class="fade-in-load">AMEX RiskIQ -- Problem 14: Executive Decision Support Dashboard</h1>
+<div class="sub fade-in-load" style="animation-delay:60ms">The platform's grand-finale BI aggregation layer -- converts all 13 prior problems' real, already-validated results into one executive view. Real Notebook 70-73 results synthesized here; ASSUMPTION values clearly marked and adjustable in the Financial Calculator tab.</div>
 
 <div class="badge-banner"><div class="status-bar zf-bar"><span class="status-title">🔵 ZERO-FABRICATION VERIFIED</span><span class="status-desc">Every figure on this dashboard is real and computed from Notebooks 1-73's own persisted outputs -- nothing is invented. Inputs explicitly labeled ASSUMPTION (e.g. executive review time, hourly cost) are disclosed in full in the Assumptions table and the Financial Calculator tab, never blended silently into a real, measured figure.</span></div><div class="status-bar pr-bar"><span class="status-title">🟢 PRODUCTION READINESS: RECOMMENDED</span><span class="status-desc">Real GitHub Actions status, verified 2026-09-16T10:55:00Z at commit 6e223d8f (<a href="https://github.com/rnanda19/AMEX_RiskIQ_Enterprise_Credit_Risk_Platform/actions" target="_blank" rel="noopener">Actions</a>):</span><span class="ci-chip c0">✓ CI: Pass <a href="https://github.com/rnanda19/AMEX_RiskIQ_Enterprise_Credit_Risk_Platform/actions/runs/34355009968" target="_blank" rel="noopener">(run #52)</a></span><span class="ci-chip c1">✓ Code Quality: Pass <a href="https://github.com/rnanda19/AMEX_RiskIQ_Enterprise_Credit_Risk_Platform/actions/runs/34355010017" target="_blank" rel="noopener">(run #51)</a></span><span class="ci-chip c2">✓ CodeQL: Pass <a href="https://github.com/rnanda19/AMEX_RiskIQ_Enterprise_Credit_Risk_Platform/actions/runs/34838228354" target="_blank" rel="noopener">(run #34)</a></span><span class="ci-chip c3">✓ Docker Build & Run Verification: Pass <a href="https://github.com/rnanda19/AMEX_RiskIQ_Enterprise_Credit_Risk_Platform/actions/runs/34355010040" target="_blank" rel="noopener">(run #20)</a></span><span class="ci-chip c4">✓ Secrets Management (Vault Dev-Mode) Verification: Pass <a href="https://github.com/rnanda19/AMEX_RiskIQ_Enterprise_Credit_Risk_Platform/actions/runs/34355010048" target="_blank" rel="noopener">(run #18)</a></span><span class="ci-chip">4x Independent Reproduction: Pass</span></div><div class="status-bar ua-bar"><span class="status-title">🟡 UNAUDITED RESULTS</span><span class="status-desc">UNAUDITED RESULTS -- every figure on this report is a real, computed internal management estimate from this platform's own notebooks, not a certified or externally audited financial statement. Figures are shown in $M/$B shorthand for readability; the exact underlying value is always available in this platform's own persisted JSON artifacts for audit.</span></div></div>
 
@@ -133,6 +150,9 @@ function fmtMB(v) {
 }
 function fmtPct(v) { return v.toFixed(1) + "%"; }
 function badgeClass(status) { return status === "RECOMMENDED" ? "good" : (status === "NOT RECOMMENDED" ? "bad" : "neutral"); }
+// Fixed categorical palette (dataviz skill: assign hues in fixed order, never cycled), no red --
+// used for the interactive waterfall chart's per-problem bars and for KPI-card accent colors.
+const CAT_PALETTE = ["#2563EB","#0D9488","#7C3AED","#B45309","#4F46E5","#059669","#0369A1","#9333EA","#0891B2","#C9A227","#0B1F3A"];
 
 const kpis = [
   {label: "Total Platform Net Value / Cycle", value: fmtMB(TOTAL_PLATFORM_VALUE), sub: N_INCLUDED + " production-recommended problems", isCount: true, raw: TOTAL_PLATFORM_VALUE, mb: true},
@@ -145,7 +165,7 @@ const kpis = [
   {label: "Deployment Status", value: RECOMMENDED ? "RECOMMENDED" : "NOT RECOMMENDED", sub: "for production", isCount: false},
 ];
 document.getElementById("kpiRow").innerHTML = kpis.map((k, i) => `
-  <div class="kpi" data-idx="${i}"><div class="label">${k.label}</div><div class="value" id="kpiVal${i}">${k.isCount ? (k.mb ? "$0" : (k.prefix||"") + "0") : k.value}</div><div class="sub2">${k.sub}</div></div>
+  <div class="kpi" data-idx="${i}" style="--kpi-accent: ${CAT_PALETTE[i % CAT_PALETTE.length]}"><div class="label">${k.label}</div><div class="value" id="kpiVal${i}">${k.isCount ? (k.mb ? "$0" : (k.prefix||"") + "0") : k.value}</div><div class="sub2">${k.sub}</div></div>
 `).join("");
 
 // KPI count-up animation, registered AFTER the cards exist in the DOM (matches the
@@ -198,9 +218,6 @@ const TABS = [
 ];
 document.getElementById("tabBar").innerHTML = TABS.map((t,i) => `<button class="tab-btn${i===0?" active":""}" data-tab="${t.id}">${t.label}</button>`).join("");
 
-// Fixed categorical palette (dataviz skill: assign hues in fixed order, never cycled), no red --
-// used for the real per-problem bars in the interactive waterfall chart below.
-const CAT_PALETTE = ["#2563EB","#0D9488","#7C3AED","#B45309","#4F46E5","#059669","#0369A1","#9333EA","#0891B2","#C9A227","#0B1F3A"];
 let _waterfallChart = null, _healthChart = null;
 
 function panelOverview() {
@@ -307,7 +324,7 @@ function panelRegistry() {
     </div>
     <table id="registryTable"><thead><tr><th>#</th><th>Name</th><th>Phase</th><th>Category</th><th>Financial Value / Cycle</th><th>Status</th></tr></thead>
     <tbody>${REGISTRY.map(r => `<tr data-phase="${r.phase}" data-category="${r.category}" data-status="${r.status}">
-      <td>${r.problem_number}</td><td>${r.problem_name}</td><td>${r.phase}</td><td>${r.category}</td>
+      <td>${r.problem_number}</td><td>${r.problem_name}</td><td>${r.phase}</td><td><span class="cat-chip ${r.category}">${r.category.replace(/_/g," ")}</span></td>
       <td title="${r.financial_value_usd === null ? "N/A" : "$" + Math.round(r.financial_value_usd).toLocaleString() + " exact"}">${r.financial_value_usd === null ? "N/A" : fmtMB(r.financial_value_usd)}</td>
       <td><span class="badge ${badgeClass(r.status)}">${r.status}</span></td>
     </tr>`).join("")}</tbody></table>

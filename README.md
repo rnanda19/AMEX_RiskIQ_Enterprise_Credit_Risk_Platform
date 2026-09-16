@@ -306,6 +306,39 @@ Problems 1-8 received a "Global Standard" hardening pass on 2026-08-25 (deployab
 - New: the three chart captions in the Word, PDF, and HTML reports were expanded from a single sentence to a real two-sentence story per chart, each computed from this run's own real figures (no hardcoded narrative).
 - Real bug found and fixed: the Excel workbook's Executive Summary sheet stored its headline KPI values as pre-formatted text strings (`f"${value:,.0f}"`) rather than real numbers, which meant they could not be used in a formula or reformatted; converted to real numeric cells with a conditional custom number format (`USD_MB_FMT`) that displays M/B shorthand while preserving the exact full-precision value underneath for audit.
 
+**2026-09-16 hardening delta #3 (real regression found post-push + PDF/HTML visual overhaul):**
+
+- Real bug found and fixed (regression, not new): the first push of this delta series carried an
+  older, un-pushed local commit whose leaked-sandbox-path cleanup had replaced a bad internal path
+  in `14_Problem14.../src/executive_dashboard_service.py` with a hardcoded literal Windows path
+  (`C:\Users\rnand\...`) as the *default* fallback, instead of the portable
+  `Path(__file__).parent`-relative default it originally had. That default only resolves on one
+  machine -- on GitHub's Linux CI runners and inside Docker it crashed at import time, which is why
+  the very next CI run showed real failures on unit tests, `black --check`, and the Docker
+  health-check for Problem 14 specifically, verified by comparing check-run results against the
+  prior commit (all passing there) before diagnosing this one. Restored the portable default, the
+  real slowapi rate limiting that had also been silently dropped in the same regeneration, and
+  black-reformatted the file; verified locally with `black --check` and a full local `pytest` run
+  (8/8 passing) before pushing the fix.
+- Real bug found and fixed alongside the above: the self-contained policy/data JSON copies shipped
+  in `src/` (read by both the Docker image and the test suite) were three weeks stale, still
+  reporting the pre-Problem-10 $429.9M total with Problem 10 excluded; refreshed from this cycle's
+  real `docs/`/`reports/modeling/` outputs. Two test assertions had the same staleness (hardcoded
+  Problem 10 as not-recommended/excluded) and were updated to the current real status.
+- New: the PDF report gains two new sections -- a real per-problem description for all 14 problems
+  (pulled from the registry's own real notes, not hand-written) and a full SMART Suggestions section
+  (both by organizational level and by problem), matching what the Word report and HTML dashboard
+  already carry. Every section heading is now a colored banner (a fixed 9-color categorical palette,
+  no red) instead of plain black text.
+- New: the HTML dashboard gets a real visual pass -- gradient-accented KPI cards (one color per
+  tile from the same fixed palette), a colored left-border accent per panel, a smooth fade/slide
+  transition when switching tabs, hover states on tab buttons, a gradient title and an animated
+  shimmer line under the status banners, and colored category chips on the Problem Registry table.
+- Real bug found and fixed while building the above: the new `CAT_PALETTE` constant was declared
+  after the KPI row's render code that needed it, a JavaScript temporal-dead-zone bug that would
+  have thrown `ReferenceError` and silently broken the entire dashboard script on load; moved the
+  declaration earlier and verified with `node --check` before shipping.
+
 ## License
 
 All Rights Reserved — this repository is shared publicly for portfolio and demonstration purposes only. It is not licensed for reuse, modification, or redistribution; see `LICENSE` for details.
