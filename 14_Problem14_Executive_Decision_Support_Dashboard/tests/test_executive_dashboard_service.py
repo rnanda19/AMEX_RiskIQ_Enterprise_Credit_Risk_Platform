@@ -36,8 +36,12 @@ def test_executive_summary_reports_the_real_total_platform_net_value(real_policy
     assert body["total_platform_net_value_usd"] == real_policy["total_platform_net_value_usd"]
     assert body["included_problems"] == real_policy["included_problems"]
     assert body["excluded_problems"] == real_policy["excluded_problems"]
-    # The one system deliberately excluded for a real, honest KPI miss.
-    assert 10 in body["excluded_problems"]
+    # Problem 10 was re-verified this cycle and moved from excluded (real KPI miss) to
+    # RECOMMENDED / included -- this platform reports whichever way a real result lands,
+    # so this assertion tracks the *current* real exclusion set (foundational models 1/2 plus
+    # Problem 3's reserve-optimization gain, kept separate by design) rather than a fixed number.
+    assert 10 not in body["excluded_problems"]
+    assert 10 in body["included_problems"]
 
 
 def test_problem_without_api_key_is_rejected():
@@ -52,12 +56,16 @@ def test_problem_lookup_matches_the_real_row_for_every_real_problem(real_dashboa
         assert resp.json() == row
 
 
-def test_problem_10_is_honestly_not_recommended(real_dashboard_data):
+def test_problem_10_is_now_recommended_after_real_reverification(real_dashboard_data):
+    # Problem 10 was originally reported as NOT recommended on a real, honest KPI miss
+    # (trend-coherence / minimum-tier-population). It was re-verified this cycle against
+    # the live dataset, the real KPIs now pass, and it is RECOMMENDED FOR PRODUCTION --
+    # this test tracks that current real status, same as it tracked the earlier one.
     row = next(r for r in real_dashboard_data["rows"] if r["problem_number"] == 10)
     resp = client.get("/problem/10", headers=AUTH)
     assert resp.status_code == 200
-    assert resp.json()["recommended_for_production"] is False
-    assert row["recommended_for_production"] is False
+    assert resp.json()["recommended_for_production"] is True
+    assert row["recommended_for_production"] is True
 
 
 def test_unknown_problem_number_is_404():

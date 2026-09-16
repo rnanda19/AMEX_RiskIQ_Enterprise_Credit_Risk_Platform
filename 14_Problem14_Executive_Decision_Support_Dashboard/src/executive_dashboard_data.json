@@ -1,5 +1,5 @@
 {
-  "generated_at_utc": "2026-08-27T10:16:56.271975+00:00",
+  "generated_at_utc": "2026-09-16T10:48:17.419416+00:00",
   "rows": [
     {
       "problem_number": 1,
@@ -115,10 +115,10 @@
       "phase": "Phase 4 -- Operational Risk Management",
       "category": "value_creation",
       "model_quality_label": "Meets limit-optimization KPI target (with CI)",
-      "model_quality_value": false,
+      "model_quality_value": true,
       "financial_label": "Net benefit per cycle (limit optimization)",
-      "financial_value_usd": 4108042.5,
-      "recommended_for_production": false,
+      "financial_value_usd": 2206596.12,
+      "recommended_for_production": true,
       "notes": "Real per-cycle net benefit, net of amplified-loss cost and freeze-review cost, from utilization-trend + PD-based limit actions."
     },
     {
@@ -158,7 +158,7 @@
       "notes": "Real per-cycle net benefit targets the cross-tier (High Risk + Low Profitability) segment, explicitly designed by Problem 13 itself to not double-count Problems 9/10's benefits -- safe to sum alongside them."
     }
   ],
-  "total_platform_net_value_usd": 429926252.73,
+  "total_platform_net_value_usd": 432132848.85,
   "reserve_optimization_value_usd": 4617593.08,
   "included_problems": [
     4,
@@ -167,6 +167,7 @@
     7,
     8,
     9,
+    10,
     11,
     12,
     13
@@ -174,12 +175,11 @@
   "excluded_problems": [
     1,
     2,
-    3,
-    10
+    3
   ],
-  "n_problems_recommended": 9,
+  "n_problems_recommended": 10,
   "n_problems_foundational": 2,
-  "n_problems_not_recommended": 1,
+  "n_problems_not_recommended": 0,
   "population_consistency_passed": true,
   "p12_eligible_population": 447695,
   "p13_eligible_population": 447695
