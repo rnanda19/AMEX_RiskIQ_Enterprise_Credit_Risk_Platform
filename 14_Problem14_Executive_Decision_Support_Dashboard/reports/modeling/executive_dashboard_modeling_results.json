@@ -1,8 +1,8 @@
 {
-  "table_path": "C:\\Users\\rnand\\Downloads\\amex-default-prediction\\AMEX_Enterprise_Credit_Risk_Platform\\Phase5_Customer_Business_Intelligence\\14_Problem14_Executive_Decision_Support_Dashboard\\modeling\\executive_aggregation_table.parquet",
-  "csv_path": "C:\\Users\\rnand\\Downloads\\amex-default-prediction\\AMEX_Enterprise_Credit_Risk_Platform\\Phase5_Customer_Business_Intelligence\\14_Problem14_Executive_Decision_Support_Dashboard\\modeling\\executive_aggregation_table.csv",
-  "dashboard_data_path": "C:\\Users\\rnand\\Downloads\\amex-default-prediction\\AMEX_Enterprise_Credit_Risk_Platform\\Phase5_Customer_Business_Intelligence\\14_Problem14_Executive_Decision_Support_Dashboard\\modeling\\executive_dashboard_data.json",
-  "total_platform_net_value_usd": 429926252.73,
+  "table_path": "C:/Users/rnand/Downloads/amex-default-prediction/AMEX_Enterprise_Credit_Risk_Platform/Phase5_Customer_Business_Intelligence/Problem14_Executive_Decision_Support_Dashboard/modeling/executive_aggregation_table.parquet",
+  "csv_path": "C:/Users/rnand/Downloads/amex-default-prediction/AMEX_Enterprise_Credit_Risk_Platform/Phase5_Customer_Business_Intelligence/Problem14_Executive_Decision_Support_Dashboard/modeling/executive_aggregation_table.csv",
+  "dashboard_data_path": "C:/Users/rnand/Downloads/amex-default-prediction/AMEX_Enterprise_Credit_Risk_Platform/Phase5_Customer_Business_Intelligence/Problem14_Executive_Decision_Support_Dashboard/modeling/executive_dashboard_data.json",
+  "total_platform_net_value_usd": 432132848.85,
   "reserve_optimization_value_usd": 4617593.08,
   "included_problems": [
     4,
@@ -11,6 +11,7 @@
     7,
     8,
     9,
+    10,
     11,
     12,
     13
@@ -18,8 +19,7 @@
   "excluded_problems": [
     1,
     2,
-    3,
-    10
+    3
   ],
   "kpi_results": {
     "aggregation_completeness": {

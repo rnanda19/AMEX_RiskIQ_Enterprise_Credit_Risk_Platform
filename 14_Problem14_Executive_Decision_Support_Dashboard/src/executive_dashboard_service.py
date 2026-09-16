@@ -10,10 +10,7 @@ import os
 import secrets
 from pathlib import Path
 
-from fastapi import Depends, FastAPI, HTTPException, Request, Security
-from slowapi import Limiter, _rate_limit_exceeded_handler
-from slowapi.errors import RateLimitExceeded
-from slowapi.util import get_remote_address
+from fastapi import Depends, FastAPI, HTTPException, Security
 from fastapi.security import APIKeyHeader
 
 _auth_logger = logging.getLogger(__name__ + ".auth")
@@ -39,12 +36,8 @@ def require_api_key(presented: str = Security(_api_key_header)) -> str:
     return presented
 
 
-POLICY_PATH = Path(
-    os.environ.get("AMEX_P14_POLICY_PATH", str(Path(__file__).parent / "executive_dashboard_deployment_policy.json"))
-)
-DASHBOARD_DATA_PATH = Path(
-    os.environ.get("AMEX_P14_DATA_PATH", str(Path(__file__).parent / "executive_dashboard_data.json"))
-)
+POLICY_PATH = Path(os.environ.get("AMEX_P14_POLICY_PATH", r"C:\Users\rnand\Downloads\amex-default-prediction\AMEX_Enterprise_Credit_Risk_Platform\Phase5_Customer_Business_Intelligence\Problem14_Executive_Decision_Support_Dashboard\docs\executive_dashboard_deployment_policy.json"))
+DASHBOARD_DATA_PATH = Path(os.environ.get("AMEX_P14_DATA_PATH", r"C:\Users\rnand\Downloads\amex-default-prediction\AMEX_Enterprise_Credit_Risk_Platform\Phase5_Customer_Business_Intelligence\Problem14_Executive_Decision_Support_Dashboard\modeling\executive_dashboard_data.json"))
 with open(POLICY_PATH, "r", encoding="utf-8") as _f:
     _POLICY = json.load(_f)
 with open(DASHBOARD_DATA_PATH, "r", encoding="utf-8") as _f:
@@ -55,16 +48,9 @@ _ROWS_BY_PROBLEM = {row["problem_number"]: row for row in _DASHBOARD_DATA["rows"
 app = FastAPI(
     title="AMEX Enterprise Credit Risk Platform -- Executive Decision Support Dashboard API",
     description="Serves the real, precomputed roll-up of all 13 prior problems. Every endpoint except "
-    "/health requires a valid X-API-Key header.",
+                "/health requires a valid X-API-Key header.",
     version="1.0.0",
 )
-
-# Rate limiting -- real, enforced (60 requests/minute per client IP on this service's
-# scoring/lookup endpoint; /health and the *-info endpoints are left unlimited since
-# they're liveness/metadata reads, not scoring load).
-limiter = Limiter(key_func=get_remote_address)
-app.state.limiter = limiter
-app.add_exception_handler(RateLimitExceeded, _rate_limit_exceeded_handler)
 
 
 @app.get("/health")
@@ -78,11 +64,9 @@ def executive_summary():
 
 
 @app.get("/problem/{problem_number}", dependencies=[Depends(require_api_key)])
-@limiter.limit("60/minute")
-def get_problem(request: Request, problem_number: int):
+def get_problem(problem_number: int):
     row = _ROWS_BY_PROBLEM.get(problem_number)
     if row is None:
-        raise HTTPException(
-            status_code=404, detail=f"No such problem_number={problem_number!r}. " f"Valid range: 1-13."
-        )
+        raise HTTPException(status_code=404, detail=f"No such problem_number={problem_number!r}. "
+                                                     f"Valid range: 1-13.")
     return row
