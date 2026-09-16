@@ -1,8 +1,8 @@
-<svg viewBox="0 0 1500 800" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="AMEX RiskIQ platform architecture: the real Kaggle AMEX dataset flows through 14 phase-grouped problem notebooks (Phases 1-5), each deploying its own auth-protected FastAPI service, into a registry-driven BI aggregation layer (Notebooks 70-73) that rolls up into one executive dashboard reporting a real $432.1M/cycle platform net value, with GitHub Actions CI/CD wrapping the whole pipeline.">
+<svg viewBox="0 0 1500 824" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="AMEX RiskIQ platform architecture: the real Kaggle AMEX dataset flows through 14 phase-grouped problem notebooks (Phases 1-5), each deploying its own auth-protected FastAPI service, into a registry-driven BI aggregation layer (Notebooks 70-73) that rolls up into one executive dashboard reporting a real $432.1M/cycle platform net value, with GitHub Actions CI/CD wrapping the whole pipeline.">
 <defs>
 <marker id="arrow" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path d="M0,0 L10,5 L0,10 z" fill="#334155"/></marker>
 </defs>
-<rect x="0" y="0" width="1500" height="1020" fill="#F8FAFC"/>
+<rect x="0" y="0" width="1500" height="824" fill="#F8FAFC"/>
 <text x="750.0" y="34" text-anchor="middle" font-family="Arial,Helvetica,sans-serif" font-size="22" font-weight="700" fill="#0B1F3A">AMEX RiskIQ -- Enterprise Credit Risk Platform: System Architecture</text>
 <text x="750.0" y="58" text-anchor="middle" font-family="Arial,Helvetica,sans-serif" font-size="13" fill="#64748B">14 problems, 5 phases, 73 notebooks -- every number below is real, computed from this platform&#39;s own code, never invented</text>
 <rect x="470.0" y="78" width="560" height="56" rx="8" fill="#0B1F3A"/>
