@@ -9,6 +9,19 @@
 
 ## 📊 Executive Rollup -- Real Results, All 14 Problems
 
+<table><tr>
+<td align="center" style="background:#0B1F3A;border-radius:10px;padding:22px 30px;">
+<div style="color:#9CA9C4;font-size:13px;font-weight:700;letter-spacing:.06em;">REAL PLATFORM NET VALUE &middot; PER CYCLE (MEASURED)</div>
+<div style="color:#ffffff;font-size:36px;font-weight:800;line-height:1.3;">$432.13M</div>
+</td>
+<td align="center" style="background:#0D9488;border-radius:10px;padding:22px 30px;">
+<div style="color:#D6F5EF;font-size:13px;font-weight:700;letter-spacing:.06em;">1-YEAR PROJECTED VALUE (ASSUMPTION, 12 cycles/yr)</div>
+<div style="color:#ffffff;font-size:36px;font-weight:800;line-height:1.3;">$5.19B</div>
+</td>
+</tr></table>
+
+> 🟡 **UNAUDITED RESULTS.** Both figures above are real, computed internal management estimates from this platform's own notebooks, not certified or externally audited financial statements. The per-cycle figure is real and measured; the 1-year figure is an explicitly labeled `ASSUMPTION` extrapolation (12 cycles/year, flat run-rate), not a certified forecast. Full 3-year and 5-year projections and basis are in the table below.
+
 ### 💰 [$432,132,848.85 / cycle -- Real Platform Net Value](00_Executive_Rollup_Report/AMEX_RiskIQ_Platform_Executive_Rollup_Report.docx)
 
 | Horizon | Projected Net Value (ASSUMPTION) | Basis |
