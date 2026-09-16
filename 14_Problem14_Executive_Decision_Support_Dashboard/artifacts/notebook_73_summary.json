@@ -1,0 +1,83 @@
+{
+  "notebook": "73_executive_dashboard_financial_impact_reporting_packaging",
+  "generated_at_utc": "2026-09-16T12:02:13.339641+00:00",
+  "problem_number": 14,
+  "problem_name": "Executive Decision Support Dashboard",
+  "phase": "Phase 5 -- Customer & Business Intelligence",
+  "problem_14_complete": true,
+  "phase_5_complete": true,
+  "platform_complete": true,
+  "total_platform_net_value_usd": 432132848.85,
+  "reserve_optimization_value_usd": 4617593.08,
+  "included_problems": [
+    4,
+    5,
+    6,
+    7,
+    8,
+    9,
+    10,
+    11,
+    12,
+    13
+  ],
+  "excluded_problems": [
+    1,
+    2,
+    3
+  ],
+  "live_dashboard_verified": true,
+  "recommended_for_production": true,
+  "net_benefit_per_cycle_usd": 3562.5,
+  "roi_year_1_pct": 42.5,
+  "payback_period_months": 8.42,
+  "total_mapped_population": 447695,
+  "output_files": {
+    "Executive_Decision_Support_Financial_Impact_Report.docx": "C:/Users/rnand/Downloads/amex-default-prediction/AMEX_Enterprise_Credit_Risk_Platform/Phase5_Customer_Business_Intelligence/Problem14_Executive_Decision_Support_Dashboard/financial_impact_reporting_packaging/Executive_Decision_Support_Financial_Impact_Report.docx",
+    "AMEX_Problem14_Executive_Financial_Impact_Workbook.xlsx": "C:/Users/rnand/Downloads/amex-default-prediction/AMEX_Enterprise_Credit_Risk_Platform/Phase5_Customer_Business_Intelligence/Problem14_Executive_Decision_Support_Dashboard/financial_impact_reporting_packaging/AMEX_Problem14_Executive_Financial_Impact_Workbook.xlsx",
+    "Executive_Decision_Support_Financial_Impact_Report.pdf": "C:/Users/rnand/Downloads/amex-default-prediction/AMEX_Enterprise_Credit_Risk_Platform/Phase5_Customer_Business_Intelligence/Problem14_Executive_Decision_Support_Dashboard/financial_impact_reporting_packaging/Executive_Decision_Support_Financial_Impact_Report.pdf",
+    "AMEX_Problem14_Executive_Rollup_Deck.pptx": "C:/Users/rnand/Downloads/amex-default-prediction/AMEX_Enterprise_Credit_Risk_Platform/Phase5_Customer_Business_Intelligence/Problem14_Executive_Decision_Support_Dashboard/financial_impact_reporting_packaging/AMEX_Problem14_Executive_Rollup_Deck.pptx",
+    "Problem14_Executive_Dashboard.html": "C:/Users/rnand/Downloads/amex-default-prediction/AMEX_Enterprise_Credit_Risk_Platform/Phase5_Customer_Business_Intelligence/Problem14_Executive_Decision_Support_Dashboard/financial_impact_reporting_packaging/Problem14_Executive_Dashboard.html",
+    "platform_value_waterfall_chart.png": "C:/Users/rnand/Downloads/amex-default-prediction/AMEX_Enterprise_Credit_Risk_Platform/Phase5_Customer_Business_Intelligence/Problem14_Executive_Decision_Support_Dashboard/financial_impact_reporting_packaging/platform_value_waterfall_chart.png",
+    "risk_profitability_portfolio_map_chart.png": "C:/Users/rnand/Downloads/amex-default-prediction/AMEX_Enterprise_Credit_Risk_Platform/Phase5_Customer_Business_Intelligence/Problem14_Executive_Decision_Support_Dashboard/financial_impact_reporting_packaging/risk_profitability_portfolio_map_chart.png",
+    "model_health_matrix_chart.png": "C:/Users/rnand/Downloads/amex-default-prediction/AMEX_Enterprise_Credit_Risk_Platform/Phase5_Customer_Business_Intelligence/Problem14_Executive_Decision_Support_Dashboard/financial_impact_reporting_packaging/model_health_matrix_chart.png"
+  },
+  "platform_ci_status": {
+    "verified_at_utc": "2026-09-16T10:55:00Z",
+    "verified_at_head_sha": "6e223d8f18e13b976778f7521239f4bb43927a19",
+    "verification_method": "GitHub REST API: GET /repos/rnanda19/AMEX_RiskIQ_Enterprise_Credit_Risk_Platform/actions/workflows/{workflow_id}/runs?branch=main&per_page=1 (unauthenticated, public repo) -- queried live against the deployed repo, not asserted.",
+    "checks": [
+      {
+        "name": "CI",
+        "conclusion": "success",
+        "run_number": 52,
+        "url": "https://github.com/rnanda19/AMEX_RiskIQ_Enterprise_Credit_Risk_Platform/actions/runs/34355009968"
+      },
+      {
+        "name": "Code Quality",
+        "conclusion": "success",
+        "run_number": 51,
+        "url": "https://github.com/rnanda19/AMEX_RiskIQ_Enterprise_Credit_Risk_Platform/actions/runs/34355010017"
+      },
+      {
+        "name": "CodeQL",
+        "conclusion": "success",
+        "run_number": 34,
+        "url": "https://github.com/rnanda19/AMEX_RiskIQ_Enterprise_Credit_Risk_Platform/actions/runs/34838228354"
+      },
+      {
+        "name": "Docker Build & Run Verification",
+        "conclusion": "success",
+        "run_number": 20,
+        "url": "https://github.com/rnanda19/AMEX_RiskIQ_Enterprise_Credit_Risk_Platform/actions/runs/34355010040"
+      },
+      {
+        "name": "Secrets Management (Vault Dev-Mode) Verification",
+        "conclusion": "success",
+        "run_number": 18,
+        "url": "https://github.com/rnanda19/AMEX_RiskIQ_Enterprise_Credit_Risk_Platform/actions/runs/34355010048"
+      }
+    ]
+  },
+  "platform_ci_all_green": true
+}

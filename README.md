@@ -11,6 +11,15 @@
 
 ### 💰 [$432,132,848.85 / cycle -- Real Platform Net Value](00_Executive_Rollup_Report/AMEX_RiskIQ_Platform_Executive_Rollup_Report.docx)
 
+| Horizon | Projected Net Value (ASSUMPTION) | Basis |
+|---|---|---|
+| Per cycle (real, measured) | **$432.13M** | Real -- Notebook 73's own aggregation, 10 production-recommended value-creation problems |
+| 1 year | **$5.19B** | ASSUMPTION: 12 cycles/year (monthly cadence), flat, extrapolating the current real run-rate |
+| 3 years | **$15.56B** | ASSUMPTION: same 12-cycle/year cadence, flat, x3 |
+| 5 years | **$25.93B** | ASSUMPTION: same 12-cycle/year cadence, flat, x5 |
+
+> ⚠️ **UNAUDITED RESULTS.** Every figure above is a real, computed internal management estimate from this platform's own notebooks, not a certified or externally audited financial statement. The per-cycle figure is real and measured; the 1/3/5-year figures are explicitly labeled `ASSUMPTION` extrapolations at a 12-cycle/year (monthly) cadence, not a certified multi-year forecast. All dollar figures across this platform's Word, HTML, and Excel deliverables are shown in $M/$B shorthand for readability -- exact underlying values are always available in the platform's own persisted JSON artifacts for audit.
+
 **[📄 Full Rollup Report (Word)](00_Executive_Rollup_Report/AMEX_RiskIQ_Platform_Executive_Rollup_Report.docx)** &nbsp;·&nbsp; **[📈 Interactive Rollup Dashboard (HTML, live)](https://rnanda19.github.io/AMEX_RiskIQ_Enterprise_Credit_Risk_Platform/00_Executive_Rollup_Report/AMEX_RiskIQ_Platform_Executive_Rollup_Dashboard.html)** &nbsp;·&nbsp; **[📊 Rollup Workbook (Excel)](00_Executive_Rollup_Report/AMEX_RiskIQ_Platform_Executive_Rollup_Workbook.xlsx)** &nbsp;·&nbsp; **[🧾 Rollup Report (PDF)](00_Executive_Rollup_Report/AMEX_RiskIQ_Platform_Executive_Rollup_Report.pdf)** &nbsp;·&nbsp; **[🖥️ Rollup Deck (PowerPoint)](00_Executive_Rollup_Report/AMEX_RiskIQ_Platform_Executive_Rollup_Deck.pptx)**
 
 *(The Interactive Dashboard renders live via GitHub Pages. The Word Report and Excel Workbook open as downloads — normal browser behavior for Office files, not a broken link — view them in Word/Excel or Google Docs/Sheets. Every other problem's own README follows this same pattern for its Word/Excel deliverables.)*
@@ -286,6 +295,16 @@ Problems 1-8 received a "Global Standard" hardening pass on 2026-08-25 (deployab
 - New: Notebook 73 now also generates a native PDF (reportlab, no Office/LibreOffice dependency) and a PowerPoint deck (python-pptx) — no PDF or PPTX existed anywhere on this platform before this pass.
 - New: the Executive Rollup / Problem 14 HTML dashboard is now offline-capable (self-hosted Chart.js, no CDN dependency), has an IntersectionObserver-driven KPI count-up animation, and carries a real front-page Zero-Fabrication / Production-Readiness banner sourced from a live GitHub Actions API check at the time of generation.
 - New: this platform's first system architecture diagram (`docs/assets/system_architecture_diagram.svg`, linked above) — previously the platform had per-problem architecture diagrams but no platform-wide one.
+
+**2026-09-16 hardening delta #2 (Executive Rollup: M/B formatting, multi-year projection, interactive HTML):**
+
+- New: every dollar figure across the Executive Rollup's Word, PDF, PowerPoint, Excel, and HTML deliverables is now shown in $M/$B shorthand (a new `_fmt_mb()` helper in Python, a matching `fmtMB()` in the dashboard's JS), with a standing "UNAUDITED RESULTS" disclosure banner added to all five formats.
+- New: a real, labeled-`ASSUMPTION` 1-year / 3-year / 5-year net value projection (12 cycles/year, flat, extrapolating the current real per-cycle run-rate) added as its own KPI tiles/rows across Word, PDF, PPTX, Excel, and the HTML dashboard's front page, plus this README's own table above.
+- New: the HTML dashboard's Overview tab now renders the platform-value waterfall and model-health matrix as real, interactive Chart.js canvases (hover tooltips, a phase slicer that live-filters the waterfall) instead of static PNG images; the KPI row's count-up animation now also fires on page load (previously scroll-only, which made it invisible for a KPI row that sits above the fold).
+- New: a per-problem SMART Suggestions table (`PROBLEM_SMART_SUGGESTIONS`, one real suggestion per problem computed from that problem's own registry fields) added alongside the existing by-organizational-level table, with phase/category/status slicers in the HTML dashboard's new "SMART by Problem" tab and a matching table in the Word report.
+- New: each real-CI-check badge in the Production Readiness banner now gets its own fixed color from a small categorical palette instead of repeating the same green swatch, and the "not recommended" status color platform-wide (badges, chips, and the model-health chart) was changed from red to a burnt-orange amber — red is no longer used as a status color anywhere in this dashboard.
+- New: the three chart captions in the Word, PDF, and HTML reports were expanded from a single sentence to a real two-sentence story per chart, each computed from this run's own real figures (no hardcoded narrative).
+- Real bug found and fixed: the Excel workbook's Executive Summary sheet stored its headline KPI values as pre-formatted text strings (`f"${value:,.0f}"`) rather than real numbers, which meant they could not be used in a formula or reformatted; converted to real numeric cells with a conditional custom number format (`USD_MB_FMT`) that displays M/B shorthand while preserving the exact full-precision value underneath for audit.
 
 ## License
 
