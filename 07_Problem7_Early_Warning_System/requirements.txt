@@ -10,4 +10,4 @@ pydantic
 httpx
 slowapi
 prometheus-client
-PyJWT
+PyJWT>=2.12.0
